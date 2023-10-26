@@ -11,6 +11,8 @@
 #include"VBO.h"
 #include"EBO.h"
 
+#define PI 3.1415926538
+
 
 // Setting up array of verticies.
 	// Now I'm using this vertices array to hold the vertex info while
@@ -106,9 +108,9 @@ int main()
 
 	// Gets ID of uniform called "scale"
 	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
+	GLuint rotationUniID = glGetUniformLocation(shaderProgram.ID, "rotationDegree");
 
 	float frac, whole;
-
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -127,6 +129,8 @@ int main()
 			glUniform1f(uniID, 1 - frac);
 
 		// Binding texture object.
+		frac = frac * 2 - 1;
+		glUniform1f(rotationUniID, PI * frac);
 		tex.Bind();
 
 		// Bind the VAO so OpenGL knows to use it
