@@ -7,6 +7,7 @@
 #include<glm/glm.hpp>
 #include<glm/gtc/matrix_transform.hpp>
 #include<glm/gtc/type_ptr.hpp>
+#include<glm/gtc/vec1.hpp>
 
 #include"shaderClass.h"
 #include"Texture.h"
@@ -68,9 +69,34 @@ GLuint pyramidIndices[] =
 	3, 0, 4
 };
 
-int viewWidth = 800, veiwHeight = 800;
+int viewWidth = 800, viewHeight = 800;
 
+glm::vec2 getRotationAngle(GLFWwindow *window) {
+	double xPos, yPos;
+	glm::vec3 screenCenter = glm::vec3(0.f, 0.f, -1000.f);
+	glm::vec3 cursorPosX, cursorPosY;
+	float cursorMagX, cursorMagY, screenMag, _acos, _asin;
 
+	// Making it so we can rotate the camera.
+	// Getting the cursor's position in the window and setting the center to be the center of the window.
+	glfwGetCursorPos(window, &xPos, &yPos);
+	cursorPosX = glm::vec3(xPos - viewWidth / 2.f,	0.f,						-1000.f);
+	cursorPosY = glm::vec3(0.f,						yPos - viewHeight / 2.f,	-1000.f);
+
+	// Getting acos and asin angles in degrees.
+	if (cursorPosX.x > 0.f)
+		_acos = 180 * acos(glm::dot(cursorPosX, screenCenter) / (glm::length(cursorPosX) * glm::length(screenCenter)));
+	else
+		_acos = -180 * acos(glm::dot(cursorPosX, screenCenter) / (glm::length(cursorPosX) * glm::length(screenCenter)));
+
+	if (cursorPosY.y > 0.f)
+		_asin = 180 * acos(glm::dot(cursorPosY, screenCenter) / (glm::length(cursorPosY) * glm::length(screenCenter)));
+	else
+		_asin = -180 * acos(glm::dot(cursorPosY, screenCenter) / (glm::length(cursorPosY) * glm::length(screenCenter)));
+
+	//std::cout << "( " << cursorPos.x << ", " << cursorPos.y << " )\tacos(x) = " << _acos << "\tasin(x) = " << _asin << std::endl;
+	return glm::vec2(_acos, _asin);
+}
 
 int main()
 {
@@ -143,6 +169,21 @@ int main()
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
 
+	// Making matrices for model, view and projection
+	glm::mat4 model = glm::mat4(1.f);
+	glm::mat4 view = glm::mat4(1.f);
+	glm::mat4 projection = glm::mat4(1.f);
+
+	// Rotating the model about the y axis
+	model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+	// Moving world around our camera
+	view = glm::translate(view, glm::vec3(0.f, -0.5f, -2.f));
+	// Changing frustum of our projection matrix
+	projection = glm::perspective(glm::radians(45.f), (float)(viewWidth / viewHeight), 0.1f, 100.f);
+
+	double lockoutTimer = 0;
+	bool shouldRotate = false;
+
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -152,36 +193,32 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
-		// Assigns a value to the uniform; NOTE: Must always be done after activating the Shader Program
-		//frac = std::modf(glfwGetTime(), &whole);
-		//if (int(whole) % 2 == 0)
-		//	glUniform1f(uniID, frac);
-		//else 
-		//	glUniform1f(uniID, 1 - frac);
-		//
-		//// Binding texture object.
-		//frac = frac * 2 - 1;
-		//glUniform1f(rotationUniID, PI * frac);
+
+		//std::cout << "( " << cursorPos.x << ", " << cursorPos.y << " )\tacos(x) = " << _acos << "\tasin(x) = " << _asin << std::endl;
 
 		// Simple timer
 		double crntTime = glfwGetTime();
 		if (crntTime - prevTime >= 1 / 60)
 		{
-			rotation += 0.5f;
+			rotation = 0.5f;
 			prevTime = crntTime;
 		}
 
-		// Making matrices for model, view and projection
-		glm::mat4 model = glm::mat4(1.f);
-		glm::mat4 view = glm::mat4(1.f);
-		glm::mat4 projection = glm::mat4(1.f);
-
 		// Rotating the model about the y axis
 		model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-		// Moving world around our camera
-		view = glm::translate(view, glm::vec3(0.f, -0.5f, -2.f));
-		// Changing frustum of our projection matrix
-		projection = glm::perspective(glm::radians(45.f), (float)(viewWidth / veiwHeight), 0.1f, 100.f);
+
+		// Rotating the view about the x and y axis
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_F) && lockoutTimer <= crntTime) {
+			lockoutTimer = crntTime + 0.2;
+			shouldRotate = !shouldRotate;
+		}
+
+		// Rotating projection matrix.
+		if (shouldRotate) {
+			glm::vec2 angles = getRotationAngle(window);
+			projection = glm::rotate(projection, glm::radians(angles.x / 500.f), glm::vec3(0.0f, 1.0f, 0.0f));
+			projection = glm::rotate(projection, glm::radians(angles.y / 500.f), glm::vec3(1.0f, 0.0f, 0.0f));
+		}
 
 		// Actually setting uniforms to be the values of model, veiw and projection
 		GLuint uniModel = glGetUniformLocation(shaderProgram.ID, "model");
