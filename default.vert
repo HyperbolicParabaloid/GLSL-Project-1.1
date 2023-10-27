@@ -17,6 +17,11 @@ out vec2 texCoord;
 uniform float scale;
 uniform float rotationDegree;
 
+// Controls the scale of the vertices
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+
 float xPrime = aPos.x * cos(rotationDegree) - aPos.y * sin(rotationDegree);
 float yPrime = aPos.y * cos(rotationDegree) + aPos.x * sin(rotationDegree);
 
@@ -25,8 +30,9 @@ void main()
 {
 	// Outputs the positions/coordinates of all vertices
 	//gl_Position = vec4(aPos.x + aPos.x * scale, aPos.y + aPos.y * scale, aPos.z + aPos.z * scale, 1.0);
+	//gl_Position = vec4(xPrime + xPrime * scale, yPrime + yPrime * scale, aPos.z + aPos.z * scale, 1.0);
+	gl_Position = projection * view * model * vec4(aPos, 1.f);
 
-	gl_Position = vec4(xPrime + xPrime * scale, yPrime + yPrime * scale, aPos.z + aPos.z * scale, 1.0);
 	// Assigns the colors from the Vertex Data to "color"
 	color = aColor;
 	// Assigns the texture coordinates from the Vertex Data to "texCoord"

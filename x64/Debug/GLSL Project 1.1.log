@@ -1,6 +1,8 @@
 ﻿  main.cpp
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(125,31): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(133,33): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(141,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(156,31): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(164,33): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(171,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 glfw3.lib(init.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(init.obj)' or at ''; linking object as if no debug info
 glfw3.lib(window.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(window.obj)' or at ''; linking object as if no debug info
 glfw3.lib(input.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(input.obj)' or at ''; linking object as if no debug info

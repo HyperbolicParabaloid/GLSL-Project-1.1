@@ -168,6 +168,8 @@
     <ClInclude Include="VBO.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="137215-barack-face-vector-obama-png-image-high-quality.png" />
+    <Image Include="brick.png" />
     <Image Include="pop_cat.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

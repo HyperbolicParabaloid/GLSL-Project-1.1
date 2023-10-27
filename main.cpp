@@ -4,6 +4,9 @@
 #include <ctime>
 #include <time.h>
 #include <stb/stb_image.h>
+#include<glm/glm.hpp>
+#include<glm/gtc/matrix_transform.hpp>
+#include<glm/gtc/type_ptr.hpp>
 
 #include"shaderClass.h"
 #include"Texture.h"
@@ -27,6 +30,11 @@ GLfloat vertices[] = {
 	0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.f,		0.1f, 0.05f, 0.05f,	// Inner Right	4
 	0.0f, -0.5f * float(sqrt(3)) / 3, 0.f,			0.1f, 0.05f, 0.05f	// Inner Down	5
 };
+GLuint indices[] = {
+	0, 3, 5,	// Lower Left triangle
+	3, 2, 4,	// Lower Right triangle
+	5, 4, 1		// Upper triangle
+};
 
 GLfloat sqr[] = {
 	// POSITION					COLOR			TEXTURE COORDS
@@ -35,17 +43,32 @@ GLfloat sqr[] = {
 	0.5f, 0.5f, 0.f,		0.9f, 0.9f, 0.0f,	1, 1,	// Upper Right	2
 	-0.5f, 0.5f, 0.f,		0.9f, 0.9f, 0.9f,	0, 1	// Upper Left	3
 };
-
-GLuint indices[] = {
-	0, 3, 5,	// Lower Left triangle
-	3, 2, 4,	// Lower Right triangle
-	5, 4, 1		// Upper triangle
-};
-
 GLuint sqrIndices[] = {
-	0, 1, 2,	// Lower trinagle
+	0, 1, 2,	// Lower triangle
 	3, 0, 2		// Upper triangle
 };
+
+// Vertices coordinates
+GLfloat pyramidVertices[] =
+{ //     COORDINATES     /        COLORS      /   TexCoord  //
+	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
+	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	0.5f, 1.0f
+};
+// Indices for vertices order
+GLuint pyramidIndices[] =
+{
+	0, 1, 2,
+	0, 2, 3,
+	0, 1, 4,
+	1, 2, 4,
+	2, 3, 4,
+	3, 0, 4
+};
+
+int viewWidth = 800, veiwHeight = 800;
 
 
 
@@ -62,8 +85,9 @@ int main()
 	// So that means we only have the modern functions
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+
 	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
-	GLFWwindow* window = glfwCreateWindow(800, 800, "YoutubeOpenGL", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(viewWidth, viewWidth, "GLFW Testing Window", NULL, NULL);
 	// Error check if the window fails to create
 	if (window == NULL)
 	{
@@ -78,13 +102,14 @@ int main()
 	gladLoadGL();
 	// Specify the viewport of OpenGL in the Window
 	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
-	glViewport(0, 0, 800, 800);
+	glViewport(0, 0, viewWidth, viewWidth);
 
-	// Generates Shader object using shaders defualt.vert and default.frag
+
+	// Generates Shader object using shaders default.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
 
 	// Using Texture class to handle all the binding, activating and parameter setting of the texture.
-	Texture tex("pop_cat.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	Texture tex("137215-barack-face-vector-obama-png-image-high-quality.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 	tex.texUnit(shaderProgram, "tex0", 0);
 	tex.Bind();
 
@@ -93,9 +118,9 @@ int main()
 	VAO1.Bind();
 
 	// Generates Vertex Buffer Object and links it to vertices
-	VBO VBO1(sqr, sizeof(sqr));
+	VBO VBO1(pyramidVertices, sizeof(pyramidVertices));
 	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(sqrIndices, sizeof(sqrIndices));
+	EBO EBO1(pyramidIndices, sizeof(pyramidIndices));
 
 	// Links VBO attributes such as coordinates and colors to VAO
 	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
@@ -111,6 +136,12 @@ int main()
 	GLuint rotationUniID = glGetUniformLocation(shaderProgram.ID, "rotationDegree");
 
 	float frac, whole;
+	glUniform1f(uniID, 0.5);
+	
+	float rotation = 0.f, prevTime = glfwGetTime();
+
+	// Enables the Depth Buffer
+	glEnable(GL_DEPTH_TEST);
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -118,25 +149,56 @@ int main()
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign the new color to it
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
 		// Assigns a value to the uniform; NOTE: Must always be done after activating the Shader Program
-		frac = std::modf(glfwGetTime(), &whole);
-		if (int(whole) % 2 == 0)
-			glUniform1f(uniID, frac);
-		else 
-			glUniform1f(uniID, 1 - frac);
+		//frac = std::modf(glfwGetTime(), &whole);
+		//if (int(whole) % 2 == 0)
+		//	glUniform1f(uniID, frac);
+		//else 
+		//	glUniform1f(uniID, 1 - frac);
+		//
+		//// Binding texture object.
+		//frac = frac * 2 - 1;
+		//glUniform1f(rotationUniID, PI * frac);
 
-		// Binding texture object.
-		frac = frac * 2 - 1;
-		glUniform1f(rotationUniID, PI * frac);
+		// Simple timer
+		double crntTime = glfwGetTime();
+		if (crntTime - prevTime >= 1 / 60)
+		{
+			rotation += 0.5f;
+			prevTime = crntTime;
+		}
+
+		// Making matrices for model, view and projection
+		glm::mat4 model = glm::mat4(1.f);
+		glm::mat4 view = glm::mat4(1.f);
+		glm::mat4 projection = glm::mat4(1.f);
+
+		// Rotating the model about the y axis
+		model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+		// Moving world around our camera
+		view = glm::translate(view, glm::vec3(0.f, -0.5f, -2.f));
+		// Changing frustum of our projection matrix
+		projection = glm::perspective(glm::radians(45.f), (float)(viewWidth / veiwHeight), 0.1f, 100.f);
+
+		// Actually setting uniforms to be the values of model, veiw and projection
+		GLuint uniModel = glGetUniformLocation(shaderProgram.ID, "model");
+		glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+
+		GLuint uniView = glGetUniformLocation(shaderProgram.ID, "view");
+		glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
+
+		GLuint uniProjection = glGetUniformLocation(shaderProgram.ID, "projection");
+		glUniformMatrix4fv(uniProjection, 1, GL_FALSE, glm::value_ptr(projection));
+
 		tex.Bind();
 
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(pyramidIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events
