@@ -21,9 +21,10 @@ private:
 	glm::vec3 cameraPos;
 	glm::vec3 cameraForward;
 	glm::vec3 cameraUp;
+	glm::vec2 screenDimensions;
 
 	float lastX, lastY, yaw, pitch;	// Keeping track of the motion.
-	bool firstMouse = true, motionEnabled = false, flyingMouseLock = false;
+	bool firstMouse = true, motionEnabled = false, flyingMouseLock = false, stopFlying = false, currentlyFlying = false;
 
 	float deltaTime = 0.0f;	// Time between current frame and last frame
 	float lastFrame = 0.0f; // Time of last frame

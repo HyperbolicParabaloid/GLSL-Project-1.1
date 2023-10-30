@@ -3,11 +3,12 @@
 // Constructor takes in a window and the screen dimensions to initialize view
 // matrix, with default values for cameraUp, cameraPos and cameraForward being
 // assumed to be vec3(0.f, 1.f, 0.f), vec3(0.f, 0.5f, 2.f) and vec3(0.f, 0.f, -1.f)
-Camera::Camera(GLFWwindow* _window, glm::vec2 screenDimensions, glm::vec3 _cameraPos, glm::vec3 _cameraForward, glm::vec3 _cameraUp) {
+Camera::Camera(GLFWwindow* _window, glm::vec2 _screenDimensions, glm::vec3 _cameraPos, glm::vec3 _cameraForward, glm::vec3 _cameraUp) {
 	// Assinging values to the prominant vectors.
 	cameraPos = _cameraPos;
 	cameraForward = _cameraForward;
 	cameraUp = _cameraUp;
+	screenDimensions = _screenDimensions;
 
 	// Initalizing window (pressently cannot be changed)
 	window = _window;
@@ -25,6 +26,9 @@ Camera::Camera(GLFWwindow* _window, glm::vec2 screenDimensions, glm::vec3 _camer
 // This function takes mouse inputs and converts it into camera rotation.
 void Camera::mouse_callback()
 {
+	if (flyingMouseLock)
+		return;
+
 	// 2D position of the mousse on the screen.
 	double xpos, ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
@@ -51,6 +55,8 @@ void Camera::mouse_callback()
 	yaw += xoffset;
 	pitch += yoffset;
 
+	//std::cout << "pitch = " << pitch << "\tyaw = " << yaw << "\n";
+
 	// Clamping the values so they can't get too large.
 	if (pitch > 89.0f)
 		pitch = 89.0f;
@@ -63,6 +69,8 @@ void Camera::mouse_callback()
 	direction.y = sin(glm::radians(pitch));
 	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
 
+	// cameraForward = glm::normalize(cameraForward) + glm::normalize(direction);
+	// My idea was maybe add them together but it didn't work so L 
 	cameraForward = glm::normalize(direction);
 }
 
@@ -74,6 +82,8 @@ void Camera::processInput()
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
 	float speed = cameraSpeed * deltaTime;
+
+	glm::vec3 temp = cameraPos;
 
 	// Maping key inputs to motion.
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
@@ -88,6 +98,11 @@ void Camera::processInput()
 		cameraPos += glm::normalize(cameraUp) * speed;
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 		cameraPos -= glm::normalize(cameraUp) * speed;
+
+	if (temp != cameraPos && currentlyFlying)
+		stopFlying = true;
+	else 
+		stopFlying = false;
 }
 
 // Toggles the cursor lock/movement capturing for WASD/cursor postion.
@@ -136,8 +151,12 @@ void Camera::track_movement() {
 bool Camera::fly_to(glm::vec3 _newPos, glm::vec3 _newForward) {
 	//std::cout << "----------------------\nDOING IT NOW!!!\n--------------------\n";
 	//std::cout << "cameraPos = (" << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << ")\n";
+	std::cout << "cameraForward = (" << cameraForward.x << ", " << cameraForward.y << ", " << cameraForward.z << ")\n";
 
-	if (_newPos == cameraPos && _newForward == cameraForward) {
+	_newForward = glm::normalize(_newForward);
+
+	//if (_newPos == cameraPos && _newForward == cameraForward) {
+	if (_newForward == cameraForward) {
 		flyingMouseLock = false;
 		return true;
 	}
@@ -162,23 +181,23 @@ bool Camera::fly_to(glm::vec3 _newPos, glm::vec3 _newForward) {
 
 	// Setting new values for cameraPosition
 	// ____________________________________
-	if (abs(cameraPos.x - _newPos.x) < snapInPlaceDistance)
-		cameraPos.x = _newPos.x;
-	else
-		cameraPos.x += deltaPos.x * speed;
-	// For y
-	if (abs(cameraPos.y - _newPos.y) < snapInPlaceDistance)
-		cameraPos.y = _newPos.y;
-	else
-		cameraPos.y += deltaPos.y * speed;
-	// For z
-	if (abs(cameraPos.z - _newPos.z) < snapInPlaceDistance)
-		cameraPos.z = _newPos.z;
-	else
-		cameraPos.z += deltaPos.z * speed;
-
-	std::cout << "----------------------\nfly_to(newPos, newForward) DOES NOT WORK!!!\n--------------------\n";
-	std::cout << "_newForward = (" << _newForward.x << ", " << _newForward.y << ", " << _newForward.z << ")\n";
+	//if (abs(cameraPos.x - _newPos.x) < snapInPlaceDistance)
+	//	cameraPos.x = _newPos.x;
+	//else
+	//	cameraPos.x += deltaPos.x * speed;
+	//// For y
+	//if (abs(cameraPos.y - _newPos.y) < snapInPlaceDistance)
+	//	cameraPos.y = _newPos.y;
+	//else
+	//	cameraPos.y += deltaPos.y * speed;
+	//// For z
+	//if (abs(cameraPos.z - _newPos.z) < snapInPlaceDistance)
+	//	cameraPos.z = _newPos.z;
+	//else
+	//	cameraPos.z += deltaPos.z * speed;
+	//
+	//std::cout << "----------------------\nfly_to(newPos, newForward) DOES NOT WORK!!!\n--------------------\n";
+	//std::cout << "_newForward = (" << _newForward.x << ", " << _newForward.y << ", " << _newForward.z << ")\n";
 
 	// Setting new values for cameraForward
 	// ____________________________________
@@ -197,9 +216,10 @@ bool Camera::fly_to(glm::vec3 _newPos, glm::vec3 _newForward) {
 		cameraForward.z = _newForward.z;
 	else
 		cameraForward.z += deltaForward.z * sensitivity;
-	
-	cameraForward = _newForward;
-	std::cout << "cameraForward = (" << cameraForward.x << ", " << cameraForward.y << ", " << cameraForward.z << ")\n";
+
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+	std::cout << "xpos = " << xpos << "\typos " << ypos << "\n";
 
 	return false;
 }
@@ -208,9 +228,12 @@ bool Camera::fly_to(glm::vec3 _newPos, glm::vec3 _newForward) {
 bool Camera::fly_to(glm::vec3 _newPos) {
 	//std::cout << "----------------------\nDOING IT NOW!!!\n--------------------\n";
 	//std::cout << "cameraPos = (" << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << ")\n";
+	currentlyFlying = true;
 
-	if (_newPos == cameraPos)
+	std::cout << "stopFlying = "<< stopFlying<<"\n";
+	if (_newPos == cameraPos || stopFlying) {
 		return true;
+	}
 
 	// Making sure framerate is constant among all framerates.
 	// NOTE: if we don't have delta time updated in view or something of that nature, we'll get

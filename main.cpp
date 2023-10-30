@@ -230,6 +230,7 @@ int main()
 		}
 
 		if (shouldFly) {
+			std::cout << "Flyin' in\n";
 			if (camera.fly_to(glm::vec3(0.f, 0.f, -5.f))) {
 				shouldFly = false;
 			}
