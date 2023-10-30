@@ -14,11 +14,13 @@
 #include"VAO.h"
 #include"VBO.h"
 #include"EBO.h"
+#include "Camera.h"
+
 
 #define PI 3.1415926538
 
 
-// Setting up array of verticies.
+// Setting up array of vertices.
 	// Now I'm using this vertices array to hold the vertex info while
 	// using the indicies buffer to hold the index of each vertex that
 	// will be used to form each of the triangles (saves memory).
@@ -169,17 +171,12 @@ int main()
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
 
-	// Making matrices for model, view and projection
+	// Initializing matrices for model, view and projection
 	glm::mat4 model = glm::mat4(1.f);
 	glm::mat4 view = glm::mat4(1.f);
-	glm::mat4 projection = glm::mat4(1.f);
+	glm::mat4 projection = glm::perspective(glm::radians(45.f), (float)(viewWidth / viewHeight), 0.1f, 100.f);
 
-	// Rotating the model about the y axis
-	model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-	// Moving world around our camera
-	view = glm::translate(view, glm::vec3(0.f, -0.5f, -2.f));
-	// Changing frustum of our projection matrix
-	projection = glm::perspective(glm::radians(45.f), (float)(viewWidth / viewHeight), 0.1f, 100.f);
+	Camera camera(window, glm::vec2(viewWidth, viewHeight), glm::vec3(0.f, 0.5f, 2.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
 
 	double lockoutTimer = 0;
 	bool shouldRotate = false;
@@ -193,8 +190,6 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
-
-		//std::cout << "( " << cursorPos.x << ", " << cursorPos.y << " )\tacos(x) = " << _acos << "\tasin(x) = " << _asin << std::endl;
 
 		// Simple timer
 		double crntTime = glfwGetTime();
@@ -211,14 +206,18 @@ int main()
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_F) && lockoutTimer <= crntTime) {
 			lockoutTimer = crntTime + 0.2;
 			shouldRotate = !shouldRotate;
+			std::cout << "Crotation\n";
 		}
 
-		// Rotating projection matrix.
+		// Toggling the tracking of user movement
 		if (shouldRotate) {
-			glm::vec2 angles = getRotationAngle(window);
-			projection = glm::rotate(projection, glm::radians(angles.x / 500.f), glm::vec3(0.0f, 1.0f, 0.0f));
-			projection = glm::rotate(projection, glm::radians(angles.y / 500.f), glm::vec3(1.0f, 0.0f, 0.0f));
-		}
+			camera.motion_enabled(); 
+			shouldRotate = !shouldRotate;
+		} else 
+			camera.track_movement();
+
+		// Setting view matrix with camera class
+		view = camera.get_view();
 
 		// Actually setting uniforms to be the values of model, veiw and projection
 		GLuint uniModel = glGetUniformLocation(shaderProgram.ID, "model");
@@ -246,7 +245,6 @@ int main()
 	VAO1.Delete();
 	VBO1.Delete();
 	EBO1.Delete();
-
 	// Making sure to use the tex classes delete function.
 	tex.Delete();
 	shaderProgram.Delete();
