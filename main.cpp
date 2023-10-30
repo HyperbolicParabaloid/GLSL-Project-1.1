@@ -60,6 +60,17 @@ GLfloat pyramidVertices[] =
 	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
 	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	0.5f, 1.0f
 };
+/*
+// Vertices coordinates
+GLfloat pyramidVertices[] =
+{ //     COORDINATES     /        COLORS      /   TexCoord  //
+	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
+	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	0.5f, 1.0f
+};
+*/
 // Indices for vertices order
 GLuint pyramidIndices[] =
 {
@@ -177,9 +188,10 @@ int main()
 	glm::mat4 projection = glm::perspective(glm::radians(45.f), (float)(viewWidth / viewHeight), 0.1f, 100.f);
 
 	Camera camera(window, glm::vec2(viewWidth, viewHeight), glm::vec3(0.f, 0.5f, 2.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
+	model = glm::translate(model, glm::vec3(0.f, 0.f, -5.f));
 
 	double lockoutTimer = 0;
-	bool shouldRotate = false;
+	bool shouldRotate = false, shouldFly = false, captureingMotion = false;
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -205,16 +217,26 @@ int main()
 		// Rotating the view about the x and y axis
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_F) && lockoutTimer <= crntTime) {
 			lockoutTimer = crntTime + 0.2;
-			shouldRotate = !shouldRotate;
+			captureingMotion = !captureingMotion;
+			camera.motion_enabled(captureingMotion);
 			std::cout << "Crotation\n";
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_G) && lockoutTimer <= crntTime) {
+			lockoutTimer = crntTime + 0.2;
+			std::cout << "Crotation\n";
+			camera.motion_enabled(true);
+			shouldFly = true;
+			captureingMotion = true;
+		}
+
+		if (shouldFly) {
+			if (camera.fly_to(glm::vec3(0.f, 0.f, -5.f))) {
+				shouldFly = false;
+			}
 		}
 
 		// Toggling the tracking of user movement
-		if (shouldRotate) {
-			camera.motion_enabled(); 
-			shouldRotate = !shouldRotate;
-		} else 
-			camera.track_movement();
+		camera.track_movement();
 
 		// Setting view matrix with camera class
 		view = camera.get_view();

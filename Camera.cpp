@@ -84,11 +84,15 @@ void Camera::processInput()
 		cameraPos -= glm::normalize(glm::cross(cameraForward, cameraUp)) * speed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cameraPos += glm::normalize(glm::cross(cameraForward, cameraUp)) * speed;
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		cameraPos += glm::normalize(cameraUp) * speed;
+	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+		cameraPos -= glm::normalize(cameraUp) * speed;
 }
 
 // Toggles the cursor lock/movement capturing for WASD/cursor postion.
-void Camera::motion_enabled() {
-	motionEnabled = !motionEnabled;
+void Camera::motion_enabled(bool state) {
+	motionEnabled = state;
 
 	// Setting "firstMouse" to true so whenever I stop and start the camera won't snap.
 	firstMouse = true;
@@ -100,6 +104,12 @@ void Camera::motion_enabled() {
 
 // returns view matrix.
 glm::mat4 Camera::get_view() {
+	// Doing this to keep motion consistent, otherwise when I do something initially like fly_to() the
+	// initial delta time will be huge causing unintended aggressive motion.
+	float currentFrame = glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+
 	view = glm::lookAt(cameraPos, cameraPos + cameraForward, cameraUp);
 	return view;
 }
@@ -122,4 +132,116 @@ void Camera::track_movement() {
 	}
 }
 
+// flys the camera to a specified location and faces the camera to new newly specified direction
+bool Camera::fly_to(glm::vec3 _newPos, glm::vec3 _newForward) {
+	//std::cout << "----------------------\nDOING IT NOW!!!\n--------------------\n";
+	//std::cout << "cameraPos = (" << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << ")\n";
+
+	if (_newPos == cameraPos && _newForward == cameraForward) {
+		flyingMouseLock = false;
+		return true;
+	}
+	flyingMouseLock = true;
+
+	// Making sure framerate is constant among all framerates.
+	// NOTE: if we don't have delta time updated in view or something of that nature, we'll get
+	// a massive initial delta time which will send the camera way off in another direction.
+	// To fix this, whenever get_view() is called we update delta-time there.
+	float currentFrame = glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+	float speed = cameraSpeed * deltaTime;
+
+	// Setting deltas
+	glm::vec3 deltaPos		= (_newPos - cameraPos);
+	glm::vec3 deltaForward	= (_newForward - cameraForward);
+
+	// Variable to control the distance at which the camera's position will snap to the newPos
+	// so it doesn't keep going at infinitesimally smaller steps and never get there.
+	float snapInPlaceDistance = 0.01f;
+
+	// Setting new values for cameraPosition
+	// ____________________________________
+	if (abs(cameraPos.x - _newPos.x) < snapInPlaceDistance)
+		cameraPos.x = _newPos.x;
+	else
+		cameraPos.x += deltaPos.x * speed;
+	// For y
+	if (abs(cameraPos.y - _newPos.y) < snapInPlaceDistance)
+		cameraPos.y = _newPos.y;
+	else
+		cameraPos.y += deltaPos.y * speed;
+	// For z
+	if (abs(cameraPos.z - _newPos.z) < snapInPlaceDistance)
+		cameraPos.z = _newPos.z;
+	else
+		cameraPos.z += deltaPos.z * speed;
+
+	std::cout << "----------------------\nfly_to(newPos, newForward) DOES NOT WORK!!!\n--------------------\n";
+	std::cout << "_newForward = (" << _newForward.x << ", " << _newForward.y << ", " << _newForward.z << ")\n";
+
+	// Setting new values for cameraForward
+	// ____________________________________
+	// NOTE: Pressently DOES NOT WORK
+	if (abs(cameraForward.x - _newForward.x) < snapInPlaceDistance)
+		cameraForward.x = _newForward.x;
+	else
+		cameraForward.x += deltaForward.x * sensitivity;
+	// For y
+	if (abs(cameraForward.y - _newForward.y) < snapInPlaceDistance)
+		cameraForward.y = _newForward.y;
+	else
+		cameraForward.y += deltaForward.y * sensitivity;
+	// For z
+	if (abs(cameraForward.z - _newForward.z) < snapInPlaceDistance)
+		cameraForward.z = _newForward.z;
+	else
+		cameraForward.z += deltaForward.z * sensitivity;
+	
+	cameraForward = _newForward;
+	std::cout << "cameraForward = (" << cameraForward.x << ", " << cameraForward.y << ", " << cameraForward.z << ")\n";
+
+	return false;
+}
+
+// flys the camera to a specified location
+bool Camera::fly_to(glm::vec3 _newPos) {
+	//std::cout << "----------------------\nDOING IT NOW!!!\n--------------------\n";
+	//std::cout << "cameraPos = (" << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << ")\n";
+
+	if (_newPos == cameraPos)
+		return true;
+
+	// Making sure framerate is constant among all framerates.
+	// NOTE: if we don't have delta time updated in view or something of that nature, we'll get
+	// a massive initial delta time which will send the camera way off in another direction.
+	// To fix this, whenever get_view() is called we update delta-time there.
+	float currentFrame = glfwGetTime();
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
+	float speed = cameraSpeed * deltaTime;
+
+	glm::vec3 deltaPos = (_newPos - cameraPos);
+
+	// Variable to control the distance at which the camera's position will snap to the newPos
+	// so it doesn't keep going at infinitesimally smaller steps and never get there.
+	float snapInPlaceDistance = 0.01f;
+
+	if (abs(cameraPos.x - _newPos.x) < snapInPlaceDistance)
+		cameraPos.x = _newPos.x;
+	else
+		cameraPos.x += deltaPos.x * speed;
+	// For y
+	if (abs(cameraPos.y - _newPos.y) < snapInPlaceDistance)
+		cameraPos.y = _newPos.y;
+	else
+		cameraPos.y += deltaPos.y * speed;
+	// For z
+	if (abs(cameraPos.z - _newPos.z) < snapInPlaceDistance)
+		cameraPos.z = _newPos.z;
+	else
+		cameraPos.z += deltaPos.z * speed;
+
+	return false;
+}
 

@@ -23,7 +23,7 @@ private:
 	glm::vec3 cameraUp;
 
 	float lastX, lastY, yaw, pitch;	// Keeping track of the motion.
-	bool firstMouse = true, motionEnabled = false;
+	bool firstMouse = true, motionEnabled = false, flyingMouseLock = false;
 
 	float deltaTime = 0.0f;	// Time between current frame and last frame
 	float lastFrame = 0.0f; // Time of last frame
@@ -37,11 +37,14 @@ private:
 public:
 	Camera(GLFWwindow* window, glm::vec2 screenDimensions, glm::vec3 _cameraPos, glm::vec3 _cameraForward, glm::vec3 _cameraUp);	// Constructor
 
-	void motion_enabled();	// For toggling the motion capture
+	void motion_enabled(bool state);	// For toggling the motion capture
 	void set_camera_speed(float _cameraSpeed);	// For setting the WASD movement sensitivity
 	void set_camera_sensitivity(float _cameraSense);	// For setting the mouse movement sensitivity
 
 	void track_movement();	// Tracks movements of player
 	glm::mat4 get_view();	// Returns the view matrix
+
+	bool fly_to(glm::vec3 newPos, glm::vec3 newForward);
+	bool fly_to(glm::vec3 newPos);
 };
 
