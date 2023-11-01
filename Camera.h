@@ -31,6 +31,7 @@ private:
 
 	float cameraSpeed = 2.5f; // Sensitivity of WASD movements
 	float sensitivity = 0.1f; // Sensitivity of mouse movements
+	float flySpeedScaler = 5.f;	// Scaler to make fly-in speed faster
 
 	void processInput();	// For processing the WASD movement
 	void mouse_callback();	// For processing the mouse movement
@@ -41,11 +42,13 @@ public:
 	void motion_enabled(bool state);	// For toggling the motion capture
 	void set_camera_speed(float _cameraSpeed);	// For setting the WASD movement sensitivity
 	void set_camera_sensitivity(float _cameraSense);	// For setting the mouse movement sensitivity
+	void set_fly_speed_scaler(float _flySpeedScaler);	// For setting the motion scaler for the camera's motion/turning speed
 
 	void track_movement();	// Tracks movements of player
 	glm::mat4 get_view();	// Returns the view matrix
 
-	bool fly_to(glm::vec3 newPos, glm::vec3 newForward);
-	bool fly_to(glm::vec3 newPos);
+	bool fly_to(glm::vec3 newPos, glm::vec3 newForward, bool lockCursorMovement);	// Specifying a position, forward and option to lock camera
+	bool setMousePos(glm::vec3 _newForward, bool lockCursorMovement);	// forward and option to lock camera
+	bool fly_to(glm::vec3 newPos);	// Specifying a position
 };
 

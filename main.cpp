@@ -222,16 +222,22 @@ int main()
 			std::cout << "Crotation\n";
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_G) && lockoutTimer <= crntTime) {
+			//lockoutTimer = crntTime + 0.2;
+			//std::cout << "Crotation\n";
+			//camera.motion_enabled(true);
+			//shouldFly = true;
+			//captureingMotion = true;
+		}
+
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_T) && lockoutTimer <= crntTime) {
 			lockoutTimer = crntTime + 0.2;
 			std::cout << "Crotation\n";
-			camera.motion_enabled(true);
 			shouldFly = true;
-			captureingMotion = true;
 		}
 
 		if (shouldFly) {
-			std::cout << "Flyin' in\n";
-			if (camera.fly_to(glm::vec3(0.f, 0.f, -5.f))) {
+			//if (camera.fly_to(glm::vec3(0.f, 0.f, -5.f))) 
+			if (camera.fly_to(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.125f, -1.f), true)) {
 				shouldFly = false;
 			}
 		}

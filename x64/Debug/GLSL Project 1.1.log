@@ -1,15 +1,4 @@
-﻿  Camera.cpp
-C:\Users\riley\source\repos\GLSL Project 1.1\Camera.cpp(40,11): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Camera.cpp(41,11): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Camera.cpp(46,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Camera.cpp(47,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Camera.cpp(48,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Camera.cpp(49,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Camera.cpp(81,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Camera.cpp(124,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Camera.cpp(169,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Camera.cpp(242,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  main.cpp
+﻿  main.cpp
 C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(91,32): warning C4101: 'screenMag': unreferenced local variable
 C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(91,20): warning C4101: 'cursorMagY': unreferenced local variable
 C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(91,8): warning C4101: 'cursorMagX': unreferenced local variable
@@ -17,20 +6,4 @@ C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(180,33): warning C4244: 'i
 C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(211,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(177,8): warning C4101: 'frac': unreferenced local variable
 C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(177,14): warning C4101: 'whole': unreferenced local variable
-  Generating Code...
-glfw3.lib(input.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(input.obj)' or at ''; linking object as if no debug info
-glfw3.lib(init.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(init.obj)' or at ''; linking object as if no debug info
-glfw3.lib(window.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(window.obj)' or at ''; linking object as if no debug info
-glfw3.lib(context.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(context.obj)' or at ''; linking object as if no debug info
-glfw3.lib(win32_window.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(win32_window.obj)' or at ''; linking object as if no debug info
-glfw3.lib(win32_joystick.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(win32_joystick.obj)' or at ''; linking object as if no debug info
-glfw3.lib(win32_time.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(win32_time.obj)' or at ''; linking object as if no debug info
-glfw3.lib(win32_init.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(win32_init.obj)' or at ''; linking object as if no debug info
-glfw3.lib(win32_monitor.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(win32_monitor.obj)' or at ''; linking object as if no debug info
-glfw3.lib(win32_thread.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(win32_thread.obj)' or at ''; linking object as if no debug info
-glfw3.lib(monitor.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(monitor.obj)' or at ''; linking object as if no debug info
-glfw3.lib(vulkan.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(vulkan.obj)' or at ''; linking object as if no debug info
-glfw3.lib(wgl_context.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(wgl_context.obj)' or at ''; linking object as if no debug info
-glfw3.lib(egl_context.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(egl_context.obj)' or at ''; linking object as if no debug info
-glfw3.lib(osmesa_context.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(osmesa_context.obj)' or at ''; linking object as if no debug info
   GLSL Project 1.1.vcxproj -> C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\GLSL Project 1.1.exe
