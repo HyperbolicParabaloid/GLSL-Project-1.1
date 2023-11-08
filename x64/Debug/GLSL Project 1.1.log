@@ -1,9 +1,7 @@
 ﻿  main.cpp
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(91,32): warning C4101: 'screenMag': unreferenced local variable
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(91,20): warning C4101: 'cursorMagY': unreferenced local variable
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(91,8): warning C4101: 'cursorMagX': unreferenced local variable
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(180,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(211,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(177,8): warning C4101: 'frac': unreferenced local variable
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(177,14): warning C4101: 'whole': unreferenced local variable
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(576,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(627,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(574,8): warning C4101: 'frac': unreferenced local variable
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(574,14): warning C4101: 'whole': unreferenced local variable
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(253): warning C4172: returning address of local variable or temporary: VAO1
   GLSL Project 1.1.vcxproj -> C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\GLSL Project 1.1.exe

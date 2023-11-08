@@ -1,3 +1,6 @@
+#ifndef CAMERA_CLASS_H
+#define CAMERA_CLASS_H
+
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -9,6 +12,8 @@
 #include<glm/gtc/type_ptr.hpp>
 #include<glm/gtc/vec1.hpp>
 
+#include"shaderClass.h"
+
 // Camera class for handling the view matrix.
 class Camera
 {
@@ -16,10 +21,9 @@ private:
 	GLFWwindow* window;
 
 	glm::mat4 view;
+	glm::mat4 projection;
 
 	// For constructing view;
-	glm::vec3 cameraPos;
-	glm::vec3 cameraForward;
 	glm::vec3 cameraUp;
 	glm::vec2 screenDimensions;
 
@@ -37,7 +41,11 @@ private:
 	void mouse_callback();	// For processing the mouse movement
 
 public:
+	glm::vec3 cameraForward;
+	glm::vec3 cameraPos;
 	Camera(GLFWwindow* window, glm::vec2 screenDimensions, glm::vec3 _cameraPos, glm::vec3 _cameraForward, glm::vec3 _cameraUp);	// Constructor
+
+	void set_projection(float angle, float aspectRatio, float nearClip, float farClip);
 
 	void motion_enabled(bool state);	// For toggling the motion capture
 	void set_camera_speed(float _cameraSpeed);	// For setting the WASD movement sensitivity
@@ -50,5 +58,8 @@ public:
 	bool fly_to(glm::vec3 newPos, glm::vec3 newForward, bool lockCursorMovement);	// Specifying a position, forward and option to lock camera
 	bool setMousePos(glm::vec3 _newForward, bool lockCursorMovement);	// forward and option to lock camera
 	bool fly_to(glm::vec3 newPos);	// Specifying a position
+
+	void camMatrixForShader(Shader _newShader, const char* uniformName);	// Sets the view matrix for the camera whatever shader program and uniform name are provided
 };
 
+#endif

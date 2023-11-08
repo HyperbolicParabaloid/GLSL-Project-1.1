@@ -8,13 +8,15 @@
 #include<glm/gtc/matrix_transform.hpp>
 #include<glm/gtc/type_ptr.hpp>
 #include<glm/gtc/vec1.hpp>
+#include<vector>
 
 #include"shaderClass.h"
 #include"Texture.h"
 #include"VAO.h"
 #include"VBO.h"
 #include"EBO.h"
-#include "Camera.h"
+#include"Camera.h"
+#include"Cube.h"
 
 
 #define PI 3.1415926538
@@ -51,66 +53,212 @@ GLuint sqrIndices[] = {
 	3, 0, 2		// Upper triangle
 };
 
+//// Vertices coordinates
+//GLfloat pyramidVertices[] =
+//{ //     COORDINATES     /        COLORS		/   TexCoord  /		Normals	/
+//	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+//	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
+//	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+//	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
+//	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	0.5f, 1.0f
+//};
+//
+//// Indices for vertices order
+//GLuint pyramidIndices[] =
+//{
+//	0, 1, 2,
+//	0, 2, 3,
+//	0, 1, 4,
+//	1, 2, 4,
+//	2, 3, 4,
+//	3, 0, 4
+//};
+
 // Vertices coordinates
 GLfloat pyramidVertices[] =
-{ //     COORDINATES     /        COLORS      /   TexCoord  //
-	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
-	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
-	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	0.5f, 1.0f
+{ //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
+	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 1.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 1.0f, 1.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 1.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
+
+	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 1.0f, 0.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 0.5f, 1.0f,     -0.8f, 0.5f,  0.0f, // Left Side
+
+	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 1.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 0.5f, 1.0f,      0.0f, 0.5f, -0.8f, // Non-facing side
+
+	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	 0.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 1.0f, 0.0f,      0.8f, 0.5f,  0.0f, // Right side
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 0.5f, 1.0f,      0.8f, 0.5f,  0.0f, // Right side
+
+	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	 1.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, 0.5f,  0.8f, // Facing side
+	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	 0.5f, 1.0f,      0.0f, 0.5f,  0.8f  // Facing side
 };
-/*
-// Vertices coordinates
-GLfloat pyramidVertices[] =
-{ //     COORDINATES     /        COLORS      /   TexCoord  //
-	-0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-	-0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
-	 0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
-	 0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
-	 0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	0.5f, 1.0f
-};
-*/
+
 // Indices for vertices order
 GLuint pyramidIndices[] =
 {
-	0, 1, 2,
-	0, 2, 3,
-	0, 1, 4,
-	1, 2, 4,
-	2, 3, 4,
-	3, 0, 4
+	0, 1, 2, // Bottom side
+	0, 2, 3, // Bottom side
+	4, 6, 5, // Left side
+	7, 9, 8, // Non-facing side
+	10, 12, 11, // Right side
+	13, 15, 14 // Facing side
 };
 
-int viewWidth = 800, viewHeight = 800;
 
-glm::vec2 getRotationAngle(GLFWwindow *window) {
-	double xPos, yPos;
-	glm::vec3 screenCenter = glm::vec3(0.f, 0.f, -1000.f);
-	glm::vec3 cursorPosX, cursorPosY;
-	float cursorMagX, cursorMagY, screenMag, _acos, _asin;
+GLfloat lightVertices[] =
+{	// COORDINATES
+	-0.1f, -0.1f, 0.1f,
+	-0.1f, -0.1f, -0.1f,
+	0.1f, -0.1f, -0.1f,
+	0.1f, -0.1f, 0.1f,
+	-0.1f, 0.1f, 0.1f,
+	-0.1f, 0.1f, -0.1f,
+	0.1f, 0.1f, -0.1f,
+	0.1f, 0.1f, 0.1f
+};
 
-	// Making it so we can rotate the camera.
-	// Getting the cursor's position in the window and setting the center to be the center of the window.
-	glfwGetCursorPos(window, &xPos, &yPos);
-	cursorPosX = glm::vec3(xPos - viewWidth / 2.f,	0.f,						-1000.f);
-	cursorPosY = glm::vec3(0.f,						yPos - viewHeight / 2.f,	-1000.f);
 
-	// Getting acos and asin angles in degrees.
-	if (cursorPosX.x > 0.f)
-		_acos = 180 * acos(glm::dot(cursorPosX, screenCenter) / (glm::length(cursorPosX) * glm::length(screenCenter)));
-	else
-		_acos = -180 * acos(glm::dot(cursorPosX, screenCenter) / (glm::length(cursorPosX) * glm::length(screenCenter)));
+GLuint lightIndicies[] =
+{
+	0, 1, 2,
+	0, 2, 3,
+	0, 4, 7,
+	0, 7, 3,
+	3, 7, 6,
+	3, 6, 2,
+	2, 6, 5,
+	2, 5, 1,
+	1, 5, 4,
+	1, 4, 0,
+	4, 5, 6,
+	4, 6, 7
+};
 
-	if (cursorPosY.y > 0.f)
-		_asin = 180 * acos(glm::dot(cursorPosY, screenCenter) / (glm::length(cursorPosY) * glm::length(screenCenter)));
-	else
-		_asin = -180 * acos(glm::dot(cursorPosY, screenCenter) / (glm::length(cursorPosY) * glm::length(screenCenter)));
+glm::vec4 color = glm::vec4(.8f, .2f, .2f, 1.f);
 
-	//std::cout << "( " << cursorPos.x << ", " << cursorPos.y << " )\tacos(x) = " << _acos << "\tasin(x) = " << _asin << std::endl;
-	return glm::vec2(_acos, _asin);
+glm::vec3 v1 = glm::vec3(1.f, 1.f, 1.f);	// 0
+glm::vec3 v2 = glm::vec3(1.f, 1.f, -1.f);	// 1
+glm::vec3 v3 = glm::vec3(1.f, -1.f, 1.f);	// 2
+glm::vec3 v4 = glm::vec3(1.f, -1.f, -1.f);	// 3
+glm::vec3 v5 = glm::vec3(-1.f, 1.f, 1.f);	// 4
+glm::vec3 v6 = glm::vec3(-1.f, 1.f, -1.f);	// 5
+glm::vec3 v7 = glm::vec3(-1.f, -1.f, 1.f);	// 6
+glm::vec3 v8 = glm::vec3(-1.f, -1.f, -1.f);	// 7
+
+glm::vec3 n1 = glm::cross(v1 - v3, v7 - v3);	// Front face normal
+glm::vec3 n2 = glm::cross(v6 - v8, v4 - v8);	// Back face normal
+glm::vec3 n3 = glm::cross(v2 - v1, v5 - v1);	// Top normal
+glm::vec3 n4 = glm::cross(v4 - v8, v7 - v8);	// Bottom normal
+glm::vec3 n5 = glm::cross(v2 - v4, v3 - v2);	// Right normal
+glm::vec3 n6 = glm::cross(v5 - v7, v8 - v7);	// Left normal
+
+GLfloat sqrVertices_2[] = {
+	//		VERTEX		/		NORMAL		/				COLOR				/
+	v7.x, v7.y, v7.z,	n1.x, n1.y, n1.z,	color.r, color.g, color.b, color.a,		// Front face
+	v3.x, v3.y, v3.z,	n1.x, n1.y, n1.z,	color.r, color.g, color.b, color.a,
+	v1.x, v1.y, v1.z,	n1.x, n1.y, n1.z,	color.r, color.g, color.b, color.a,
+	v5.x, v5.y, v5.z,	n1.x, n1.y, n1.z,	color.r, color.g, color.b, color.a,
+
+	v4.x, v4.y, v4.z,	n2.x, n2.y, n2.z,	color.r, color.g, color.b, color.a,		// Back face
+	v8.x, v8.y, v8.z,	n2.x, n2.y, n2.z,	color.r, color.g, color.b, color.a,
+	v6.x, v6.y, v6.z,	n2.x, n2.y, n2.z,	color.r, color.g, color.b, color.a,
+	v2.x, v2.y, v2.z,	n2.x, n2.y, n2.z,	color.r, color.g, color.b, color.a,
+
+	v5.x, v5.y, v5.z,	n3.x, n3.y, n3.z,	color.r, color.g, color.b, color.a,		// Top face
+	v1.x, v1.y, v1.z,	n3.x, n3.y, n3.z,	color.r, color.g, color.b, color.a,
+	v2.x, v2.y, v2.z,	n3.x, n3.y, n3.z,	color.r, color.g, color.b, color.a,
+	v6.x, v6.y, v6.z,	n3.x, n3.y, n3.z,	color.r, color.g, color.b, color.a,
+
+	v4.x, v4.y, v4.z,	n4.x, n4.y, n4.z,	color.r, color.g, color.b, color.a,		// Bottom face
+	v8.x, v8.y, v8.z,	n4.x, n4.y, n4.z,	color.r, color.g, color.b, color.a,
+	v7.x, v7.y, v7.z,	n4.x, n4.y, n4.z,	color.r, color.g, color.b, color.a,
+	v3.x, v3.y, v3.z,	n4.x, n4.y, n4.z,	color.r, color.g, color.b, color.a,
+
+	v3.x, v3.y, v3.z,	n5.x, n5.y, n5.z,	color.r, color.g, color.b, color.a,		// Right face
+	v4.x, v4.y, v4.z,	n5.x, n5.y, n5.z,	color.r, color.g, color.b, color.a,
+	v2.x, v2.y, v2.z,	n5.x, n5.y, n5.z,	color.r, color.g, color.b, color.a,
+	v1.x, v1.y, v1.z,	n5.x, n5.y, n5.z,	color.r, color.g, color.b, color.a,
+
+	v8.x, v8.y, v8.z,	n6.x, n6.y, n6.z,	color.r, color.g, color.b, color.a,		// Left face
+	v7.x, v7.y, v7.z,	n6.x, n6.y, n6.z,	color.r, color.g, color.b, color.a,
+	v5.x, v5.y, v5.z,	n6.x, n6.y, n6.z,	color.r, color.g, color.b, color.a,
+	v6.x, v6.y, v6.z,	n6.x, n6.y, n6.z,	color.r, color.g, color.b, color.a
+};
+
+GLuint sqrIndices_2[] = {
+	// Front Face
+	0, 1, 2,
+	2, 3, 0,
+	
+	// Back face
+	4, 5, 6,
+	6, 7, 4,
+	//
+	// Top face
+	8, 9, 10,
+	10, 11, 8,
+	
+	// Bottom face
+	12, 13, 14,
+	14, 15, 12,
+	
+	// Right face
+	16, 17, 18,
+	18, 19, 16,
+	
+	// Left face
+	20, 21, 22,
+	22, 23, 20
+};
+
+VAO *drawTheBox(GLfloat* _sqrVertices_2, GLuint* _sqrIndices_2) {
+	// Generates Shader object using shaders default.vert and default.frag
+	Shader shaderProgram("object.vert", "object.frag");//Shader shaderProgram("default.vert", "default.frag");
+
+	// Using Texture class to handle all the binding, activating and parameter setting of the texture.
+	//Texture tex("137215-barack-face-vector-obama-png-image-high-quality.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	//tex.texUnit(shaderProgram, "tex0", 0);
+	//tex.Bind();	REMEMBERTODELETE
+
+	// Generates Vertex Array Object and binds it
+	VAO VAO1;
+	VAO1.Bind();
+
+	// Generates Vertex Buffer Object and links it to vertices	REMEMBERTODELETE
+	VBO VBO1(_sqrVertices_2, sizeof(_sqrVertices_2));
+	// Generates Element Buffer Object and links it to indices
+	EBO EBO1(_sqrIndices_2, sizeof(_sqrIndices_2));
+
+	// Links VBO attributes such as coordinates and colors to VAO	REMEMBERTODELETE
+	//VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);
+	//VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+	//VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+	//VAO1.LinkAttrib(VBO1, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+
+	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 10 * sizeof(float), (void*)0);
+	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 10 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAO1.LinkAttrib(VBO1, 2, 4, GL_FLOAT, 10 * sizeof(float), (void*)(6 * sizeof(float)));
+
+	// Unbind all to prevent accidentally modifying them
+	VAO1.Unbind();
+	VBO1.Unbind();
+	EBO1.Unbind();
+
+	return &VAO1;
 }
 
+
+
+
+int viewWidth = 1600, viewHeight = 1600;
+
+#if 0
 int main()
 {
 	// Initialize GLFW
@@ -143,32 +291,84 @@ int main()
 	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
 	glViewport(0, 0, viewWidth, viewWidth);
 
+	//Cube cube(window, glm::vec3(0.f, 0.f, 0.f), 1.f, glm::vec4(1.f));
 
 	// Generates Shader object using shaders default.vert and default.frag
-	Shader shaderProgram("default.vert", "default.frag");
+	Shader shaderProgram("object.vert", "object.frag");//Shader shaderProgram("default.vert", "default.frag");
 
 	// Using Texture class to handle all the binding, activating and parameter setting of the texture.
-	Texture tex("137215-barack-face-vector-obama-png-image-high-quality.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	tex.texUnit(shaderProgram, "tex0", 0);
-	tex.Bind();
+	//Texture tex("137215-barack-face-vector-obama-png-image-high-quality.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+	//tex.texUnit(shaderProgram, "tex0", 0);
+	//tex.Bind();	REMEMBERTODELETE
 
 	// Generates Vertex Array Object and binds it
 	VAO VAO1;
 	VAO1.Bind();
 
-	// Generates Vertex Buffer Object and links it to vertices
-	VBO VBO1(pyramidVertices, sizeof(pyramidVertices));
+	// Generates Vertex Buffer Object and links it to vertices	REMEMBERTODELETE
+	VBO VBO1(sqrVertices_2, sizeof(sqrVertices_2));
 	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(pyramidIndices, sizeof(pyramidIndices));
+	EBO EBO1(sqrIndices_2, sizeof(sqrIndices_2));
 
-	// Links VBO attributes such as coordinates and colors to VAO
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	// Links VBO attributes such as coordinates and colors to VAO	REMEMBERTODELETE
+	//VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);
+	//VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+	//VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+	//VAO1.LinkAttrib(VBO1, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+	
+	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 10 * sizeof(float), (void*)0);
+	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 10 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAO1.LinkAttrib(VBO1, 2, 4, GL_FLOAT, 10 * sizeof(float), (void*)(6 * sizeof(float)));
+
 	// Unbind all to prevent accidentally modifying them
 	VAO1.Unbind();
 	VBO1.Unbind();
 	EBO1.Unbind();
+
+
+	// ---------------------------
+	// Setting up the light source.
+	// ---------------------------
+	
+	// Setting Shader object for light source.
+	Shader lightShader("light.vert", "light.frag");
+
+	VAO lightVAO;
+	lightVAO.Bind();
+
+	VBO lightVBO(lightVertices, sizeof(lightVertices));
+	EBO lightEBO(lightIndicies, sizeof(lightIndicies));
+
+	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+
+	lightVAO.Unbind();
+	lightVBO.Unbind();
+	lightEBO.Unbind();
+
+
+
+	// Setting up matrices for both the light and pyramid models.
+	glm::vec4 lightColor = glm::vec4(.8f, .8f, 1.f, 1.f);
+	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+	glm::mat4 lightModel = glm::mat4(1.f);
+	lightModel = glm::translate(lightModel, lightPos);
+
+	glm::vec3 pyramidPos = glm::vec3(-1.0f, .0f, -1.75f);
+	glm::mat4 pyramidModel = glm::mat4(1.f);
+	pyramidModel = glm::translate(pyramidModel, pyramidPos);
+	//pyramidModel = glm::rotate(pyramidModel, glm::radians(90.f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	// Activating shader's and setting up model uniforms.
+	lightShader.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	shaderProgram.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
+	glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+
+
+
 
 	// Gets ID of uniform called "scale"
 	GLuint uniID = glGetUniformLocation(shaderProgram.ID, "scale");
@@ -178,20 +378,19 @@ int main()
 	glUniform1f(uniID, 0.5);
 	
 	float rotation = 0.f, prevTime = glfwGetTime();
+	float motion = 0.0001f;
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
 
 	// Initializing matrices for model, view and projection
-	glm::mat4 model = glm::mat4(1.f);
 	glm::mat4 view = glm::mat4(1.f);
-	glm::mat4 projection = glm::perspective(glm::radians(45.f), (float)(viewWidth / viewHeight), 0.1f, 100.f);
 
 	Camera camera(window, glm::vec2(viewWidth, viewHeight), glm::vec3(0.f, 0.5f, 2.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
-	model = glm::translate(model, glm::vec3(0.f, 0.f, -5.f));
+	camera.set_projection(glm::radians(45.f), (float)(viewWidth / viewHeight), 0.1f, 100.f);
 
 	double lockoutTimer = 0;
-	bool shouldRotate = false, shouldFly = false, captureingMotion = false;
+	bool shouldRotate = false, shouldFly = false, capturingMotion = false;
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -200,44 +399,48 @@ int main()
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// Tell OpenGL which Shader Program we want to use
-		shaderProgram.Activate();
+		
 
 		// Simple timer
 		double crntTime = glfwGetTime();
 		if (crntTime - prevTime >= 1 / 60)
 		{
-			rotation = 0.5f;
+			rotation = 0.1f;
 			prevTime = crntTime;
+			//pyramidPos.x += motion;
+			//lightPos.x += motion;
 		}
 
+		//std::cout << "Pos = " << pyramidPos.x << "\n";
+
+		//if (abs(pyramidPos.x) > .01f)
+			//motion = -motion;
+
 		// Rotating the model about the y axis
-		model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+		//pyramidModel = glm::rotate(pyramidModel, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+		//pyramidModel = glm::translate(pyramidModel, pyramidPos);
+		// TL:DR the rotation won't do anything cool because the triangles normals aren't based off the models position
+		// or rotation so they're always facing in the same direction.
 
 		// Rotating the view about the x and y axis
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_F) && lockoutTimer <= crntTime) {
 			lockoutTimer = crntTime + 0.2;
-			captureingMotion = !captureingMotion;
-			camera.motion_enabled(captureingMotion);
+			capturingMotion = !capturingMotion;
+			camera.motion_enabled(capturingMotion);
 			std::cout << "Crotation\n";
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_G) && lockoutTimer <= crntTime) {
-			//lockoutTimer = crntTime + 0.2;
-			//std::cout << "Crotation\n";
-			//camera.motion_enabled(true);
-			//shouldFly = true;
-			//captureingMotion = true;
+			
 		}
 
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_T) && lockoutTimer <= crntTime) {
 			lockoutTimer = crntTime + 0.2;
-			std::cout << "Crotation\n";
+			std::cout << "Flyin' in\n";
 			shouldFly = true;
 		}
 
 		if (shouldFly) {
-			//if (camera.fly_to(glm::vec3(0.f, 0.f, -5.f))) 
-			if (camera.fly_to(glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.125f, -1.f), true)) {
+			if (camera.fly_to(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 0.125f, -1.f), true)) {
 				shouldFly = false;
 			}
 		}
@@ -248,22 +451,31 @@ int main()
 		// Setting view matrix with camera class
 		view = camera.get_view();
 
-		// Actually setting uniforms to be the values of model, veiw and projection
-		GLuint uniModel = glGetUniformLocation(shaderProgram.ID, "model");
-		glUniformMatrix4fv(uniModel, 1, GL_FALSE, glm::value_ptr(model));
+		// Tell OpenGL which Shader Program we want to use
+		shaderProgram.Activate();
+		
+		glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
+		//glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+		glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z);
+		glUniform3f(glGetUniformLocation(shaderProgram.ID, "camPos"), camera.cameraPos.x, camera.cameraPos.y, camera.cameraPos.z);
+		camera.camMatrixForShader(shaderProgram, "camMatrix");
 
-		GLuint uniView = glGetUniformLocation(shaderProgram.ID, "view");
-		glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
-
-		GLuint uniProjection = glGetUniformLocation(shaderProgram.ID, "projection");
-		glUniformMatrix4fv(uniProjection, 1, GL_FALSE, glm::value_ptr(projection));
-
-		tex.Bind();
+		//tex.Bind();	REMEMBERTODELETE
 
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
+
 		// Draw primitives, number of indices, datatype of indices, index of indices
-		glDrawElements(GL_TRIANGLES, sizeof(pyramidIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(sqrIndices_2) / sizeof(int), GL_UNSIGNED_INT, 0);	// REMEMBERTODELETE
+
+		lightShader.Activate();
+		camera.camMatrixForShader(lightShader, "camMatrix");
+		lightVAO.Bind();
+		glDrawElements(GL_TRIANGLES, sizeof(lightIndicies) / sizeof(int), GL_UNSIGNED_INT, 0);
+
+
+		//cube.draw(lightPos, camera);
+
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
 		// Take care of all GLFW events
@@ -275,7 +487,7 @@ int main()
 	VBO1.Delete();
 	EBO1.Delete();
 	// Making sure to use the tex classes delete function.
-	tex.Delete();
+	//tex.Delete(); REMEMBERTODELETE
 	shaderProgram.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
@@ -283,3 +495,201 @@ int main()
 	glfwTerminate();
 	return 0;
 }
+#endif
+
+#if 1
+int main()
+{
+	// Initialize GLFW
+	glfwInit();
+
+	// Tell GLFW what version of OpenGL we are using 
+	// In this case we are using OpenGL 3.3
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	// Tell GLFW we are using the CORE profile
+	// So that means we only have the modern functions
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+
+	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
+	GLFWwindow* window = glfwCreateWindow(viewWidth, viewWidth, "GLFW Testing Window", NULL, NULL);
+	// Error check if the window fails to create
+	if (window == NULL)
+	{
+		std::cout << "Failed to create GLFW window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
+	// Introduce the window into the current context
+	glfwMakeContextCurrent(window);
+
+	//Load GLAD so it configures OpenGL
+	gladLoadGL();
+	// Specify the viewport of OpenGL in the Window
+	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
+	glViewport(0, 0, viewWidth, viewWidth);
+
+	
+	// ---------------------------
+	// Setting up the light source.
+	// ---------------------------
+
+	// Setting Shader object for light source.
+	Shader lightShader("light.vert", "light.frag");
+
+	VAO lightVAO;
+	lightVAO.Bind();
+
+	VBO lightVBO(lightVertices, sizeof(lightVertices));
+	EBO lightEBO(lightIndicies, sizeof(lightIndicies));
+
+	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+
+	lightVAO.Unbind();
+	lightVBO.Unbind();
+	lightEBO.Unbind();
+
+
+
+	// Setting up matrices for both the light and pyramid models.
+	glm::vec4 lightColor = glm::vec4(.8f, .8f, 1.f, 1.f);
+	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+	glm::mat4 lightModel = glm::mat4(1.f);
+	lightModel = glm::translate(lightModel, lightPos);
+
+	// Activating shader's and setting up model uniforms.
+	lightShader.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+	glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
+
+	float frac, whole;
+
+	float rotation = 0.f, prevTime = glfwGetTime();
+	float motion = 0.0001f;
+
+	// Enables the Depth Buffer
+	glEnable(GL_DEPTH_TEST);
+
+	// Initializing matrices for model, view and projection
+	glm::mat4 view = glm::mat4(1.f);
+
+	Camera camera(window, glm::vec2(viewWidth, viewHeight), glm::vec3(0.f, 0.5f, 2.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
+	camera.set_projection(glm::radians(45.f), (float)(viewWidth / viewHeight), 0.1f, 100.f);
+
+	double lockoutTimer = 0;
+	bool shouldRotate = false, shouldFly = false, capturingMotion = false;
+
+	// Cube(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 _color, Camera* _camera);
+	glm::vec3 cube1Pos = glm::vec3(-2.0f, -.5f, -2.5f);
+	Cube cube1(window, cube1Pos, 1.f, color, &camera);
+	cube1.rotate(45.f, glm::vec3(0.f, 0.f, 1.f));
+	cube1.rotate(45.f, glm::vec3(0.f, 1.f, 0.f));
+
+	glm::vec3 cube2Pos = glm::vec3(2.0f, -.5f, -2.5f);
+	Cube cube2(window, cube2Pos, 1.f, glm::vec4(.2f, .5f, .8f, 1.f), &camera);
+
+	glm::vec3 cube3Pos = glm::vec3(0.0f, 2.f, -2.5f);
+	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), &camera);
+
+	std::vector <Object*> objectList;
+
+	objectList.push_back(&cube1); 
+	objectList.push_back(&cube2);
+	objectList.push_back(&cube3);
+
+	camera.set_camera_speed(10);
+
+
+
+	// Main while loop
+	while (!glfwWindowShouldClose(window))
+	{
+		// Specify the color of the background
+		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+		// Clean the back buffer and assign the new color to it
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
+		// Simple timer
+		double crntTime = glfwGetTime();
+		if (crntTime - prevTime >= 1 / 60)
+		{
+			rotation = 0.1f;
+			prevTime = crntTime;
+			//pyramidPos.x += motion;
+			//lightPos.x += motion;
+		}
+
+		//std::cout << "Pos = " << pyramidPos.x << "\n";
+
+		//if (abs(pyramidPos.x) > .01f)
+			//motion = -motion;
+
+		// Rotating the model about the y axis
+		//pyramidModel = glm::rotate(pyramidModel, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+		//pyramidModel = glm::translate(pyramidModel, pyramidPos);
+		// TL:DR the rotation won't do anything cool because the triangles normals aren't based off the models position
+		// or rotation so they're always facing in the same direction.
+
+		// Rotating the view about the x and y axis
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_F) && lockoutTimer <= crntTime) {
+			lockoutTimer = crntTime + 0.2;
+			capturingMotion = !capturingMotion;
+			camera.motion_enabled(capturingMotion);
+			std::cout << "Crotation\n";
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_G) && lockoutTimer <= crntTime) {
+			cube1.rotate(.5f, glm::vec3(0.f, 1.f, 1.f));
+		}
+
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_T) && lockoutTimer <= crntTime) {
+			lockoutTimer = crntTime + 0.2;
+			std::cout << "Flyin' in\n";
+			shouldFly = true;
+		}
+
+		if (shouldFly) {
+			if (camera.fly_to(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 0.125f, -1.f), true)) {
+				shouldFly = false;
+			}
+		}
+
+		// Toggling the tracking of user movement
+		camera.track_movement();
+
+		// Setting view matrix with camera class
+		view = camera.get_view();
+
+
+		//cube1.draw(lightPos, lightColor);
+		//cube2.draw(lightPos, lightColor);
+		for (auto obj : objectList)
+		{
+			obj->draw(lightPos, lightColor);
+		}
+
+		
+
+		lightShader.Activate();
+		camera.camMatrixForShader(lightShader, "camMatrix");
+		lightVAO.Bind();
+		glDrawElements(GL_TRIANGLES, sizeof(lightIndicies) / sizeof(int), GL_UNSIGNED_INT, 0);
+
+
+		//cube.draw(lightPos, camera);
+
+		// Swap the back buffer with the front buffer
+		glfwSwapBuffers(window);
+		// Take care of all GLFW events
+		glfwPollEvents();
+	}
+
+	lightShader.Delete();
+	// Delete window before ending the program
+	glfwDestroyWindow(window);
+	// Terminate GLFW before ending the program
+	glfwTerminate();
+	return 0;
+}
+#endif
