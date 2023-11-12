@@ -50,7 +50,7 @@ public:
 	~Object();
 	void draw(glm::vec3 _lightPos, glm::vec4 _lightColor);
 	glm::vec4 color;
-	void setVBOandEBO(GLfloat* _vertices, int _vertSize, GLuint* _indices, int _indSize);
+	void setVBOandEBO(GLfloat* _vertices, int _vertSize, GLuint* _indices, int _indSize, std::string msg);
 	void rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation);
 };
 

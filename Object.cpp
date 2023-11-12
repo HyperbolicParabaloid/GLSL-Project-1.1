@@ -5,6 +5,7 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	objScale = _objScale;
 	color = _color;
 	model = glm::translate(glm::mat4(1.f), objPos);
+	model = glm::scale(model, glm::vec3(objScale));
 	camera = _camera;
 }
 
@@ -41,7 +42,7 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 
 }
 
-void Object::setVBOandEBO(GLfloat* _vertices, int _vertSize, GLuint* _indices, int _indSize) {
+void Object::setVBOandEBO(GLfloat* _vertices, int _vertSize, GLuint* _indices, int _indSize, std::string msg) {
 	// Generates Shader object using shaders object.vert and object.frag
 	shaderProgram = new Shader("object.vert", "object.frag");
 
@@ -58,9 +59,10 @@ void Object::setVBOandEBO(GLfloat* _vertices, int _vertSize, GLuint* _indices, i
 	objEBO = new EBO(_indices, indSize);
 
 	// Links VBO attributes such as coordinates and colors to VAO
-	objVAO.LinkAttrib(*objVBO, 0, 3, GL_FLOAT, 10 * sizeof(float), (void*)0);
-	objVAO.LinkAttrib(*objVBO, 1, 3, GL_FLOAT, 10 * sizeof(float), (void*)(3 * sizeof(float)));
-	objVAO.LinkAttrib(*objVBO, 2, 4, GL_FLOAT, 10 * sizeof(float), (void*)(6 * sizeof(float)));
+	objVAO.LinkAttrib(*objVBO, 0, 3, GL_FLOAT, 12 * sizeof(float), (void*)0);
+	objVAO.LinkAttrib(*objVBO, 1, 3, GL_FLOAT, 12 * sizeof(float), (void*)(3 * sizeof(float)));
+	objVAO.LinkAttrib(*objVBO, 2, 4, GL_FLOAT, 12 * sizeof(float), (void*)(6 * sizeof(float)));
+	objVAO.LinkAttrib(*objVBO, 3, 2, GL_FLOAT, 12 * sizeof(float), (void*)(10 * sizeof(float)));
 
 	// Unbind all to prevent accidentally modifying them
 	objVAO.Unbind();

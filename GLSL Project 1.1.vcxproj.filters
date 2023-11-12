@@ -51,7 +51,7 @@
     <ClCompile Include="Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Circle.cpp">
+    <ClCompile Include="Sphere.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Cube.cpp">
@@ -100,7 +100,7 @@
     <ClInclude Include="Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Circle.h">
+    <ClInclude Include="Sphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Cube.h">

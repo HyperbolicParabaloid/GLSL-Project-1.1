@@ -1,7 +1,4 @@
-﻿  main.cpp
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(576,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(627,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(574,8): warning C4101: 'frac': unreferenced local variable
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(574,14): warning C4101: 'whole': unreferenced local variable
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(253): warning C4172: returning address of local variable or temporary: VAO1
+﻿  Sphere.cpp
+C:\Users\riley\source\repos\GLSL Project 1.1\Sphere.cpp(136,19): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\riley\source\repos\GLSL Project 1.1\Sphere.cpp(226,38): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
   GLSL Project 1.1.vcxproj -> C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\GLSL Project 1.1.exe

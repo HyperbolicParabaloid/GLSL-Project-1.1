@@ -6,6 +6,8 @@ layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 // Colors
 layout (location = 2) in vec4 aColor;
+// Texture coords
+layout (location = 3) in vec2 aTex;
 
 
 
@@ -17,10 +19,6 @@ out vec3 Normal;
 out vec3 crntPos;
 
 // Controls the scale of the vertices
-uniform float scale;
-uniform float rotationDegree;
-
-// Controls the scale of the vertices
 uniform mat4 model;
 //uniform mat4 projection;
 uniform mat4 camMatrix;
@@ -28,6 +26,7 @@ uniform mat4 camMatrix;
 
 void main()
 {
+	//vec4 scaledPos = vec4(aPos.x + aPos.x * scale, aPos.y + aPos.y * scale, aPos.z + aPos.z * scale, 1.0);
 	crntPos = vec3(model * vec4(aPos, 1.f));
 	
 	// Outputs the positions/coordinates of all vertices

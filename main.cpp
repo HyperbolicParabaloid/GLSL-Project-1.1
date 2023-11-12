@@ -9,6 +9,7 @@
 #include<glm/gtc/type_ptr.hpp>
 #include<glm/gtc/vec1.hpp>
 #include<vector>
+#include<algorithm>
 
 #include"shaderClass.h"
 #include"Texture.h"
@@ -17,6 +18,7 @@
 #include"EBO.h"
 #include"Camera.h"
 #include"Cube.h"
+#include"Sphere.h"
 
 
 #define PI 3.1415926538
@@ -142,6 +144,15 @@ GLuint lightIndicies[] =
 
 glm::vec4 color = glm::vec4(.8f, .2f, .2f, 1.f);
 
+glm::vec3* verts2 = new glm::vec3[1];
+glm::vec3* norms2 = new glm::vec3[1];
+GLuint* indices2 = new GLuint[1];
+GLfloat* finalVerts2 = new GLfloat[1];
+int finalVerts2Size;
+int vertsSize;
+int indicesSize;
+int level;
+
 glm::vec3 v1 = glm::vec3(1.f, 1.f, 1.f);	// 0
 glm::vec3 v2 = glm::vec3(1.f, 1.f, -1.f);	// 1
 glm::vec3 v3 = glm::vec3(1.f, -1.f, 1.f);	// 2
@@ -217,46 +228,209 @@ GLuint sqrIndices_2[] = {
 	22, 23, 20
 };
 
-VAO *drawTheBox(GLfloat* _sqrVertices_2, GLuint* _sqrIndices_2) {
-	// Generates Shader object using shaders default.vert and default.frag
-	Shader shaderProgram("object.vert", "object.frag");//Shader shaderProgram("default.vert", "default.frag");
+int viewWidth = 1600, viewHeight = 1600;
 
-	// Using Texture class to handle all the binding, activating and parameter setting of the texture.
-	//Texture tex("137215-barack-face-vector-obama-png-image-high-quality.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	//tex.texUnit(shaderProgram, "tex0", 0);
-	//tex.Bind();	REMEMBERTODELETE
-
-	// Generates Vertex Array Object and binds it
-	VAO VAO1;
-	VAO1.Bind();
-
-	// Generates Vertex Buffer Object and links it to vertices	REMEMBERTODELETE
-	VBO VBO1(_sqrVertices_2, sizeof(_sqrVertices_2));
-	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(_sqrIndices_2, sizeof(_sqrIndices_2));
-
-	// Links VBO attributes such as coordinates and colors to VAO	REMEMBERTODELETE
-	//VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);
-	//VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));
-	//VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));
-	//VAO1.LinkAttrib(VBO1, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));
-
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 10 * sizeof(float), (void*)0);
-	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 10 * sizeof(float), (void*)(3 * sizeof(float)));
-	VAO1.LinkAttrib(VBO1, 2, 4, GL_FLOAT, 10 * sizeof(float), (void*)(6 * sizeof(float)));
-
-	// Unbind all to prevent accidentally modifying them
-	VAO1.Unbind();
-	VBO1.Unbind();
-	EBO1.Unbind();
-
-	return &VAO1;
+int numVertsPerSide(int _level) {
+	if (_level == 1)
+		return 2;
+	return 2 * numVertsPerSide(_level - 1) - 1;
 }
 
+void setPreIndices() {
+	int vertsPerSide = pow(vertsSize, .5);
+	int setpsPerSide = vertsPerSide - 2;
+	
+	// Resizing indices aray.
+	indicesSize = pow(4, level - 1) * 2 * 3;
+	GLuint* newInds = new GLuint[indicesSize];
+	delete[] indices2;
+	indices2 = newInds;
+
+	int t0, t1, t2; // First triangle
+	int t3, t4, t5; // Second triangle;
+
+	int indCount = 0;
+	for (int vv = 0; vv <= setpsPerSide; vv++) {
+		for (int uu = 0; uu <= setpsPerSide; uu++) {
+			//	+-+
+			//	|\|
+			//	+-+
+			if ((uu >= setpsPerSide / 2 && vv < setpsPerSide / 2) || ((uu < setpsPerSide / 2 && vv >= setpsPerSide / 2))) {
+				t0 = (uu + 0) + (vertsPerSide * (vv + 0));
+				t1 = (uu + 0) + (vertsPerSide * (vv + 1));
+				t2 = (uu + 1) + (vertsPerSide * (vv + 1));
+
+				t3 = (uu + 1) + (vertsPerSide * (vv + 1));
+				t4 = (uu + 1) + (vertsPerSide * (vv + 0));
+				t5 = (uu + 0) + (vertsPerSide * (vv + 0));
+			}
+
+			//	+-+
+			//	|/|
+			//	+-+
+			else {
+				t0 = (uu + 1) + (vertsPerSide * (vv + 0));
+				t1 = (uu + 0) + (vertsPerSide * (vv + 0));
+				t2 = (uu + 0) + (vertsPerSide * (vv + 1));
+
+				t3 = (uu + 0) + (vertsPerSide * (vv + 1));
+				t4 = (uu + 1) + (vertsPerSide * (vv + 1));
+				t5 = (uu + 1) + (vertsPerSide * (vv + 0));
+			}
+			indices2[indCount + 0] = t0;
+			indices2[indCount + 1] = t1;
+			indices2[indCount + 2] = t2;
+			indices2[indCount + 3] = t3;
+			indices2[indCount + 4] = t4;
+			indices2[indCount + 5] = t5;
+			indCount += 6;
+		}
+	}
+
+}
+
+void genOctahedron()
+{
+	if (level < 1)
+		level = 1;
+	if (level > 10)
+		level = 10;
+
+	// Num vertices per level
+	//	1			2		3		4
+	// 2x2=4 => 3x3=9 => 5x5=25 => 9x9=81
+	// So basically, if you think about it you're doing:
+	// NumVertsPerSide_X = NumVertsPerSide_X-1 + NumVertsPerSide_X-1 - 1
+	int vertsPerSide = numVertsPerSide(level);
+
+	// Resizing verts2
+	vertsSize = vertsPerSide * vertsPerSide;
+	glm::vec3* newVerts = new glm::vec3[vertsSize];
+	delete[] verts2;
+	verts2 = newVerts;
+
+	float temp;
+	for (int vv = 0; vv <= (vertsPerSide - 1); vv++) {
+		for (int uu = 0; uu <= (vertsPerSide - 1); uu++) {
+			GLfloat x, y, z = 0.f;
+			x = ((uu * 2) - (vertsPerSide - 1)) / (float)(vertsPerSide - 1);	// Goes from -1.f =>  1.f
+			y = ((vertsPerSide - 1) - (vv * 2)) / (float)(vertsPerSide - 1);	// Goes from  1.f => -1.f
 
 
+			//std::cout << "Old: (\t" << x << ",\t" << y << ",\t" << z << ")\n";
 
-int viewWidth = 1600, viewHeight = 1600;
+			// Transforming the 2D plane to a 3D Octahedron.
+			if (abs(x) + abs(y) <= 1)
+				z = 1.f - (abs(x) + abs(y));
+			else {
+				temp = x;
+				// 1st Quadrant
+				if (x >= 0 && y >= 0) {
+					x = 1 - y;
+					y = 1 - temp;
+				}
+
+				// 2nd Quadrant
+				else if (x < 0 && y >= 0) {
+					x = -1 + y;
+					y = 1 + temp;
+				}
+
+				// 3rd Quadrant
+				else if (x >= 0 && y < 0) {
+					x = 1 + y;
+					y = -1 + temp;
+				}
+
+				// 4th Quadrant
+				else if (x < 0 && y < 0) {
+					x = -1 - y;
+					y = -1 - temp;
+				}
+				z = -1.f + (abs(x) + abs(y));
+			}
+			//std::cout << "New: (\t" << x << ",\t" << y << ",\t" << z << ")\n";
+			//std::cout << "\n";
+	
+			verts2[vertsPerSide * vv + uu] = glm::vec3(x, y, z);
+
+
+		}
+		std::cout << "\n";
+	}
+}
+
+void setNorms() {
+	
+	int numTriangles = pow(4, level - 1) * 2;
+	glm::vec3* newNorms = new glm::vec3[numTriangles];
+	delete[] norms2;
+	norms2 = newNorms;
+
+
+	// Resizing final verts
+	int numVertsPerTriangle = 3, numFloatsPerVert = 3, numFloatsPerNorm = 3, numFloatsPerColor = 4;
+
+
+	finalVerts2Size = numTriangles * numVertsPerTriangle * numFloatsPerVert * numFloatsPerNorm * numFloatsPerColor;
+	GLfloat* newFinalVerts2 = new GLfloat[finalVerts2Size];
+	delete[] finalVerts2;
+	finalVerts2 = newFinalVerts2;
+
+	int normCount = 0;
+	for (int ii = 0; ii < indicesSize; ii+=6) {
+		glm::vec3 v1 = verts2[indices2[ii + 0]];
+		glm::vec3 v2 = verts2[indices2[ii + 1]];
+		glm::vec3 v3 = verts2[indices2[ii + 2]];
+
+		glm::vec3 v4 = verts2[indices2[ii + 3]];
+		glm::vec3 v5 = verts2[indices2[ii + 4]];
+		glm::vec3 v6 = verts2[indices2[ii + 5]];
+
+		glm::vec3 n1 = glm::cross(v3 - v2, v1 - v2);
+		glm::vec3 n2 = glm::cross(v6 - v5, v4 - v5);
+
+		norms2[normCount + 0] = n1;
+		norms2[normCount + 1] = n2;
+
+		float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float r3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		glm::vec4 color1 = glm::vec4(r1, r2, r3, 1.f);
+
+		float r4 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float r5 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		float r6 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+		glm::vec4 color2 = glm::vec4(r4, r5, r6, 1.f);
+
+		//						|	VERTEX		|	|	NORMAL		|	|				COLOR					|
+		GLfloat tempVert1[] = { v1.x, v1.y, v1.z,	n1.x, n1.y, n1.z,	color1.r, color1.g, color1.b, color1.a };
+		GLfloat tempVert2[] = { v2.x, v2.y, v2.z,	n1.x, n1.y, n1.z,	color1.r, color1.g, color1.b, color1.a };
+		GLfloat tempVert3[] = { v3.x, v3.y, v3.z,	n1.x, n1.y, n1.z,	color1.r, color1.g, color1.b, color1.a };
+
+		//						|	VERTEX		|	|	NORMAL		|	|				COLOR					|
+		GLfloat tempVert4[] = { v4.x, v4.y, v4.z,	n2.x, n2.y, n2.z,	color2.r, color2.g, color2.b, color2.a };
+		GLfloat tempVert5[] = { v5.x, v5.y, v5.z,	n2.x, n2.y, n2.z,	color2.r, color2.g, color2.b, color2.a };
+		GLfloat tempVert6[] = { v6.x, v6.y, v6.z,	n2.x, n2.y, n2.z,	color2.r, color2.g, color2.b, color2.a };
+
+		int steps = numFloatsPerVert + numFloatsPerNorm + numFloatsPerColor;
+
+		// Copying the contents from the new temp verts into the finalVerts2 array
+		std::copy(tempVert1, tempVert1 + steps, finalVerts2);
+		std::copy(tempVert2, tempVert2 + steps, finalVerts2);
+		std::copy(tempVert3, tempVert3 + steps, finalVerts2);
+		std::copy(tempVert4, tempVert4 + steps, finalVerts2);
+		std::copy(tempVert5, tempVert5 + steps, finalVerts2);
+		std::copy(tempVert6, tempVert6 + steps, finalVerts2);
+		normCount += 2;
+	}
+}
+
+void setPostIndices() {
+	for (int ii = 0; ii < indicesSize; ii++) {
+		indices2[ii] = ii;
+	}
+}
 
 #if 0
 int main()
@@ -575,7 +749,7 @@ int main()
 	glm::mat4 view = glm::mat4(1.f);
 
 	Camera camera(window, glm::vec2(viewWidth, viewHeight), glm::vec3(0.f, 0.5f, 2.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
-	camera.set_projection(glm::radians(45.f), (float)(viewWidth / viewHeight), 0.1f, 100.f);
+	camera.set_projection(glm::radians(60.f), (float)(viewWidth / viewHeight), 0.1f, 100.f);
 
 	double lockoutTimer = 0;
 	bool shouldRotate = false, shouldFly = false, capturingMotion = false;
@@ -592,16 +766,20 @@ int main()
 	glm::vec3 cube3Pos = glm::vec3(0.0f, 2.f, -2.5f);
 	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), &camera);
 
+	glm::vec3 plane1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
+	Sphere plane1(window, plane1Pos, .5f, 2, true, glm::vec4(.8f, .2f, .5f, 1.f), &camera);
+
 	std::vector <Object*> objectList;
 
-	objectList.push_back(&cube1); 
+	objectList.push_back(&cube1);
 	objectList.push_back(&cube2);
 	objectList.push_back(&cube3);
+	objectList.push_back(&plane1);
 
 	camera.set_camera_speed(10);
-
-
-
+	level = 2;
+	bool randomColor = true;
+	bool isSmooth = true;
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -639,14 +817,57 @@ int main()
 			camera.motion_enabled(capturingMotion);
 			std::cout << "Crotation\n";
 		}
-		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_G) && lockoutTimer <= crntTime) {
-			cube1.rotate(.5f, glm::vec3(0.f, 1.f, 1.f));
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
+			plane1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_UP)) {
+			plane1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_DOWN)) {
+			plane1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_RIGHT)) {
+			plane1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_MINUS) && lockoutTimer <= crntTime) {
+			level--;
+			std::cout << "\nLevel: " << level << "\n";
+			plane1.setLevel(level);
+			lockoutTimer = crntTime + 0.2;
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_EQUAL) && lockoutTimer <= crntTime) {
+			level++;
+			std::cout << "\nLevel: " << level << "\n";
+			plane1.setLevel(level);
+			lockoutTimer = crntTime + 0.2;
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_R) && lockoutTimer <= crntTime) {			
+			plane1.doRandomColors(randomColor);
+			plane1.setLevel(level);
+			randomColor = !randomColor;
+			lockoutTimer = crntTime + 0.2;
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Y) && lockoutTimer <= crntTime) {
+			isSmooth = !isSmooth;
+			plane1.smoothSurface(isSmooth);
+			plane1.setLevel(level);
+			lockoutTimer = crntTime + 0.2;
 		}
 
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_T) && lockoutTimer <= crntTime) {
+			std::cout << "\nLevel: " << level << "\n";
 			lockoutTimer = crntTime + 0.2;
 			std::cout << "Flyin' in\n";
 			shouldFly = true;
+		}
+
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_C) && lockoutTimer <= crntTime) {
+			std::cout << "\nLevel: " << level << "\n";
+			
+
+			std::cout << "\n";
+			lockoutTimer = crntTime + 0.2;
+			
 		}
 
 		if (shouldFly) {
@@ -690,6 +911,10 @@ int main()
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program
 	glfwTerminate();
+	delete[] verts2;
+	delete[] indices2;
+	delete[] norms2;
+	delete[] finalVerts2;
 	return 0;
 }
 #endif

@@ -25,8 +25,6 @@ private:
 	void genTriangles();
 public:
 	Cube(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 _color, Camera* _camera);
-	Cube(GLFWwindow* _window);
-	void keepDrawing();
 };
 
 #endif

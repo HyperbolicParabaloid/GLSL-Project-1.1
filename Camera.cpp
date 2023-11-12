@@ -91,17 +91,20 @@ void Camera::processInput()
 	// Making sure framerate is constant among all framerates.
 	float speed = cameraSpeed * deltaTime;
 
+	// Changed this a little to make it more like normal Minecraft creative mode flying.
 	glm::vec3 temp = cameraPos;
+	glm::vec3 right = glm::normalize(glm::cross(cameraForward, cameraUp));
+	glm::vec3 forward = glm::normalize(glm::cross(cameraUp, right));
 
 	// Maping key inputs to motion.
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += speed * cameraForward;
+		cameraPos += speed * forward;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPos -= speed * cameraForward;
+		cameraPos -= speed * forward;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraForward, cameraUp)) * speed;
+		cameraPos -= right * speed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraForward, cameraUp)) * speed;
+		cameraPos += right * speed;
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 		cameraPos += glm::normalize(cameraUp) * speed;
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
