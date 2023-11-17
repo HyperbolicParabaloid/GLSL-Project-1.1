@@ -1,12 +1,8 @@
-﻿  Object.cpp
-C:\Users\riley\source\repos\GLSL Project 1.1\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\riley\source\repos\GLSL Project 1.1\Object.cpp(34,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-  main.cpp
+﻿  main.cpp
 C:\Users\riley\source\repos\GLSL Project 1.1\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(540,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(572,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
 C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(631,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(538,8): warning C4101: 'frac': unreferenced local variable
 C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(538,14): warning C4101: 'whole': unreferenced local variable
-  Generating Code...
   GLSL Project 1.1.vcxproj -> C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\GLSL Project 1.1.exe

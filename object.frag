@@ -109,8 +109,8 @@ vec4 directionalLight() {
 // of the light to make the gradient less harsh and more realistic. 
 vec4 spotLight() {
 	// controls how big the area that is lit up is
-	float outerCone = 0.090f;
-	float innerCone = 0.095f;
+	float outerCone = 0.90f;
+	float innerCone = 0.95f;
 
 	// ambient lighting
 	float ambient = 0.20f;
@@ -149,8 +149,10 @@ vec4 spotLight() {
 // Doing Phong shading
 void main()
 {
-	//vec4 pntLgt = pointLight();
-	//vec4 drtLgt = directionalLight();
-	//FragColor= mix(drtLgt, pntLgt, pntLgt.b);
-	FragColor = pointLight();
+	vec4 pntLgt = pointLight();
+	vec4 drtLgt = directionalLight();
+	vec4 sptLgt = spotLight();
+	//FragColor = mix(mix(drtLgt, pntLgt, pntLgt), sptLgt, sptLgt);
+	//FragColor = mix(drtLgt, pntLgt, pntLgt);
+	FragColor = directionalLight();
 }

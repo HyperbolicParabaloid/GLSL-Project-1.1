@@ -23,10 +23,6 @@ Camera::Camera(GLFWwindow* _window, glm::vec2 _screenDimensions, glm::vec3 _came
 	pitch = 0;
 }
 
-Camera::Camera() {
-
-}
-
 void Camera::set_projection(float angle, float aspectRatio, float nearClip, float farClip) {
 	projection = glm::perspective(angle, aspectRatio, nearClip, farClip);
 }

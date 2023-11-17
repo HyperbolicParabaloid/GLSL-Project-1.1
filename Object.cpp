@@ -89,5 +89,6 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 
 // Object class's destructor. Just deletes the dynamically allocated Shader object.
 Object::~Object() {
+	shaderProgram->Delete();
 	delete shaderProgram;
 }

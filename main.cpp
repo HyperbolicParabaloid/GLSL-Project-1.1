@@ -668,6 +668,11 @@ int main()
 			randomColor = !randomColor;
 			lockoutTimer = crntTime + 0.2;
 		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_C) && lockoutTimer <= crntTime) {
+			sphere1.reseed();
+			sphere1.setLevel(level);
+			lockoutTimer = crntTime + 0.2;
+		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Y) && lockoutTimer <= crntTime) {
 			isSmooth = !isSmooth;
 			sphere1.smoothSurface(isSmooth);

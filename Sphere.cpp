@@ -5,6 +5,7 @@ Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _lev
 	level = _level;
 	isSmooth = _isSmooth;
 	randomColor = false;
+	seed = 1;
 	genTriangles();
 }
 
@@ -109,8 +110,8 @@ void Sphere::genOctahedron() {
 	texCoords = newTexCoords;
 
 	float temp;
-	for (int vv = 0; vv <= (vertsPerSide - 1); vv++) {
-		for (int uu = 0; uu <= (vertsPerSide - 1); uu++) {
+	for (int vv = 0; vv < vertsPerSide; vv++) {
+		for (int uu = 0; uu < vertsPerSide; uu++) {
 
 			// Can I just make uu and vv go from 0->1, and make that my UV texture coodiantes?
 			// If so, I just need a new array to hold them, and assign them along with the preVerts.
@@ -118,10 +119,7 @@ void Sphere::genOctahedron() {
 			// do the same thing with the texture coords. Perhaps. We shall see. Tomorrow. When I have coffee.
 			//
 			// I lied. A little. Should be something like:
-			//texCoords[vertsPerSide * vv + uu] = glm::vec2((uu / (vertsPerSide - 1)), (vv / (vertsPerSide - 1)));	// (0->1, 0->1)
 			texCoords[vertsPerSide * vv + uu] = glm::vec2(static_cast<float>(-uu) / (vertsPerSide - 1), static_cast<float>(-vv) / (vertsPerSide - 1));	// (0->1, 0->1)
-			//std::cout << "UV = (" << -uu << ", " << -vv << ")\n";
-
 			GLfloat x, y, z = 0.f;
 			x = ((uu * 2) - (vertsPerSide - 1)) / (float)(vertsPerSide - 1);	// Goes from -1.f =>  1.f
 			y = ((vertsPerSide - 1) - (vv * 2)) / (float)(vertsPerSide - 1);	// Goes from  1.f => -1.f
@@ -174,6 +172,7 @@ void Sphere::setVerticesVector() {
 
 	int indCount = 0;
 
+	srand(seed);
 	// This nested for-loop updates verts with all its Vertex information and
 	// updates indices with all the right values.
 	for (int vv = 0; vv <= setpsPerSide; vv++) {
@@ -290,7 +289,11 @@ void Sphere::doRandomColors(bool _randomColor) {
 	randomColor = _randomColor;
 }
 
-// Rerdaws the Sphere where the Vertex normals are used instead of Surface normals of each Triangle.
+void Sphere::reseed() {
+	seed++;
+}
+
+// Redraws the Sphere where the Vertex normals are used instead of Surface normals of each Triangle.
 void Sphere::smoothSurface(bool _isSmooth) {
 	isSmooth = _isSmooth;
 }

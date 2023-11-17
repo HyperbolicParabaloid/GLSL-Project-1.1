@@ -44,7 +44,6 @@ public:
 	glm::vec3 cameraForward;
 	glm::vec3 cameraPos;
 	Camera(GLFWwindow* window, glm::vec2 screenDimensions, glm::vec3 _cameraPos, glm::vec3 _cameraForward, glm::vec3 _cameraUp);	// Constructor
-	Camera();
 
 	void set_projection(float angle, float aspectRatio, float nearClip, float farClip);
 
@@ -57,8 +56,8 @@ public:
 	glm::mat4 get_view();	// Returns the view matrix
 
 	bool fly_to(glm::vec3 newPos, glm::vec3 newForward, bool lockCursorMovement);	// Specifying a position, forward and option to lock camera
-	bool setMousePos(glm::vec3 _newForward, bool lockCursorMovement);	// forward and option to lock camera
 	bool fly_to(glm::vec3 newPos);	// Specifying a position
+	bool setMousePos(glm::vec3 _newForward, bool lockCursorMovement);	// forward and option to lock camera
 
 	void camMatrixForShader(Shader& _newShader, const char* uniformName);	// Sets the view matrix for the camera whatever shader program and uniform name are provided
 };
