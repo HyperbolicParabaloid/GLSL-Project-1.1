@@ -23,6 +23,10 @@ Camera::Camera(GLFWwindow* _window, glm::vec2 _screenDimensions, glm::vec3 _came
 	pitch = 0;
 }
 
+Camera::Camera() {
+
+}
+
 void Camera::set_projection(float angle, float aspectRatio, float nearClip, float farClip) {
 	projection = glm::perspective(angle, aspectRatio, nearClip, farClip);
 }
@@ -143,8 +147,7 @@ glm::mat4 Camera::get_view() {
 }
 
 // Sets the view matrix for the camera whatever shader program and uniform name are provided.
-void Camera::camMatrixForShader(Shader _newShader, const char* uniformName) {
-
+void Camera::camMatrixForShader(Shader& _newShader, const char* uniformName) {
 	GLuint uniView = glGetUniformLocation(_newShader.ID, uniformName);
 	glUniformMatrix4fv(uniView, 1, GL_FALSE, glm::value_ptr(view));
 

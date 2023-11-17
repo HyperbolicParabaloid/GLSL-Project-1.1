@@ -1,5 +1,7 @@
 #include "Object.h"
-Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 _color, Camera* _camera) {
+
+// Object classes constructor. Just sets some member variables and updates the glm::mat4 model of the object.
+Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) {
 	window = _window;
 	objPos = _objPos;
 	objScale = _objScale;
@@ -7,74 +9,85 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	model = glm::translate(glm::mat4(1.f), objPos);
 	model = glm::scale(model, glm::vec3(objScale));
 	camera = _camera;
+	textures = _textures;
 }
 
-Object::Object(GLFWwindow* _window) {
-	window = _window;
-	objPos = glm::vec3(1.f);
-	objScale = 1.f;
-
-	/*
-	VBO verts;
-	EBO indicies;
-	*/
-};
-
+// Rotates the object about a given acis by a set angle in degrees.
 void Object::rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation) {
 	model = glm::rotate(model, glm::radians(rotationDegreeAngle), axisOfRotation);
 }
 
+// Draws the object to the screen and sets the appropriate information in the Shader object about position, and lighting.
 void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
-	// Tell OpenGL which Shader Program we want to use
+	// Activating the shader program and binding the VAO so OpenGL knows what we're trying to do.
 	shaderProgram->Activate();
+	VAO.Bind();
 
+	// Assigning all relvant info to the shader.
+	glUniform3f(glGetUniformLocation(shaderProgram->ID, "camPos"), camera->cameraPos.x, camera->cameraPos.y, camera->cameraPos.z);
+	camera->camMatrixForShader(*shaderProgram, "camMatrix");
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram->ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glUniform3f(glGetUniformLocation(shaderProgram->ID, "lightPos"), _lightPos.x, _lightPos.y, _lightPos.z);
-	glUniform3f(glGetUniformLocation(shaderProgram->ID, "camPos"), camera->cameraPos.x, camera->cameraPos.y, camera->cameraPos.z);
 	glUniform4f(glGetUniformLocation(shaderProgram->ID, "lightColor"), _lightColor.x, _lightColor.y, _lightColor.z, _lightColor.w);
-	camera->camMatrixForShader(*shaderProgram, "camMatrix");
 
-	// Bind the VAO so OpenGL knows to use it
-	objVAO.Bind();
-
-	// Draw primitives, number of indices, datatype of indices, index of indices
-	glDrawElements(GL_TRIANGLES, indSize / sizeof(int), GL_UNSIGNED_INT, 0);
-
+	// Draw the actual mesh
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-void Object::setVBOandEBO(GLfloat* _vertices, int _vertSize, GLuint* _indices, int _indSize, std::string msg) {
+// Creates a new shader program and binds the adds the appropriate information into the GPU's memory so it can draw the
+// object.
+void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg) {
 	// Generates Shader object using shaders object.vert and object.frag
+	delete shaderProgram;
 	shaderProgram = new Shader("object.vert", "object.frag");
+	shaderProgram->Activate();
 
-	vertSize = _vertSize;
-	indSize = _indSize;
+	vertices = _vertices;
+	indices = _indices;
 
-	// Binding VAO
-	objVAO.Bind();
-
+	VAO.Bind();
 	// Setting VBO and EBO
 	// Generates Vertex Buffer Object and links it to vertices
-	objVBO = new VBO(_vertices, vertSize);
+	VBO VBO(vertices);
 	// Generates Element Buffer Object and links it to indices
-	objEBO = new EBO(_indices, indSize);
+	EBO EBO(indices);
 
 	// Links VBO attributes such as coordinates and colors to VAO
-	objVAO.LinkAttrib(*objVBO, 0, 3, GL_FLOAT, 12 * sizeof(float), (void*)0);
-	objVAO.LinkAttrib(*objVBO, 1, 3, GL_FLOAT, 12 * sizeof(float), (void*)(3 * sizeof(float)));
-	objVAO.LinkAttrib(*objVBO, 2, 4, GL_FLOAT, 12 * sizeof(float), (void*)(6 * sizeof(float)));
-	objVAO.LinkAttrib(*objVBO, 3, 2, GL_FLOAT, 12 * sizeof(float), (void*)(10 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 2, 4, GL_FLOAT, sizeof(Vertex), (void*)(6 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)(10 * sizeof(float)));
+
+	// Keep track of how many of each type of textures we have
+	unsigned int numDiffuse = 0;
+	unsigned int numSpecular = 0;
+
+	// Assign all the relevant information to the shader.
+	for (unsigned int i = 0; i < textures.size(); i++)
+	{
+		std::string num;
+		std::string type = textures[i].type;
+		if (type == "diffuse")
+		{
+			num = std::to_string(numDiffuse++);
+			glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTex"), 1);
+		}
+		else if (type == "specular")
+		{
+			num = std::to_string(numSpecular++);
+			glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTexSpec"), 1);
+		}
+		textures[i].texUnit(*shaderProgram, (type + num).c_str(), i);
+		textures[i].Bind();
+	}
 
 	// Unbind all to prevent accidentally modifying them
-	objVAO.Unbind();
-	objVBO->Unbind();
-	objEBO->Unbind();
+	VAO.Unbind();
+	VBO.Unbind();
+	EBO.Unbind();
 }
 
+// Object class's destructor. Just deletes the dynamically allocated Shader object.
 Object::~Object() {
-	delete(shaderProgram);
-	objVAO.Delete();
-	objVBO->Delete();
-	objEBO->Delete();
-	delete(objVBO);
-	delete(objEBO);
+	delete shaderProgram;
 }

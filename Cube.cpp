@@ -1,6 +1,6 @@
 #include "Cube.h"
 
-Cube::Cube(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 _color, Camera* _camera) : Object (_window, _objPos, _objScale, _color, _camera) {
+Cube::Cube(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object (_window, _objPos, _objScale, _color, _textures, _camera) {
 	genTriangles();
 }
 
@@ -21,42 +21,45 @@ void Cube::genTriangles() {
 	glm::vec3 n5 = glm::cross(v2 - v4, v3 - v2);	// Right normal
 	glm::vec3 n6 = glm::cross(v5 - v7, v8 - v7);	// Left normal
 
-	glm::vec2 texCoord = glm::vec2(0.f);
+	glm::vec2 texCoord1 = glm::vec2(0.f, 0.f);
+	glm::vec2 texCoord2 = glm::vec2(1.f, 0.f);
+	glm::vec2 texCoord3 = glm::vec2(1.f, 1.f);
+	glm::vec2 texCoord4 = glm::vec2(0.f, 1.f);
 
-	GLfloat sqrVertices[] = {
+	std::vector <Vertex> sqrVertices = {
 		//		VERTEX		/		NORMAL		/				COLOR				/	/		TEXTURE COORD	/
-		v7.x, v7.y, v7.z,	n1.x, n1.y, n1.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,	// Front face
-		v3.x, v3.y, v3.z,	n1.x, n1.y, n1.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v1.x, v1.y, v1.z,	n1.x, n1.y, n1.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v5.x, v5.y, v5.z,	n1.x, n1.y, n1.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
+		Vertex { v7, n1, color, texCoord1 },	// Front face
+		Vertex { v3, n1, color, texCoord2 },
+		Vertex { v1, n1, color, texCoord3 },
+		Vertex { v5, n1, color, texCoord4 },
 
-		v4.x, v4.y, v4.z,	n2.x, n2.y, n2.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,	// Back face
-		v8.x, v8.y, v8.z,	n2.x, n2.y, n2.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v6.x, v6.y, v6.z,	n2.x, n2.y, n2.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v2.x, v2.y, v2.z,	n2.x, n2.y, n2.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
+		Vertex { v4, n2, color, texCoord1 },	// Back face
+		Vertex { v8, n2, color, texCoord2 },
+		Vertex { v6, n2, color, texCoord3 },
+		Vertex { v2, n2, color, texCoord4 },
 
-		v5.x, v5.y, v5.z,	n3.x, n3.y, n3.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,	// Top face
-		v1.x, v1.y, v1.z,	n3.x, n3.y, n3.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v2.x, v2.y, v2.z,	n3.x, n3.y, n3.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v6.x, v6.y, v6.z,	n3.x, n3.y, n3.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
+		Vertex { v5, n3, color, texCoord1 },	// Top face
+		Vertex { v1, n3, color, texCoord2 },
+		Vertex { v2, n3, color, texCoord3 },
+		Vertex { v6, n3, color, texCoord4 },
 
-		v4.x, v4.y, v4.z,	n4.x, n4.y, n4.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,	// Bottom face
-		v8.x, v8.y, v8.z,	n4.x, n4.y, n4.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v7.x, v7.y, v7.z,	n4.x, n4.y, n4.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v3.x, v3.y, v3.z,	n4.x, n4.y, n4.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
+		Vertex { v4, n4, color, texCoord1 },	// Bottom face
+		Vertex { v8, n4, color, texCoord2 },
+		Vertex { v7, n4, color, texCoord3 },
+		Vertex { v3, n4, color, texCoord4 },
 
-		v3.x, v3.y, v3.z,	n5.x, n5.y, n5.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,	// Right face
-		v4.x, v4.y, v4.z,	n5.x, n5.y, n5.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v2.x, v2.y, v2.z,	n5.x, n5.y, n5.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v1.x, v1.y, v1.z,	n5.x, n5.y, n5.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
+		Vertex { v3, n5, color, texCoord1 },	// Right face
+		Vertex { v4, n5, color, texCoord2 },
+		Vertex { v2, n5, color, texCoord3 },
+		Vertex { v1, n5, color, texCoord4 },
 
-		v8.x, v8.y, v8.z,	n6.x, n6.y, n6.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,	// Left face
-		v7.x, v7.y, v7.z,	n6.x, n6.y, n6.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v5.x, v5.y, v5.z,	n6.x, n6.y, n6.z,	color.r, color.g, color.b, color.a,		texCoord.s, texCoord.t,
-		v6.x, v6.y, v6.z,	n6.x, n6.y, n6.z,	color.r, color.g, color.b, color.a, 	texCoord.s, texCoord.t
+		Vertex { v8, n6, color, texCoord1 },	// Left face
+		Vertex { v7, n6, color, texCoord2 },
+		Vertex { v5, n6, color, texCoord3 },
+		Vertex { v6, n6, color, texCoord4 }
 	};
 
-	GLuint sqrIndices[] = {
+	std::vector <GLuint> sqrIndices = {
 		// Front Face
 		0, 1, 2,
 		2, 3, 0,
@@ -81,5 +84,5 @@ void Cube::genTriangles() {
 		20, 21, 22,
 		22, 23, 20
 	};
-	setVBOandEBO(sqrVertices, sizeof(sqrVertices), sqrIndices, sizeof(sqrIndices), "Cube");
+	setVBOandEBO(sqrVertices, sqrIndices, "Cube");
 }

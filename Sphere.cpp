@@ -1,6 +1,7 @@
 #include "Sphere.h"
 
-Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, bool _isSmooth, glm::vec4 _color, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _camera) {
+// Constructor for Sphere.
+Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
 	level = _level;
 	isSmooth = _isSmooth;
 	randomColor = false;
@@ -10,6 +11,17 @@ Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _lev
 
 /*
 * To explain what's going on: behold, my ASCII art.
+* The sphere is made by creating a 2D plane as such,
+* and wrapping it into a Octahedron.
+* 
+* The Octahedron's points are then normalized, which
+* creates a sphere.
+* 
+* Tessellating the surface of the plane to different
+* levels increases the number of triangles by 4 each
+* time. Effectively making the surface of the sphere
+* more and more smooth. With proper lighting, level 6
+* is about all you need to make the sphere near perfect.
 +---------------------+---------------------+
 |                    /|\                    |
 |                 /   |   \                 |
@@ -61,12 +73,20 @@ Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _lev
 +----------+----------+----------+----------+
 */
 
+// Creates a new set of Vertex's and their associated indices to send to the Object
+// class for drawing.
 void Sphere::genTriangles() {
 	genOctahedron();
-	setVBOandEBO(postVerts, postVertsSize * sizeof(float), indices, indicesSize * sizeof(int), "Sphere");
+	setVBOandEBO(verts, indices, "Sphere");
 }
 
 void Sphere::genOctahedron() {
+	// Whenever we generate a new set a vertices and indices, we want to wipe the old ones.
+	// In the future it'd be better to just add in the new vertices and update indices instead
+	// of clearing both indices and verts and starting over but it's fine for now.
+	verts.clear();
+	indices.clear();
+
 	if (level < 1)
 		level = 1;
 	if (level > 10)
@@ -79,11 +99,14 @@ void Sphere::genOctahedron() {
 	// NumVertsPerSide_X = NumVertsPerSide_X-1 + NumVertsPerSide_X-1 - 1
 	int vertsPerSide = numVertsPerSide(level);
 
-	// Resizing verts2
+
+	// Resizing verts and texCoords. 
 	preVertsSize = vertsPerSide * vertsPerSide;
-	glm::vec3* newPreVerts = new glm::vec3[preVertsSize];
-	delete[] preVerts;
+
+	glm::vec3* newPreVerts = new glm::vec3[preVertsSize];	delete[] preVerts;
 	preVerts = newPreVerts;
+	glm::vec2* newTexCoords = new glm::vec2[preVertsSize];	delete[] texCoords;
+	texCoords = newTexCoords;
 
 	float temp;
 	for (int vv = 0; vv <= (vertsPerSide - 1); vv++) {
@@ -93,6 +116,11 @@ void Sphere::genOctahedron() {
 			// If so, I just need a new array to hold them, and assign them along with the preVerts.
 			// then, when preVerts get mapped into postVerts inside of the setNorms function, I can
 			// do the same thing with the texture coords. Perhaps. We shall see. Tomorrow. When I have coffee.
+			//
+			// I lied. A little. Should be something like:
+			//texCoords[vertsPerSide * vv + uu] = glm::vec2((uu / (vertsPerSide - 1)), (vv / (vertsPerSide - 1)));	// (0->1, 0->1)
+			texCoords[vertsPerSide * vv + uu] = glm::vec2(static_cast<float>(-uu) / (vertsPerSide - 1), static_cast<float>(-vv) / (vertsPerSide - 1));	// (0->1, 0->1)
+			//std::cout << "UV = (" << -uu << ", " << -vv << ")\n";
 
 			GLfloat x, y, z = 0.f;
 			x = ((uu * 2) - (vertsPerSide - 1)) / (float)(vertsPerSide - 1);	// Goes from -1.f =>  1.f
@@ -129,115 +157,25 @@ void Sphere::genOctahedron() {
 				z = -1.f + (abs(x) + abs(y));
 			}
 
+			// Normalizing the vector, places the vertices of the Octehdron on the surface of the sphere.
 			preVerts[vertsPerSide * vv + uu] = glm::normalize(glm::vec3(x, y, z));
 		}
 	}
-	setPreIndices();
-	setNorms();
-	setPostIndices();
+	setVerticesVector();
 }
 
-
-void Sphere::setNorms() {
-	int numTriangles = pow(4, level - 1) * 2;
-
-	// Resizing final verts
-	int numVertsPerTriangle = 3, numFloatsPerVert = 3, numFloatsPerNorm = 3, numFloatsPerColor = 4, numFloatsPerTextureCoords = 2;
-	int offset = numFloatsPerVert + numFloatsPerNorm + numFloatsPerColor + numFloatsPerTextureCoords;
-
-	postVertsSize = numTriangles * numVertsPerTriangle * offset;
-	GLfloat* newPostVerts = new GLfloat[postVertsSize];
-	delete[] postVerts;
-	postVerts = newPostVerts;
-
-	int normCount = 0;
-	for (int ii = 0; ii < indicesSize; ii += 6) {
-		glm::vec3 v1 = preVerts[indices[ii + 0]];
-		glm::vec3 v2 = preVerts[indices[ii + 1]];
-		glm::vec3 v3 = preVerts[indices[ii + 2]];
-
-		glm::vec3 v4 = preVerts[indices[ii + 3]];
-		glm::vec3 v5 = preVerts[indices[ii + 4]];
-		glm::vec3 v6 = preVerts[indices[ii + 5]];
-
-		glm::vec3 n1 = glm::normalize(glm::cross(v3 - v2, v1 - v2));
-		glm::vec3 n2 = glm::normalize(glm::cross(v6 - v5, v4 - v5));
-
-		glm::vec4 color1, color2;
-		if (randomColor) {
-			float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			float r3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			color1 = glm::vec4(r1, r2, r3, 1.f);
-
-			float r4 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			float r5 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			float r6 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			color2 = glm::vec4(r4, r5, r6, 1.f);
-		}
-		else
-			color1 = color2 = color;
-
-		// Copying the contents from the new temp verts into the finalVerts2 array
-		int count = ii * offset;
-
-		glm::vec2 texCoord = glm::vec2(0.f);
-
-		if (!isSmooth) {
-			//						|	VERTEX		|	|	NORMAL		|	|				COLOR					|	|	TEXTURE COORD		|
-			GLfloat tempVert1[] = { v1.x, v1.y, v1.z,	n1.x, n1.y, n1.z,	color1.r, color1.g, color1.b, color1.a,		texCoord.s, texCoord.t };
-			GLfloat tempVert2[] = { v2.x, v2.y, v2.z,	n1.x, n1.y, n1.z,	color1.r, color1.g, color1.b, color1.a,		texCoord.s, texCoord.t };
-			GLfloat tempVert3[] = { v3.x, v3.y, v3.z,	n1.x, n1.y, n1.z,	color1.r, color1.g, color1.b, color1.a,		texCoord.s, texCoord.t };
-
-			//						|	VERTEX		|	|	NORMAL		|	|				COLOR					|	|	TEXTURE COORD		|
-			GLfloat tempVert4[] = { v4.x, v4.y, v4.z,	n2.x, n2.y, n2.z,	color2.r, color2.g, color2.b, color2.a,		texCoord.s, texCoord.t };
-			GLfloat tempVert5[] = { v5.x, v5.y, v5.z,	n2.x, n2.y, n2.z,	color2.r, color2.g, color2.b, color2.a,		texCoord.s, texCoord.t };
-			GLfloat tempVert6[] = { v6.x, v6.y, v6.z,	n2.x, n2.y, n2.z,	color2.r, color2.g, color2.b, color2.a,		texCoord.s, texCoord.t };
-
-			std::copy(tempVert1, tempVert1 + offset, postVerts + count + offset * 0);
-			std::copy(tempVert2, tempVert2 + offset, postVerts + count + offset * 1);
-			std::copy(tempVert3, tempVert3 + offset, postVerts + count + offset * 2);
-			std::copy(tempVert4, tempVert4 + offset, postVerts + count + offset * 3);
-			std::copy(tempVert5, tempVert5 + offset, postVerts + count + offset * 4);
-			std::copy(tempVert6, tempVert6 + offset, postVerts + count + offset * 5);
-		}
-		else {
-			//						|	VERTEX		|	|	NORMAL		|	|				COLOR					|	|	TEXTURE COORD		|
-			GLfloat tempVert1[] = { v1.x, v1.y, v1.z,	v1.x, v1.y, v1.z,	color1.r, color1.g, color1.b, color1.a,		texCoord.s, texCoord.t };
-			GLfloat tempVert2[] = { v2.x, v2.y, v2.z,	v2.x, v2.y, v2.z,	color1.r, color1.g, color1.b, color1.a,		texCoord.s, texCoord.t };
-			GLfloat tempVert3[] = { v3.x, v3.y, v3.z,	v3.x, v3.y, v3.z,	color1.r, color1.g, color1.b, color1.a,		texCoord.s, texCoord.t };
-
-			//						|	VERTEX		|	|	NORMAL		|	|				COLOR					|	|	TEXTURE COORD		|
-			GLfloat tempVert4[] = { v4.x, v4.y, v4.z,	v4.x, v4.y, v4.z,	color2.r, color2.g, color2.b, color2.a,		texCoord.s, texCoord.t };
-			GLfloat tempVert5[] = { v5.x, v5.y, v5.z,	v5.x, v5.y, v5.z,	color2.r, color2.g, color2.b, color2.a,		texCoord.s, texCoord.t };
-			GLfloat tempVert6[] = { v6.x, v6.y, v6.z,	v6.x, v6.y, v6.z,	color2.r, color2.g, color2.b, color2.a,		texCoord.s, texCoord.t };
-
-			std::copy(tempVert1, tempVert1 + offset, postVerts + count + offset * 0);
-			std::copy(tempVert2, tempVert2 + offset, postVerts + count + offset * 1);
-			std::copy(tempVert3, tempVert3 + offset, postVerts + count + offset * 2);
-			std::copy(tempVert4, tempVert4 + offset, postVerts + count + offset * 3);
-			std::copy(tempVert5, tempVert5 + offset, postVerts + count + offset * 4);
-			std::copy(tempVert6, tempVert6 + offset, postVerts + count + offset * 5);
-		}
-
-		normCount += 2;
-	}
-}
-
-void Sphere::setPreIndices() {
+//
+void Sphere::setVerticesVector() {
 	int vertsPerSide = numVertsPerSide(level);
 	int setpsPerSide = vertsPerSide - 2;
-
-	// Resizing indices aray.
-	indicesSize = pow(4, level - 1) * 2 * 3;
-	GLuint* newInds = new GLuint[indicesSize];
-	delete[] indices;
-	indices = newInds;
 
 	int t0, t1, t2; // First triangle
 	int t3, t4, t5; // Second triangle;
 
 	int indCount = 0;
+
+	// This nested for-loop updates verts with all its Vertex information and
+	// updates indices with all the right values.
 	for (int vv = 0; vv <= setpsPerSide; vv++) {
 		for (int uu = 0; uu <= setpsPerSide; uu++) {
 			//	+-+
@@ -265,45 +203,94 @@ void Sphere::setPreIndices() {
 				t4 = (uu + 1) + (vertsPerSide * (vv + 1));
 				t5 = (uu + 1) + (vertsPerSide * (vv + 0));
 			}
-			indices[indCount + 0] = t0;
-			indices[indCount + 1] = t1;
-			indices[indCount + 2] = t2;
-			indices[indCount + 3] = t3;
-			indices[indCount + 4] = t4;
-			indices[indCount + 5] = t5;
-			indCount += 6;
+
+			// These are the position and texture coordiante glm::vecs for each of the two triangles per-square.
+			glm::vec3 v1 = preVerts[t0];	glm::vec2 tex1 = texCoords[t0];
+			glm::vec3 v2 = preVerts[t1];	glm::vec2 tex2 = texCoords[t1];
+			glm::vec3 v3 = preVerts[t2];	glm::vec2 tex3 = texCoords[t2];
+
+			glm::vec3 v4 = preVerts[t3];	glm::vec2 tex4 = texCoords[t3];
+			glm::vec3 v5 = preVerts[t4];	glm::vec2 tex5 = texCoords[t4];
+			glm::vec3 v6 = preVerts[t5];	glm::vec2 tex6 = texCoords[t5];
+
+			// Setting the colors of the object:
+			glm::vec4 color1, color2;
+			if (randomColor) {
+				float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				float r3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				color1 = glm::vec4(r1, r2, r3, 1.f);
+
+				float r4 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				float r5 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				float r6 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				color2 = glm::vec4(r4, r5, r6, 1.f);
+			}
+			else
+				color1 = color2 = color;
+
+			// If the Sphere's lighting is supposed to be smooth, these normals will be the same
+			// as the position (on a sphere, all vertex's point directly away from the center already).
+			//
+			// If we'd rather they appear angular, we can set that by getting the normal of the triangle
+			// the vertexs are a part of, and using that for each Vertex.
+			if (!isSmooth) {
+				glm::vec3 n1 = glm::normalize(glm::cross(v3 - v2, v1 - v2));
+				glm::vec3 n2 = glm::normalize(glm::cross(v6 - v5, v4 - v5));
+
+				verts.push_back(Vertex{ v1, n1, color1, tex1 });
+				verts.push_back(Vertex{ v2, n1, color1, tex2 });
+				verts.push_back(Vertex{ v3, n1, color1, tex3 });
+
+				verts.push_back(Vertex{ v4, n2, color2, tex4 });
+				verts.push_back(Vertex{ v5, n2, color2, tex5 });
+				verts.push_back(Vertex{ v6, n2, color2, tex6 });
+			}
+			else {
+				verts.push_back(Vertex{ v1, v1, color1, tex1 });
+				verts.push_back(Vertex{ v2, v2, color1, tex2 });
+				verts.push_back(Vertex{ v3, v3, color1, tex3 });
+
+				verts.push_back(Vertex{ v4, v4, color2, tex4 });
+				verts.push_back(Vertex{ v5, v5, color2, tex5 });
+				verts.push_back(Vertex{ v6, v6, color2, tex6 });
+			}
+			// Finally, setting the values of the Indices. I have it in such a way,
+			// that indices[n] = n; for all n; >= 0, < indices.size().
+			for (int ii = 0; ii < 6; ii++) {
+				indices.push_back(indCount);
+				indCount++;
+			}
 		}
 	}
 
 }
 
-void Sphere::setPostIndices() {
-	for (int ii = 0; ii < indicesSize; ii++) {
-		indices[ii] = ii;
-	}
-}
-
+// Destructor of Sphere class.
 Sphere::~Sphere() {
 	delete[] preVerts;
-	delete[] indices;
-	delete[] postVerts;
+	delete[] texCoords;
 }
 
+// Returns the number of Vertices per side of the plane at a given level of Tessellation.
 int Sphere::numVertsPerSide(int _level) {
 	if (_level == 1)
 		return 2;
 	return 2 * numVertsPerSide(_level - 1) - 1;
 }
 
+// Sets a new level for the Sphere and calls genTriangles to create a new Sphere at the given level.
 void Sphere::setLevel(int _level) {
 	level = _level;
 	genTriangles();
 }
 
+// Redraws the Sphere where ever triangle has a random color.
 void Sphere::doRandomColors(bool _randomColor) {
 	randomColor = _randomColor;
 }
 
+// Rerdaws the Sphere where the Vertex normals are used instead of Surface normals of each Triangle.
 void Sphere::smoothSurface(bool _isSmooth) {
 	isSmooth = _isSmooth;
 }

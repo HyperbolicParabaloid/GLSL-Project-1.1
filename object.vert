@@ -17,6 +17,8 @@ out vec4 color;
 out vec3 Normal;
 // Current position of vertex, used to calculate direction of flight
 out vec3 crntPos;
+// Outputs the texture coordinates to the fragment shader
+out vec2 texCoord;
 
 // Controls the scale of the vertices
 uniform mat4 model;
@@ -30,17 +32,13 @@ void main()
 	crntPos = vec3(model * vec4(aPos, 1.f));
 	
 	// Outputs the positions/coordinates of all vertices
-	
 	gl_Position = camMatrix * vec4(crntPos, 1.f);
+
+	texCoord = aTex;
 	
 	// Assigns the colors from the Vertex Data to "color"
 	color = aColor;
 	
-	// Assigns normal
-	//mat3 normalMatrix = mat3(camMatrix * model);
-	//normalMatrix = inverse(normalMatrix);
-	//normalMatrix = transpose(normalMatrix);
-	//Normal = normalize(aNormal * normalMatrix);
-	
+	// This will rotate the surface normals along with the model.
 	Normal = transpose(inverse(mat3(model))) * aNormal;		
 }

@@ -148,6 +148,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="EditingSphere.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="EBO.cpp" />
@@ -170,6 +173,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="EditingSphere.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="EBO.h" />
@@ -180,6 +186,8 @@
     <ClInclude Include="VBO.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\Downloads\planks.png" />
+    <Image Include="..\..\..\Downloads\planksSpec.png" />
     <Image Include="137215-barack-face-vector-obama-png-image-high-quality.png" />
     <Image Include="brick.png" />
     <Image Include="pop_cat.png" />

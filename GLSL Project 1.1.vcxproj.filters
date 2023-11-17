@@ -57,6 +57,15 @@
     <ClCompile Include="Cube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EditingSphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="default.vert">
@@ -106,6 +115,15 @@
     <ClInclude Include="Cube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditingSphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="pop_cat.png">
@@ -115,6 +133,12 @@
       <Filter>Resource Files\Textures</Filter>
     </Image>
     <Image Include="137215-barack-face-vector-obama-png-image-high-quality.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\..\..\Downloads\planksSpec.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="..\..\..\Downloads\planks.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
   </ItemGroup>
