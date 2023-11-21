@@ -177,7 +177,7 @@ void main()
 	vec4 sptLgt = spotLight();
 	//FragColor = mix(mix(drtLgt, pntLgt, pntLgt), sptLgt, sptLgt);
 	//FragColor = mix(drtLgt, pntLgt, pntLgt);
-	//FragColor = drtLgt;
+	//FragColor = pntLgt;
 	//return;
 
 	vec2 uv = texCoord;
@@ -190,12 +190,12 @@ void main()
 	//	uv.x += 0.5;
 
 	// Adds in the cell boarders so you can see what you're doing a little better.
-	if (fract(uv.x) > 0.99 || fract(uv.x) < 0.01)
-		FragColor = vec4(1);
-	else if (fract(uv.y) > 0.99 || fract(uv.y) < 0.01)
-		FragColor = vec4(1);
-	else
-		FragColor = mix(noiseColor, vec4(1), 0);
+	//if (fract(uv.x) > 0.99 || fract(uv.x) < 0.01)
+	//	FragColor = vec4(1);
+	//else if (fract(uv.y) > 0.99 || fract(uv.y) < 0.01)
+	//	FragColor = vec4(1);
+	//else
+		FragColor = mix(noiseColor, vec4(1), n / 2);
 
 	vec2 cPos = vec2(int(uv.x), int(uv.y));
 	
@@ -208,8 +208,8 @@ void main()
 	int searchDist = 1;
 	// Maximum and minimum time it will take a given circle to reach it's
 	// maximum radius as it expands.
-	float maxCrclTm = 1, minCrclTm = 0.25;//0.5;
-	float maxRadius = 1.0, minRadius = 0.25;//0.5;
+	float maxCrclTm = 0.5, minCrclTm = 0.25;//0.5;
+	float maxRadius = 1.0, minRadius = 1.0;//0.5;
 
 	float offset = 0.1;
 	for (int jj = -searchDist; jj <= searchDist; jj++) {
@@ -221,8 +221,8 @@ void main()
 
 			// timeScaler		= Seconds until the circle reaches max radius, minCrclTm -> maxCrclTm
 			// rand(searchPos)	= Max radius
-			float timeScaler = clamp(rand(searchPos) * maxCrclTm, minCrclTm, maxCrclTm);
-			float circleMaxRadius = clamp(rand(searchPos) * maxRadius, minRadius, maxRadius);
+			float timeScaler = rand(searchPos) * (maxCrclTm - minCrclTm) + minCrclTm;
+			float circleMaxRadius = rand(searchPos) * (maxRadius - minRadius) + minRadius;
 
 			// Everytime (time * timeScaler) reaches a new whole number,
 			// we know that the maximum radius of the circle has been achieved
@@ -242,9 +242,9 @@ void main()
 
 			// New Version where the max radius can change everytime.
 			if (circleMaxRadius < 0.5)
-				radiusOuter = fract(time / timeScaler) * ((circleMaxRadius) * offset);
+				radiusOuter = fract(time / timeScaler) * ((circleMaxRadius)) / 10;
 			else
-				radiusOuter = fract(time / timeScaler) * ((circleMaxRadius) * offset);
+				radiusOuter = fract(time / timeScaler) * ((circleMaxRadius)) / 4;
 			//radiusOuter = fract(time / timeScaler) * circleMaxRadius;	// Old Version with set max radius per cell
 			radiusInner = radiusOuter * clamp(offset * 1.5, 0.9, .95);
 
@@ -257,7 +257,7 @@ void main()
 			// Pretty self explanitory: if distance > min but < max, draw the color.
 			if ((cLength <= radiusOuter && cLength > radiusInner)) {
 				//vec4 randomColor = vec4(rand(searchPos), rand(searchPos + 1), rand(searchPos + 2), 1);
-				FragColor = mix(vec4(1), FragColor, fract(time / timeScaler));
+				FragColor = mix(vec4(.75), FragColor, fract(time / timeScaler));
 			} //else if (cLength <= radiusInner)
 			//	FragColor = FragColor;
 		}

@@ -90,7 +90,7 @@ vec3 calculateNoiseWave() {
 void main()
 {
 	crntPos = aPos;
-	crntPos.y = applyNoise(crntPos);
+	//crntPos.y = applyNoise(crntPos);
 	//float newY = (noise(aPos.xz + time) * 2.f) + (noise((aPos.xz + time) * 1.2) * 1/8) + (noise((aPos.xz + time) * 2) * 1/16);
 	//crntPos.y += newY / 10.f;
 	crntPos = vec3(model * vec4(crntPos, 1.f));
