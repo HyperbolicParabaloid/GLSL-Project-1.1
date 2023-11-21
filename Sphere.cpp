@@ -124,39 +124,43 @@ void Sphere::genOctahedron() {
 			x = ((uu * 2) - (vertsPerSide - 1)) / (float)(vertsPerSide - 1);	// Goes from -1.f =>  1.f
 			y = ((vertsPerSide - 1) - (vv * 2)) / (float)(vertsPerSide - 1);	// Goes from  1.f => -1.f
 
-			// Transforming the 2D plane to a 3D Octahedron.
-			if (abs(x) + abs(y) <= 1)
-				z = 1.f - (abs(x) + abs(y));
-			else {
-				temp = x;
-				// 1st Quadrant
-				if (x >= 0 && y >= 0) {
-					x = 1 - y;
-					y = 1 - temp;
+			if (true) {
+				// Transforming the 2D plane to a 3D Octahedron.
+				if (abs(x) + abs(y) <= 1)
+					z = 1.f - (abs(x) + abs(y));
+				else {
+					temp = x;
+					// 1st Quadrant
+					if (x >= 0 && y >= 0) {
+						x = 1 - y;
+						y = 1 - temp;
+					}
+
+					// 2nd Quadrant
+					else if (x < 0 && y >= 0) {
+						x = -1 + y;
+						y = 1 + temp;
+					}
+
+					// 3rd Quadrant
+					else if (x >= 0 && y < 0) {
+						x = 1 + y;
+						y = -1 + temp;
+					}
+
+					// 4th Quadrant
+					else if (x < 0 && y < 0) {
+						x = -1 - y;
+						y = -1 - temp;
+					}
+					z = -1.f + (abs(x) + abs(y));
 				}
-			
-				// 2nd Quadrant
-				else if (x < 0 && y >= 0) {
-					x = -1 + y;
-					y = 1 + temp;
-				}
-			
-				// 3rd Quadrant
-				else if (x >= 0 && y < 0) {
-					x = 1 + y;
-					y = -1 + temp;
-				}
-			
-				// 4th Quadrant
-				else if (x < 0 && y < 0) {
-					x = -1 - y;
-					y = -1 - temp;
-				}
-				z = -1.f + (abs(x) + abs(y));
 			}
 
 			// Normalizing the vector, places the vertices of the Octehdron on the surface of the sphere.
 			preVerts[vertsPerSide * vv + uu] = glm::normalize(glm::vec3(x, y, z));
+			//preVerts[vertsPerSide * vv + uu] = glm::vec3(x, y, z);
+			//preVerts[vertsPerSide * vv + uu] = glm::vec3(-x, z, y);
 		}
 	}
 	setVerticesVector();

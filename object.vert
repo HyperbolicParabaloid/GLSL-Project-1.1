@@ -24,13 +24,32 @@ out vec2 texCoord;
 uniform mat4 model;
 //uniform mat4 projection;
 uniform mat4 camMatrix;
+// For time
+uniform float time;
 
+float rand(vec2 co) {
+    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+float rand(float n){return fract(sin(n) * 43758.5453123);}
+
+float noise(float p){
+	float fl = floor(p);
+  float fc = fract(p);
+	return mix(rand(fl), rand(fl + 1.0), fc);
+}
+	
+float noise(vec2 n) {
+	const vec2 d = vec2(0.0, 1.0);
+  vec2 b = floor(n), f = smoothstep(vec2(0.0), vec2(1.0), fract(n));
+	return mix(mix(rand(b), rand(b + d.yx), f.x), mix(rand(b + d.xy), rand(b + d.yy), f.x), f.y);
+}
 
 void main()
 {
 	//vec4 scaledPos = vec4(aPos.x + aPos.x * scale, aPos.y + aPos.y * scale, aPos.z + aPos.z * scale, 1.0);
 	crntPos = vec3(model * vec4(aPos, 1.f));
-	
+
 	// Outputs the positions/coordinates of all vertices
 	gl_Position = camMatrix * vec4(crntPos, 1.f);
 
@@ -38,7 +57,8 @@ void main()
 	
 	// Assigns the colors from the Vertex Data to "color"
 	color = aColor;
-	
+
 	// This will rotate the surface normals along with the model.
-	Normal = transpose(inverse(mat3(model))) * aNormal;		
+	Normal = transpose(inverse(mat3(model))) * aNormal;
+
 }

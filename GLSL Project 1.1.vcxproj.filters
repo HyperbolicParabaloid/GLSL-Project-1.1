@@ -86,6 +86,15 @@
     <None Include="object.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="wave.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="wave.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="computeShader.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaderClass.h">

@@ -76,7 +76,7 @@ vec4 directionalLight() {
 	float ambient = 0.2f;
 	
 	// Position of the light
-	vec3 lightVec = vec3(0.0, 1.0f, 1.0f);
+	vec3 lightVec = vec3(0.0, 1.0f, 5.0f);
 
 	// diffuse lighting
 	vec3 normal = normalize(Normal);
@@ -154,5 +154,5 @@ void main()
 	vec4 sptLgt = spotLight();
 	//FragColor = mix(mix(drtLgt, pntLgt, pntLgt), sptLgt, sptLgt);
 	//FragColor = mix(drtLgt, pntLgt, pntLgt);
-	FragColor = directionalLight();
+	FragColor = pntLgt;
 }

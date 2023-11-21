@@ -29,6 +29,7 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram->ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glUniform3f(glGetUniformLocation(shaderProgram->ID, "lightPos"), _lightPos.x, _lightPos.y, _lightPos.z);
 	glUniform4f(glGetUniformLocation(shaderProgram->ID, "lightColor"), _lightColor.x, _lightColor.y, _lightColor.z, _lightColor.w);
+	glUniform1f(glGetUniformLocation(shaderProgram->ID, "time"), glfwGetTime());
 
 	// Draw the actual mesh
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
@@ -39,7 +40,13 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg) {
 	// Generates Shader object using shaders object.vert and object.frag
 	delete shaderProgram;
-	shaderProgram = new Shader("object.vert", "object.frag");
+
+	if (msg == "Plane") {
+		shaderProgram = new Shader("wave.vert", "wave.frag");
+		glUniform1f(glGetUniformLocation(shaderProgram->ID, "offset"), 2.f / (sqrt(_vertices.size()) - 1.f));
+	}
+	else
+		shaderProgram = new Shader("object.vert", "object.frag");
 	shaderProgram->Activate();
 
 	vertices = _vertices;
@@ -91,4 +98,68 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 Object::~Object() {
 	shaderProgram->Delete();
 	delete shaderProgram;
+}
+
+void Object::moveFirstVertex() {
+	//vertices[0].pos.y += 0.1f;
+	//(noise(aPos.xz + time) * 2.f) + (noise((aPos.xz + time) * 1.2) * 1/8) + (noise((aPos.xz + time) * 2) * 1/16);
+	for (Vertex& v : vertices) {
+		v.pos.y = noise(glm::vec2(v.texCoord.x + glfwGetTime(), v.texCoord.y + glfwGetTime()));
+		std::cout << "Yaaaaas\n";
+	}
+
+	VAO.Bind();
+	// Setting VBO and EBO
+	// Generates Vertex Buffer Object and links it to vertices
+	VBO VBO(vertices);
+	// Generates Element Buffer Object and links it to indices
+	EBO EBO(indices);
+
+	// Links VBO attributes such as coordinates and colors to VAO
+	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 2, 4, GL_FLOAT, sizeof(Vertex), (void*)(6 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)(10 * sizeof(float)));
+
+	VAO.Unbind();
+	VBO.Unbind();
+	EBO.Unbind();
+}
+
+float Object::newrand(glm::vec2 co) {
+	return glm::fract(sin(glm::dot(co, glm::vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+float Object::noise(glm::vec2 n) {
+	const glm::vec2 d = glm::vec2(0.0, 1.0);
+	glm::vec2 b = floor(n), f = glm::smoothstep(glm::vec2(0.0), glm::vec2(1.0), fract(n));
+	return glm::mix(glm::mix(newrand(b), newrand(b + glm::vec2(d.y, d.x)), f.x), glm::mix(newrand(b + glm::vec2(d.x, d.y)), newrand(b + glm::vec2(d.y, d.y)), f.x), f.y);
+}
+
+void Object::hotRealoadShader() {
+	shaderProgram->hotReaload();
+	shaderProgram->Activate();
+
+	// Keep track of how many of each type of textures we have
+	unsigned int numDiffuse = 0;
+	unsigned int numSpecular = 0;
+
+	// Assign all the relevant information to the shader.
+	for (unsigned int i = 0; i < textures.size(); i++)
+	{
+		std::string num;
+		std::string type = textures[i].type;
+		if (type == "diffuse")
+		{
+			num = std::to_string(numDiffuse++);
+			glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTex"), 1);
+		}
+		else if (type == "specular")
+		{
+			num = std::to_string(numSpecular++);
+			glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTexSpec"), 1);
+		}
+		textures[i].texUnit(*shaderProgram, (type + num).c_str(), i);
+		textures[i].Bind();
+	}
 }

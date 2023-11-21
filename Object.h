@@ -41,7 +41,6 @@ public:
 	Shader* shaderProgram;
 	Camera* camera;
 	Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 color, std::vector <Texture>& _textures, Camera* _camera);
-	Object();
 	~Object();
 	void draw(glm::vec3 _lightPos, glm::vec4 _lightColor);
 	glm::vec4 color;
@@ -49,6 +48,12 @@ public:
 	void setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg);
 	//void setVBOandEBO(std::vector <Triangle>* _triangles, int _trianglesSize, GLuint* _indices, int _indSize, std::string msg);
 	void rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation);
+	void moveFirstVertex();
+
+	void hotRealoadShader();
+
+	float newrand(glm::vec2 co);
+	float noise(glm::vec2 n);
 };
 
 #endif

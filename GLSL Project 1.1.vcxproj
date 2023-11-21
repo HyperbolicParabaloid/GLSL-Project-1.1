@@ -164,12 +164,15 @@
     <ClCompile Include="VBO.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="computeShader.vert" />
     <None Include="default.frag" />
     <None Include="default.vert" />
     <None Include="light.frag" />
     <None Include="light.vert" />
     <None Include="object.frag" />
     <None Include="object.vert" />
+    <None Include="wave.frag" />
+    <None Include="wave.vert" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
