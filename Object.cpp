@@ -40,7 +40,6 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg) {
 	// Generates Shader object using shaders object.vert and object.frag
 	delete shaderProgram;
-
 	if (msg == "Plane") {
 		shaderProgram = new Shader("wave.vert", "wave.frag");
 		glUniform1f(glGetUniformLocation(shaderProgram->ID, "offset"), 2.f / (sqrt(_vertices.size()) - 1.f));

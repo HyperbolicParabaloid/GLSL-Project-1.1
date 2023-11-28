@@ -2,8 +2,7 @@
 #include"Cube.h"
 #include"Sphere.h"
 #include"Plane.h"
-
-#define PI 3.1415926538
+#include"Cone.h"
 
 // Setting up array of vertices.
 // Now I'm using this vertices array to hold the vertex info while
@@ -609,7 +608,7 @@ int main()
 
 	glm::vec3 plane1Pos = glm::vec3(0.0f, -1.5f, 0.0f);
 	//Plane plane1(window, plane1Pos, 40.f, true, glm::vec4(1.f, 1.f, 1.f, 1.f), tex, &camera);
-	Plane plane1(window, plane1Pos, 5.f, 2, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
+	Plane plane1(window, plane1Pos, 25.f, 2, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
 	
 	float cube1y = -1.5 + sqrt(3);
 	glm::vec3 cube1Pos = glm::vec3(-2.5f, cube1y, -2.5f);
@@ -626,8 +625,12 @@ int main()
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
 	Sphere sphere1(window, sphere1Pos, .5f, 2, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 
+	glm::vec3 cone1Pos = glm::vec3(0.0f, 3.f, -2.5f);
+	Cone cone1(window, cone1Pos, 1.f, 16, 2.f, 0.f, 1.f, true, glm::vec4(1.f, .2f, .1f, 1.f), empty, &camera);
+
 	std::vector <Object*> objectList;
 
+	objectList.push_back(&cone1);
 	objectList.push_back(&sphere1);
 	objectList.push_back(&cube1);
 	objectList.push_back(&cube2);
@@ -635,7 +638,7 @@ int main()
 	objectList.push_back(&plane1);
 
 
-	//camera.set_camera_speed(10);
+	camera.set_camera_speed(10);
 	level = 2;
 	int planeLevel = 2;
 	bool randomColor = true;
@@ -688,33 +691,31 @@ int main()
 			std::cout << "Crotation\n";
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
-			sphere1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
+			cone1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_UP)) {
-			sphere1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
+			cone1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_DOWN)) {
-			sphere1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
+			cone1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_RIGHT)) {
-			sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
+			cone1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_MINUS) && lockoutTimer <= crntTime) {
 			level--;
 			std::cout << "\nLevel: " << level << "\n";
 			sphere1.setLevel(level);
-			planeScale1 -= 1.f;
-			plane1.setScale(planeScale1);
 			plane1.setLevel(level);
+			//cone1.setLevel(level);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_EQUAL) && lockoutTimer <= crntTime) {
 			level++;
 			std::cout << "\nLevel: " << level << "\n";
 			sphere1.setLevel(level);
-			planeScale1 += 1.f;
-			plane1.setScale(planeScale1);
 			plane1.setLevel(level);
+			//cone1.setLevel(level);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_9) && lockoutTimer <= crntTime) {

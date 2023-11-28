@@ -253,6 +253,7 @@ void Plane::genOctahedron() {
 			// Normalizing the vector, places the vertices of the Octehdron on the surface of the sphere.
 			//preVerts[vertsPerSide * vv + uu] = glm::normalize(glm::vec3(x, y, z));
 			//preVerts[vertsPerSide * vv + uu] = glm::vec3(x, y, z);
+			//z += noise(glm::vec2(-x, y) + float(glfwGetTime())) / 3.f;// +(noise((glm::vec2(-x, y) * float(seed)) * 1.2f) * 1 / 8) + (noise(glm::vec2(-x, y) * 2.f) * 1 / 16)) / 5.f;
 			preVerts[vertsPerSide * vv + uu] = glm::vec3(-x, z, y);
 		}
 	}

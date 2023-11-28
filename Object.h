@@ -1,6 +1,8 @@
 #ifndef OBJECT_CLASS_H
 #define OBJECT_CLASS_H
 
+#define PI 3.1415926538
+
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

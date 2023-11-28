@@ -177,8 +177,8 @@ void main()
 	vec4 sptLgt = spotLight();
 	//FragColor = mix(mix(drtLgt, pntLgt, pntLgt), sptLgt, sptLgt);
 	//FragColor = mix(drtLgt, pntLgt, pntLgt);
-	//FragColor = pntLgt;
-	//return;
+	FragColor = pntLgt;
+	return;
 
 	vec2 uv = texCoord;
 	
@@ -209,7 +209,7 @@ void main()
 	// Maximum and minimum time it will take a given circle to reach it's
 	// maximum radius as it expands.
 	float maxCrclTm = 0.5, minCrclTm = 0.25;//0.5;
-	float maxRadius = 1.0, minRadius = 1.0;//0.5;
+	float maxRadius = 0.75, minRadius = 0.5;//0.5;
 
 	float offset = 0.1;
 	for (int jj = -searchDist; jj <= searchDist; jj++) {
@@ -242,9 +242,9 @@ void main()
 
 			// New Version where the max radius can change everytime.
 			if (circleMaxRadius < 0.5)
-				radiusOuter = fract(time / timeScaler) * ((circleMaxRadius)) / 10;
+				radiusOuter = fract(time / timeScaler) * ((circleMaxRadius));
 			else
-				radiusOuter = fract(time / timeScaler) * ((circleMaxRadius)) / 4;
+				radiusOuter = fract(time / timeScaler) * ((circleMaxRadius));
 			//radiusOuter = fract(time / timeScaler) * circleMaxRadius;	// Old Version with set max radius per cell
 			radiusInner = radiusOuter * clamp(offset * 1.5, 0.9, .95);
 

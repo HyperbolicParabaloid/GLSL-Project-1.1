@@ -1,11 +1,8 @@
-﻿  Object.cpp
+﻿  main.cpp
 C:\Users\riley\source\repos\GLSL Project 1.1\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\riley\source\repos\GLSL Project 1.1\Object.cpp(32,74): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Object.cpp(35,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Object.cpp(46,70): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\riley\source\repos\GLSL Project 1.1\Object.cpp(130,19): warning C4244: 'return': conversion from 'genType' to 'float', possible loss of data
-          with
-          [
-              genType=double
-          ]
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(580,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(613,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(683,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(578,8): warning C4101: 'frac': unreferenced local variable
+C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp(578,14): warning C4101: 'whole': unreferenced local variable
   GLSL Project 1.1.vcxproj -> C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\GLSL Project 1.1.exe
