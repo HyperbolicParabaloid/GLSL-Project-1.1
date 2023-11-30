@@ -13,7 +13,7 @@ private:
 	void genTriangles();
 	int numVertsPerSide(int _level);
 	void setVerticesVector();
-
+	
 	std::vector <Vertex> verts;		// Vertex vector that gets sent to Object class to put information into the GPU.
 	std::vector <GLuint> indices;	// GLuint vector that gets sent to Object class to put indices into the GPU.
 
@@ -39,6 +39,8 @@ public:
 	void doRandomColors(bool _randomColor);
 	void reseed();
 	void smoothSurface(bool _isSmooth);
+	void setTopRadius(float _topRadius);
+	void setHeight(float _height);
 };
 
 #endif

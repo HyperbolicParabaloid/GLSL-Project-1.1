@@ -625,8 +625,16 @@ int main()
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
 	Sphere sphere1(window, sphere1Pos, .5f, 2, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 
-	glm::vec3 cone1Pos = glm::vec3(0.0f, 3.f, -2.5f);
-	Cone cone1(window, cone1Pos, 1.f, 16, 2.f, 0.f, 1.f, true, glm::vec4(1.f, .2f, .1f, 1.f), empty, &camera);
+
+
+	int coneLevel = 12;
+
+
+
+	glm::vec3 cone1Pos = glm::vec3(2.0f, .5f, -2.5f);
+	//						_bottomRadius<---sqrt(2), _topRadius, _height, _isSmooth
+	Cone cone1(window, cone1Pos, 1.f, coneLevel, 1.0f, 1.0f, 2.0f, true, glm::vec4(1.f, .2f, .1f, 1.f), tex, &camera);
+	cone1.rotate(45, glm::vec3(0.f, 1.f, 0.f));
 
 	std::vector <Object*> objectList;
 
@@ -638,7 +646,7 @@ int main()
 	objectList.push_back(&plane1);
 
 
-	camera.set_camera_speed(10);
+	camera.set_camera_speed(1);
 	level = 2;
 	int planeLevel = 2;
 	bool randomColor = true;
@@ -657,6 +665,8 @@ int main()
 
 
 	float planeScale1 = 5.f;
+
+	float topRadius = 0.f;
 
 
 	
@@ -679,9 +689,16 @@ int main()
 		double crntTime = glfwGetTime();
 		if (crntTime - prevTime >= 1 / 60)
 		{
-			rotation = 0.1f;
+			//rotation = 0.1f;
 			prevTime = crntTime;
+			topRadius += 0.002f;
 		}
+
+		
+		//float newTopRadius = (1 - glm::fract(topRadius)) * (int(glm::floor(topRadius)) % 2) + (glm::fract(topRadius)) * (int(glm::floor(topRadius + 1)) % 2);
+		//cone1.setHeight(newTopRadius);
+		//cone1.setTopRadius(newTopRadius);
+
 
 		// Rotating the view about the x and y axis, and loads of other neat things.
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_F) && lockoutTimer <= crntTime) {
@@ -692,34 +709,39 @@ int main()
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
 			cone1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
+			sphere1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_UP)) {
 			cone1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
+			sphere1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_DOWN)) {
 			cone1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
+			sphere1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_RIGHT)) {
 			cone1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
+			sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_MINUS) && lockoutTimer <= crntTime) {
-			level--;
+			//level--;
+			coneLevel--;
 			std::cout << "\nLevel: " << level << "\n";
 			sphere1.setLevel(level);
 			plane1.setLevel(level);
-			//cone1.setLevel(level);
+			cone1.setLevel(coneLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_EQUAL) && lockoutTimer <= crntTime) {
-			level++;
+			//level++;
+			coneLevel++;
 			std::cout << "\nLevel: " << level << "\n";
 			sphere1.setLevel(level);
 			plane1.setLevel(level);
-			//cone1.setLevel(level);
+			cone1.setLevel(coneLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_9) && lockoutTimer <= crntTime) {
-			//level--;
 			std::cout << "\nLevel: " << level << "\n";
 			planeScale1 -= 1.f;
 			plane1.setScale(planeScale1);
@@ -727,7 +749,6 @@ int main()
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_0) && lockoutTimer <= crntTime) {
-			//level++;
 			std::cout << "\nLevel: " << level << "\n";
 			planeScale1 += 1.f;
 			plane1.setScale(planeScale1);
@@ -740,6 +761,9 @@ int main()
 
 			plane1.doRandomColors(randomColor);
 			plane1.setLevel(level);
+
+			cone1.doRandomColors(randomColor);
+			cone1.setLevel(coneLevel);
 			randomColor = !randomColor;
 			lockoutTimer = crntTime + 0.2;
 		}
@@ -758,6 +782,9 @@ int main()
 
 			plane1.smoothSurface(isSmooth);
 			plane1.setLevel(level);
+
+			cone1.smoothSurface(isSmooth);
+			cone1.setLevel(coneLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_T) && lockoutTimer <= crntTime) {
