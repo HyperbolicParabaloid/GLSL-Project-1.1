@@ -21,6 +21,7 @@
 #include"Texture.h"
 #include"shaderClass.h"
 #include"Camera.h"
+#include"Arrow.h"
 
 /*
 This class is for creating basic objects. It's meant to be a parent class.
@@ -36,6 +37,8 @@ private:
 
 	std::vector <Vertex> vertices;
 	std::vector <GLuint> indices;
+
+	bool doNormalArrows;
 
 	VAO VAO;
 
@@ -56,6 +59,8 @@ public:
 
 	float newrand(glm::vec2 co);
 	float noise(glm::vec2 n);
+
+	void toggleNormalArrows();
 };
 
 #endif

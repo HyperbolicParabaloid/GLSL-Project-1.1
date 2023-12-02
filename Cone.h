@@ -26,20 +26,24 @@ private:
 	bool isSmooth;
 	bool randomColor;
 
-	float bottomRadius; 
+	float bottomRadius;
 	float topRadius;
-	float height;
+	glm::vec3 pointPos;
+	glm::vec3 objPos;
+	glm::vec3 pointingAt;
 
 	int seed;
 public:
-	Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, float _height, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
+	Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
 	~Cone();
 	void genCone();
 	void setLevel(int _level);
 	void doRandomColors(bool _randomColor);
 	void reseed();
 	void smoothSurface(bool _isSmooth);
+	void setTopRadius(float _topRadius);
+	void setBottomRadius(float _bottomRadius);
+	void setTipPos(glm::vec3 _pointPos);
 };
 
 #endif
-

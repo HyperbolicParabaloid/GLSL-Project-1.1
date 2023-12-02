@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Arrow.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cone.cpp" />
     <ClCompile Include="EditingSphere.cpp" />
@@ -176,6 +177,7 @@
     <None Include="wave.vert" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Arrow.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cone.h" />
     <ClInclude Include="EditingSphere.h" />

@@ -1,16 +1,17 @@
-C:\Users\riley\source\repos\GLSL Project 1.1\Camera.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\Camera.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\Cone.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\Cone.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\EditingSphere.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\EditingSphere.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\Mesh.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\Mesh.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\Plane.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\Plane.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\Sphere.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\Sphere.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\Cube.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\Cube.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\EBO.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\EBO.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\glad.c;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\glad.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\main.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\main.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\Object.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\Object.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\shaderClass.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\shaderClass.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\stb.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\stb.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\Texture.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\Texture.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\VAO.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\VAO.obj
-C:\Users\riley\source\repos\GLSL Project 1.1\VBO.cpp;C:\Users\riley\source\repos\GLSL Project 1.1\x64\Debug\VBO.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\Arrow.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\Arrow.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\Camera.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\Camera.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\Cone.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\Cone.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\EditingSphere.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\EditingSphere.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\Mesh.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\Mesh.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\Plane.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\Plane.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\Sphere.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\Sphere.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\Cube.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\Cube.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\EBO.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\EBO.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\glad.c;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\glad.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\main.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\main.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\Object.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\Object.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\shaderClass.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\shaderClass.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\stb.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\stb.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\Texture.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\Texture.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\VAO.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\VAO.obj
+C:\Users\riley\source\repos\GLSL-Project 1.1\VBO.cpp;C:\Users\riley\source\repos\GLSL-Project 1.1\x64\Debug\VBO.obj
