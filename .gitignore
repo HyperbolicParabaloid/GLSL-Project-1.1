@@ -41,6 +41,12 @@
 ehthumbs.db
 Thumbs.db
 
+<<<<<<< HEAD
 *.vcxproj
 *.pdb
 x64
+=======
+x64\
+*.vcxproj
+*.pdb
+>>>>>>> f7a80e04587321051fd1ba9e03a3d8cd11e1040f
