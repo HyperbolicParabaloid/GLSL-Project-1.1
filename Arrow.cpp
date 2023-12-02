@@ -20,8 +20,14 @@ Arrow::Arrow(glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius
 	//std::cout << "axis = (" << axis.x << ", " << axis.y << ", " << axis.z << ")\n\n";
 
 	model = glm::translate(model, objPos);
-	model = glm::rotate(model, angle, axis);
+	if (ceil(abs(glm::degrees(angle))) < 179.f && floor(abs(glm::degrees(angle))) > 1.f) {
+		model = glm::rotate(model, angle, axis);
+	}
+	else if (floor(abs(glm::degrees(angle))) >= 179.f) {
+		pointPos.y *= -1;
+	}	
 	model = glm::scale(model, glm::vec3(_objScale));
+
 	color = _color;
 	startingIndex = _startingIndex;
 	objScale = _objScale;
@@ -96,8 +102,19 @@ Arrow::Arrow(glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius
 // Creates a new set of Vertex's and their associated indices to send to the Object
 // class for drawing.
 void Arrow::genTriangles() {
+	indCount = 0;
+	verts.clear();
+	indices.clear();
+
+	// Top cone of arrow
+	model = glm::translate(model, pointPos);
 	genCone();
-	//setVBOandEBO(verts, indices, "Cone");
+
+	// Bottom shaft of arrow
+	bottomRadius /= 3.f;
+	topRadius = bottomRadius;
+	model = glm::translate(model, -pointPos);
+	genCone();
 }
 
 std::vector <Vertex> Arrow::getVerts() {
@@ -111,8 +128,6 @@ void Arrow::genCone() {
 	// Whenever we generate a new set a vertices and indices, we want to wipe the old ones.
 	// In the future it'd be better to just add in the new vertices and update indices instead
 	// of clearing both indices and verts and starting over but it's fine for now.
-	verts.clear();
-	indices.clear();
 
 	if (level < 2)
 		level = 2;
@@ -144,7 +159,7 @@ void Arrow::genCone() {
 
 		float x = sin(theta1), y = cos(theta1);
 		preVerts[evenIndex] = glm::vec3(model * glm::vec4(x * bottomRadius, 0.f, y * bottomRadius, 1));//glm::mat3(model) * (((glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius) + objPos));
-		preVerts[oddIndex] = glm::vec3(model * glm::vec4(x * topRadius, 5.f, y * topRadius, 1));//glm::mat3(model) * (glm::vec3(sin(theta2) * topRadius, 0.f, cos(theta2) * topRadius) + objPos + pointPos);
+		preVerts[oddIndex] = glm::vec3(model * glm::vec4(x * topRadius, pointPos.y, y * topRadius, 1));//glm::mat3(model) * (glm::vec3(sin(theta2) * topRadius, 0.f, cos(theta2) * topRadius) + objPos + pointPos);
 
 		texCoords[evenIndex] = glm::vec2(u * 4, 0);
 		texCoords[oddIndex] = glm::vec2(u * 4, 1);	// 0.25 should be 1
@@ -167,7 +182,6 @@ void Arrow::setVerticesVector() {
 	// Values for the vertices indexes.
 	int lwrCntr = 0, uprCntr = 1;
 	int lwrTriVrt1, lwrTriVrt2, uprTriVrt1, uprTriVrt2;
-	int indCount = 0;
 	// Algorithm will essentially be: n, n+1, 0		for all n >= 1.
 	for (int jj = 1; jj <= level; jj++) {
 		lwrTriVrt1 = (jj * 2);

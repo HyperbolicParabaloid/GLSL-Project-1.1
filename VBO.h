@@ -8,19 +8,7 @@
 // In the future I plan on using these to hold information about each vertex instead of just
 // packing everything into a massive array.
 struct Vertex {
-	glm::vec3 pos;	glm::vec3 norm;	glm::vec4 color;	glm::vec2 texCoord;
-	//Vertex() {
-	//	pos = glm::vec3(0.f);
-	//	norm = glm::vec3(0.f);
-	//	color = glm::vec4(0.f);
-	//	texCoord = glm::vec2(0.f);
-	//}
-	//Vertex(glm::vec3 _pos, glm::vec3 _norm, glm::vec4 _color, glm::vec2 _texCoord) {
-	//	pos = _pos;
-	//	norm = _norm;
-	//	color = _color;
-	//	texCoord = _texCoord;
-	//}
+	glm::vec3 pos = glm::vec3(0.f);	glm::vec3 norm;	glm::vec4 color = glm::vec4(0.f);	glm::vec2 texCoord = glm::vec2(0.f);
 };
 struct Triangle {
 	Vertex verts[3];

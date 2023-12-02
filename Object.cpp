@@ -55,20 +55,21 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 	vertices = _vertices;
 	indices = _indices;
 
-	std::cout << "doNormalArrows = " << doNormalArrows << " for " << msg << "\n";
-	if (doNormalArrows) {
+	//std::cout << "doNormalArrows = " << doNormalArrows << " for " << msg << "\n";
+	if (doNormalArrows == true) {
 		//std::cout << "Drawing the arrows for " << msg <<  "\n";
 		int vNum = 1;
-		for (const Vertex& v : vertices) {
-			glm::vec3 conePos = v.pos;
+		int maxSize = vertices.size();
+		for (int vv = 0; vv < maxSize; vv++) {
+			glm::vec3 conePos = vertices[vv].pos;
 			float coneScale = 0.02f;
-			int coneLevel = 10;
+			int coneLevel = 4;
 			float coneBottomRadius = 1.f;
 			float coneTopRadius = 0.f;
-			glm::vec3 conePointPos = glm::vec3(0.f, 1.f, 0.f);
-			glm::vec3 conePointingAt = v.norm;
+			glm::vec3 conePointPos = glm::vec3(0.f, 5.f, 0.f);
+			glm::vec3 conePointingAt = vertices[vv].norm;
 			bool coneIsSmooth = true;
-			glm::vec4 coneColor = color;
+			glm::vec4 coneColor = vertices[vv].color;
 			int coneStartingIndex = indices.size();
 
 			//std::cout << "Drawing arrows #" << vNum << " at pos (" << conePos.x << ", " << conePos.y << ", " << conePos.z << ")\n";

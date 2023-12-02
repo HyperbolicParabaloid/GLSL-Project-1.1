@@ -9,6 +9,7 @@ private:
 	void genTriangles();
 public:
 	Cube(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
+	void reGenTriangles();
 };
 
 #endif

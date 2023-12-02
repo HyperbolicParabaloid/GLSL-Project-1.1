@@ -38,6 +38,7 @@ private:
 	glm::mat4 model;
 
 	int seed;
+	int indCount;
 public:
 	Arrow(glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, glm::vec3 _pointingAt, bool _isSmooth, glm::vec4 _color, int _startingIndex);
 	~Arrow();

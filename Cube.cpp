@@ -67,7 +67,7 @@ void Cube::genTriangles() {
 		// Back face
 		4, 5, 6,
 		6, 7, 4,
-		//
+
 		// Top face
 		8, 9, 10,
 		10, 11, 8,
@@ -85,4 +85,8 @@ void Cube::genTriangles() {
 		22, 23, 20
 	};
 	setVBOandEBO(sqrVertices, sqrIndices, "Cube");
+}
+
+void Cube::reGenTriangles() {
+	genTriangles();
 }

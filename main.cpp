@@ -795,6 +795,8 @@ int main()
 			sphere1.toggleNormalArrows();
 			sphere1.setLevel(level);
 
+			cube2.toggleNormalArrows();
+			cube2.reGenTriangles();
 
 
 			cone1.toggleNormalArrows();
