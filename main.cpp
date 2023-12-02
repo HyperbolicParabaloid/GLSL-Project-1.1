@@ -4,12 +4,6 @@
 #include"Plane.h"
 #include"Cone.h"
 
-/*
-TESTING TO MAKE SURE!!!!!!!!!!!!!!!!!
-
-*/
-
-
 
 // Setting up array of vertices.
 // Now I'm using this vertices array to hold the vertex info while
