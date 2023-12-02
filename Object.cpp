@@ -1,8 +1,10 @@
 #include "Object.h"
 
+
 // Object classes constructor. Just sets some member variables and updates the glm::mat4 model of the object.
 Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) {
 	window = _window;
+	doNormalArrows = false;
 	objPos = _objPos;
 	objScale = _objScale;
 	color = _color;
@@ -33,6 +35,8 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 
 	// Draw the actual mesh
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+
 }
 
 // Creates a new shader program and binds the adds the appropriate information into the GPU's memory so it can draw the
@@ -50,6 +54,36 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 
 	vertices = _vertices;
 	indices = _indices;
+
+	std::cout << "doNormalArrows = " << doNormalArrows << " for " << msg << "\n";
+	if (doNormalArrows) {
+		//std::cout << "Drawing the arrows for " << msg <<  "\n";
+		int vNum = 1;
+		for (const Vertex& v : vertices) {
+			glm::vec3 conePos = v.pos;
+			float coneScale = 0.02f;
+			int coneLevel = 10;
+			float coneBottomRadius = 1.f;
+			float coneTopRadius = 0.f;
+			glm::vec3 conePointPos = glm::vec3(0.f, 1.f, 0.f);
+			glm::vec3 conePointingAt = v.norm;
+			bool coneIsSmooth = true;
+			glm::vec4 coneColor = color;
+			int coneStartingIndex = indices.size();
+	
+			//std::cout << "Drawing arrows #" << vNum << " at pos (" << conePos.x << ", " << conePos.y << ", " << conePos.z << ")\n";
+			//vNum++;
+	
+			//std::cout << "Drawing a " << msg << "\n";
+			Arrow newArrow(conePos, coneScale, coneLevel, coneBottomRadius, coneTopRadius, conePointPos, conePointingAt, coneIsSmooth, coneColor, coneStartingIndex);
+			std::vector <Vertex> coneVerts = newArrow.getVerts();
+			std::vector <GLuint> coneInds = newArrow.getInds();
+	
+			//std::cout << "vertices.size() BEFORE = " << vertices.size() << "\n";
+			vertices.insert(vertices.end(), coneVerts.begin(), coneVerts.end());
+			indices.insert(indices.end(), coneInds.begin(), coneInds.end());
+		}
+	}
 
 	VAO.Bind();
 	// Setting VBO and EBO
@@ -161,4 +195,8 @@ void Object::hotRealoadShader() {
 		textures[i].texUnit(*shaderProgram, (type + num).c_str(), i);
 		textures[i].Bind();
 	}
+}
+
+void Object::toggleNormalArrows() {
+	doNormalArrows = !doNormalArrows;
 }
