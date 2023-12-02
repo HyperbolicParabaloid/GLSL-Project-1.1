@@ -4,6 +4,13 @@
 #include"Plane.h"
 #include"Cone.h"
 
+/*
+TESTING TO MAKE SURE!!!!!!!!!!!!!!!!!
+
+*/
+
+
+
 // Setting up array of vertices.
 // Now I'm using this vertices array to hold the vertex info while
 // using the indicies buffer to hold the index of each vertex that
@@ -623,7 +630,7 @@ int main()
 	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), empty, &camera);
 
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
-	Sphere sphere1(window, sphere1Pos, .5f, 2, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
+	Sphere sphere1(window, sphere1Pos, 1.f, 4, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 
 
 
@@ -632,13 +639,35 @@ int main()
 
 
 	glm::vec3 cone1Pos = glm::vec3(2.0f, .5f, -2.5f);
+	glm::vec3 cone1Tip = glm::vec3(0.0f, 1.0f, 0.0f);	// Tip Pos is relative to the cone's position.
+
 	//						_bottomRadius<---sqrt(2), _topRadius, _height, _isSmooth
-	Cone cone1(window, cone1Pos, 1.f, coneLevel, 1.0f, 1.0f, 2.0f, true, glm::vec4(1.f, .2f, .1f, 1.f), tex, &camera);
-	cone1.rotate(45, glm::vec3(0.f, 1.f, 0.f));
+	Cone cone1(window, cone1Pos, 1.f, coneLevel, 1.0f, 0.2f, cone1Tip, true, glm::vec4(1.f, .2f, .1f, 1.f), empty, &camera);
+
+	//glm::vec3 cone2Pos = glm::vec3(2.0f, .5f, -2.5f) + coneVerts[0].pos;
+	//glm::vec3 cone2Tip = glm::vec3(0.0f, 5.0f, 0.0f);
+	//Cone cone2(window, cone2Pos, 0.09f, coneLevel, 1.0f, 0.0f, cone2Tip, true, glm::vec4(1.f, .2f, .1f, 1.f), empty, &camera);
 
 	std::vector <Object*> objectList;
+	//for (int ii = 0; ii < coneVerts.size(); ii++) {
+	//	glm::vec3 cone2Pos = sphere1Pos + coneVerts[ii].pos;
+	//	glm::vec3 cone2Tip = glm::vec3(0.0f, 5.0f, 0.0f);
+	//	Cone *cone2 = new Cone(window, cone2Pos, 0.05f, coneLevel, 1.0f, 0.0f, cone2Tip, true, glm::vec4(coneVerts[ii].norm, 1.f), empty, &camera);
+	//	glm::vec3 cone2pointingAt = coneVerts[ii].norm;	// Tip Pos is relative to the cone's position.
+	//	glm::vec3 axis = glm::cross(cone2Tip, cone2pointingAt);
+	//	float angle = acos(glm::dot(glm::normalize(cone2Tip), glm::normalize(cone2pointingAt)));
+	//	angle = glm::degrees(angle);
+	//	cone2->rotate(angle, axis);
+	//	//std::cout << "angle = " << angle << "\n";
+	//	//std::cout << "cone2pointingAt = (" << cone2pointingAt.x << ", " << cone2pointingAt.y << ", " << cone2pointingAt.z << ")\n";
+	//	objectList.push_back(cone2);
+	//}
+
+
+	
 
 	objectList.push_back(&cone1);
+	//objectList.push_back(&cone2);
 	objectList.push_back(&sphere1);
 	objectList.push_back(&cube1);
 	objectList.push_back(&cube2);
@@ -647,7 +676,7 @@ int main()
 
 
 	camera.set_camera_speed(1);
-	level = 2;
+	level = 4;
 	int planeLevel = 2;
 	bool randomColor = true;
 	bool isSmooth = true;
@@ -698,6 +727,7 @@ int main()
 		//float newTopRadius = (1 - glm::fract(topRadius)) * (int(glm::floor(topRadius)) % 2) + (glm::fract(topRadius)) * (int(glm::floor(topRadius + 1)) % 2);
 		//cone1.setHeight(newTopRadius);
 		//cone1.setTopRadius(newTopRadius);
+		//cone1.setBottomRadius(newTopRadius);
 
 
 		// Rotating the view about the x and y axis, and loads of other neat things.
@@ -765,6 +795,17 @@ int main()
 			cone1.doRandomColors(randomColor);
 			cone1.setLevel(coneLevel);
 			randomColor = !randomColor;
+			lockoutTimer = crntTime + 0.2;
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_N) && lockoutTimer <= crntTime) {
+			sphere1.toggleNormalArrows();
+			sphere1.setLevel(level);
+
+			
+
+			cone1.toggleNormalArrows();
+			cone1.setLevel(coneLevel);
+
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_C) && lockoutTimer <= crntTime) {
@@ -843,6 +884,8 @@ int main()
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program
 	glfwTerminate();
+	//for (auto obj : objectList)
+	//	delete obj;
 	delete[] verts2;
 	delete[] indices2;
 	delete[] norms2;

@@ -1,12 +1,13 @@
 #include "Cone.h"
 
 // Constructor for Cone.
-Cone::Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, float _height, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
+Cone::Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
 	level = _level;
 	isSmooth = _isSmooth;
 	bottomRadius = _bottomRadius;
 	topRadius = _topRadius;
-	height = _height;
+	pointPos = _pointPos;
+	objPos = _objPos;
 	randomColor = false;
 	seed = 1;
 	genTriangles();
@@ -104,7 +105,8 @@ void Cone::genCone() {
 	texCoords = newTexCoords;
 
 	preVerts[0] = glm::vec3(0.f);
-	preVerts[1] = glm::vec3(0.f, height, 0.f);
+	preVerts[1] = pointPos;
+
 
 
 	float theta1 = 0.f, theta2 = 0.f;
@@ -113,13 +115,22 @@ void Cone::genCone() {
 		int evenIndex	= ii * 2;
 		int oddIndex	= ii * 2 + 1;
 
-		float u = float(ii) / float(level + 1);
+		float u = float(ii - 1) / float(level);
 
 		theta1 = glm::radians(ii * anglePerVertex);
 		theta2 = glm::radians(ii * anglePerVertex);		//theta2 = glm::radians((ii + 0.5f) * anglePerVertex2);//anglePerVert;	// This is to offset the top/bottom vertices. It doesn't look very good tbh.
+	
+		//glm::vec3 n = glm::normalize(pointPos) - glm::normalize(objPos);
+		//glm::vec3 v = glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius;
+		//glm::mat4 m = glm::mat4(1.f);
+		//m = glm::rotate(m, glm::dot(n, v), n);
+		//v = glm::vec3(m * glm::vec4(v,1));
+		//glm::vec3 n = glm::normalize(pointPos) - glm::vec3(0.f, 1.f, 0.f);
+		//float f = glm::dot(pointPos, glm::vec3(0.f, 1.f, 0.f));
 		
-		preVerts[evenIndex] = glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius;
-		preVerts[oddIndex]	= glm::vec3(sin(theta2) * topRadius, height, cos(theta2) * topRadius);
+		
+		preVerts[evenIndex] = (glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius);
+		preVerts[oddIndex] = glm::vec3(sin(theta2) * topRadius, 0.f, cos(theta2) * topRadius) + pointPos;
 
 		texCoords[evenIndex]	= glm::vec2(u * 4, 0);
 		texCoords[oddIndex]		= glm::vec2(u * 4, 1);	// 0.25 should be 1
@@ -193,6 +204,9 @@ void Cone::setVerticesVector() {
 			else
 				futrjj = jj + 1;
 
+			// NOTE! // The top-to-bottom triangle is the problem! Not sure why, I'm investigating.
+
+
 			// Getting the previous faces nromal.
 			lwrTriVrt1 = (prevjj * 2);
 			lwrTriVrt2 = ((prevjj * 2) % evenLength) + 2;
@@ -238,8 +252,8 @@ void Cone::setVerticesVector() {
 			verts.push_back(Vertex{ v6, n3, color2, tex6 });
 			verts.push_back(Vertex{ v4, n3, color2, tex4 });
 
-			// High-to-low side triangle.
-			verts.push_back(Vertex{ v5, avgNorm1, color2, tex5 });
+			// High-to-low side triangle.	// NOTE! // The top-to-bottom triangle is the problem! Not sure why, I'm investigating.
+			verts.push_back(Vertex{ v5, avgNorm1, color2, tex5 });	// Change back
 			verts.push_back(Vertex{ v6, avgNorm2, color2, tex6 });
 			verts.push_back(Vertex{ v2, avgNorm2, color2, tex2 });
 		}
@@ -279,8 +293,13 @@ void Cone::setTopRadius(float _topRadius) {
 	setLevel(level);
 }
 
-void Cone::setHeight(float _height) {
-	height = _height;
+void Cone::setBottomRadius(float _bottomRadius) {
+	bottomRadius = _bottomRadius;
+	setLevel(level);
+}
+
+void Cone::setTipPos(glm::vec3 _pointPos) {
+	pointPos = _pointPos;
 	setLevel(level);
 }
 
