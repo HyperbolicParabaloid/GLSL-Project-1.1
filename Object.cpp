@@ -70,15 +70,26 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 			bool coneIsSmooth = true;
 			glm::vec4 coneColor = color;
 			int coneStartingIndex = indices.size();
+<<<<<<< HEAD
 
 			//std::cout << "Drawing arrows #" << vNum << " at pos (" << conePos.x << ", " << conePos.y << ", " << conePos.z << ")\n";
 			//vNum++;
 
+=======
+	
+			//std::cout << "Drawing arrows #" << vNum << " at pos (" << conePos.x << ", " << conePos.y << ", " << conePos.z << ")\n";
+			//vNum++;
+	
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 			//std::cout << "Drawing a " << msg << "\n";
 			Arrow newArrow(conePos, coneScale, coneLevel, coneBottomRadius, coneTopRadius, conePointPos, conePointingAt, coneIsSmooth, coneColor, coneStartingIndex);
 			std::vector <Vertex> coneVerts = newArrow.getVerts();
 			std::vector <GLuint> coneInds = newArrow.getInds();
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 			//std::cout << "vertices.size() BEFORE = " << vertices.size() << "\n";
 			vertices.insert(vertices.end(), coneVerts.begin(), coneVerts.end());
 			indices.insert(indices.end(), coneInds.begin(), coneInds.end());
@@ -199,4 +210,8 @@ void Object::hotRealoadShader() {
 
 void Object::toggleNormalArrows() {
 	doNormalArrows = !doNormalArrows;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3

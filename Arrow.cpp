@@ -143,8 +143,13 @@ void Arrow::genCone() {
 		theta2 = glm::radians(ii * anglePerVertex);		//theta2 = glm::radians((ii + 0.5f) * anglePerVertex2);//anglePerVert;	// This is to offset the top/bottom vertices. It doesn't look very good tbh.
 
 		float x = sin(theta1), y = cos(theta1);
+<<<<<<< HEAD
 		preVerts[evenIndex] = glm::vec3(model * glm::vec4(x * bottomRadius, 0.f, y * bottomRadius, 1));//glm::mat3(model) * (((glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius) + objPos));
 		preVerts[oddIndex] = glm::vec3(model * glm::vec4(x * topRadius, 5.f, y * topRadius, 1));//glm::mat3(model) * (glm::vec3(sin(theta2) * topRadius, 0.f, cos(theta2) * topRadius) + objPos + pointPos);
+=======
+		preVerts[evenIndex] = glm::vec3(model * glm::vec4(x * bottomRadius,	0.f,	y * bottomRadius,	1));//glm::mat3(model) * (((glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius) + objPos));
+		preVerts[oddIndex] = glm::vec3(model * glm::vec4(x * topRadius,		5.f,	y * topRadius,		1));//glm::mat3(model) * (glm::vec3(sin(theta2) * topRadius, 0.f, cos(theta2) * topRadius) + objPos + pointPos);
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 
 		texCoords[evenIndex] = glm::vec2(u * 4, 0);
 		texCoords[oddIndex] = glm::vec2(u * 4, 1);	// 0.25 should be 1
@@ -152,7 +157,11 @@ void Arrow::genCone() {
 	texCoords[vertsPerCone] = glm::vec2(4, 0);
 	texCoords[vertsPerCone + 1] = glm::vec2(4, 1);// 0.25 should be 1
 	setVerticesVector();
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 }
 
 

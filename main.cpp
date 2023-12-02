@@ -658,7 +658,11 @@ int main()
 	//}
 
 
+<<<<<<< HEAD
 
+=======
+	
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 
 	objectList.push_back(&cone1);
 	//objectList.push_back(&cone2);
@@ -691,7 +695,10 @@ int main()
 
 	float topRadius = 0.f;
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 
 	shaderProgram.Activate();
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(objectModel));
@@ -717,7 +724,11 @@ int main()
 			topRadius += 0.002f;
 		}
 
+<<<<<<< HEAD
 
+=======
+		
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 		//float newTopRadius = (1 - glm::fract(topRadius)) * (int(glm::floor(topRadius)) % 2) + (glm::fract(topRadius)) * (int(glm::floor(topRadius + 1)) % 2);
 		//cone1.setHeight(newTopRadius);
 		//cone1.setTopRadius(newTopRadius);
@@ -795,7 +806,11 @@ int main()
 			sphere1.toggleNormalArrows();
 			sphere1.setLevel(level);
 
+<<<<<<< HEAD
 
+=======
+			
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 
 			cone1.toggleNormalArrows();
 			cone1.setLevel(coneLevel);

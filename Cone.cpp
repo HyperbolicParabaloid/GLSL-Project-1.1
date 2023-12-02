@@ -101,7 +101,11 @@ void Cone::genCone() {
 
 	glm::vec3* newPreVerts = new glm::vec3[vertsPerCone];	delete[] preVerts;
 	preVerts = newPreVerts;
+<<<<<<< HEAD
 	glm::vec2* newTexCoords = new glm::vec2[vertsPerCone + 2]; delete[] texCoords;
+=======
+	glm::vec2* newTexCoords = new glm::vec2[vertsPerCone + 2];delete[] texCoords;
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 	texCoords = newTexCoords;
 
 	preVerts[0] = glm::vec3(0.f);
@@ -112,6 +116,7 @@ void Cone::genCone() {
 	float theta1 = 0.f, theta2 = 0.f;
 	float anglePerVertex = (360.f / level);
 	for (int ii = 1; ii <= level; ii++) {
+<<<<<<< HEAD
 		int evenIndex = ii * 2;
 		int oddIndex = ii * 2 + 1;
 
@@ -127,13 +132,38 @@ void Cone::genCone() {
 		//v = glm::vec3(m * glm::vec4(v,1));
 		//glm::vec3 n = glm::normalize(pointPos) - glm::vec3(0.f, 1.f, 0.f);
 		//float f = glm::dot(pointPos, glm::vec3(0.f, 1.f, 0.f));
+=======
+		int evenIndex	= ii * 2;
+		int oddIndex	= ii * 2 + 1;
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 
+		float u = float(ii - 1) / float(level);
 
+<<<<<<< HEAD
 		preVerts[evenIndex] = (glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius);
 		preVerts[oddIndex] = glm::vec3(sin(theta2) * topRadius, 0.f, cos(theta2) * topRadius) + pointPos;
 
 		texCoords[evenIndex] = glm::vec2(u * 4, 0);
 		texCoords[oddIndex] = glm::vec2(u * 4, 1);	// 0.25 should be 1
+=======
+		theta1 = glm::radians(ii * anglePerVertex);
+		theta2 = glm::radians(ii * anglePerVertex);		//theta2 = glm::radians((ii + 0.5f) * anglePerVertex2);//anglePerVert;	// This is to offset the top/bottom vertices. It doesn't look very good tbh.
+	
+		//glm::vec3 n = glm::normalize(pointPos) - glm::normalize(objPos);
+		//glm::vec3 v = glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius;
+		//glm::mat4 m = glm::mat4(1.f);
+		//m = glm::rotate(m, glm::dot(n, v), n);
+		//v = glm::vec3(m * glm::vec4(v,1));
+		//glm::vec3 n = glm::normalize(pointPos) - glm::vec3(0.f, 1.f, 0.f);
+		//float f = glm::dot(pointPos, glm::vec3(0.f, 1.f, 0.f));
+		
+		
+		preVerts[evenIndex] = (glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius);
+		preVerts[oddIndex] = glm::vec3(sin(theta2) * topRadius, 0.f, cos(theta2) * topRadius) + pointPos;
+
+		texCoords[evenIndex]	= glm::vec2(u * 4, 0);
+		texCoords[oddIndex]		= glm::vec2(u * 4, 1);	// 0.25 should be 1
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 	}
 	texCoords[vertsPerCone] = glm::vec2(4, 0);
 	texCoords[vertsPerCone + 1] = glm::vec2(4, 1);// 0.25 should be 1
@@ -262,17 +292,29 @@ void Cone::setVerticesVector() {
 			verts.push_back(Vertex{ v1, n1, color1, tex1 });
 			verts.push_back(Vertex{ v2, n1, color1, tex2 });
 			verts.push_back(Vertex{ v3, n1, color1, tex3 });
+<<<<<<< HEAD
 
+=======
+			
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 			// Low-to-high side triangle.f
 			verts.push_back(Vertex{ v1, n2, color1, tex1 });
 			verts.push_back(Vertex{ v2, n2, color1, tex2 });
 			verts.push_back(Vertex{ v5, n2, color1, tex5 });
+<<<<<<< HEAD
 
+=======
+			
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 			// Upper circle triangle.
 			verts.push_back(Vertex{ v5, n3, color2, tex5 });
 			verts.push_back(Vertex{ v6, n3, color2, tex6 });
 			verts.push_back(Vertex{ v4, n3, color2, tex4 });
+<<<<<<< HEAD
 
+=======
+			
+>>>>>>> 2178be62a09d83fc8dd09a2c1b0a6eb73075cfb3
 			// High-to-low side triangle.
 			verts.push_back(Vertex{ v5, n4, color2, tex5 });
 			verts.push_back(Vertex{ v6, n4, color2, tex6 });
