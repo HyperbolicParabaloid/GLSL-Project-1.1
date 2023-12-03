@@ -33,14 +33,20 @@ private:
 	glm::vec3 pointPos;
 	glm::vec3 objPos;
 	glm::vec3 pointingAt;
-	glm::vec4 color;
 
 	glm::mat4 model;
+
+	glm::vec4 shaftColor;
+	glm::vec4 coneColor;
+	glm::vec4 color;
+
+	float randomizationEffect;
 
 	int seed;
 	int indCount;
 public:
 	Arrow(glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, glm::vec3 _pointingAt, bool _isSmooth, glm::vec4 _color, int _startingIndex);
+	Arrow(glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, glm::vec3 _pointingAt, bool _isSmooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, float _randomizationEffect, int _startingIndex);
 	~Arrow();
 	void genCone();
 	void setLevel(int _level);
@@ -52,6 +58,8 @@ public:
 	void setTipPos(glm::vec3 _pointPos);
 	std::vector <Vertex> getVerts();
 	std::vector <GLuint> getInds();
+	float newrand(glm::vec2 co);
+	float noise(glm::vec2 n);
 };
 
 #endif

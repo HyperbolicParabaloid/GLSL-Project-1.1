@@ -169,6 +169,8 @@
     <None Include="computeShader.vert" />
     <None Include="default.frag" />
     <None Include="default.vert" />
+    <None Include="grass.frag" />
+    <None Include="grass.vert" />
     <None Include="light.frag" />
     <None Include="light.vert" />
     <None Include="object.frag" />
@@ -198,6 +200,7 @@
     <Image Include="137215-barack-face-vector-obama-png-image-high-quality.png" />
     <Image Include="brick.png" />
     <Image Include="pop_cat.png" />
+    <Image Include="seamless_green_grass_texture_01.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

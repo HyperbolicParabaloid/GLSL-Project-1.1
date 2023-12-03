@@ -8,8 +8,28 @@ Cone::Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, 
 	topRadius = _topRadius;
 	pointPos = _pointPos;
 	objPos = _objPos;
+	startingPos = glm::vec3(0.f);
 	randomColor = false;
 	seed = 1;
+	indCount = 0;
+	shaftColor = coneColor = color;
+	genTriangles();
+}
+
+// Constructor for Cone.
+Cone::Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _shaftColor, _textures, _camera) {
+	level = _level;
+	isSmooth = _isSmooth;
+	bottomRadius = _bottomRadius;
+	topRadius = _topRadius;
+	pointPos = _pointPos;
+	objPos = _objPos;
+	startingPos = glm::vec3(0.f);
+	randomColor = false;
+	seed = 1;
+	indCount = 0;
+	shaftColor = _shaftColor;
+	coneColor = _coneColor;
 	genTriangles();
 }
 
@@ -81,7 +101,38 @@ Cone::Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, 
 // Creates a new set of Vertex's and their associated indices to send to the Object
 // class for drawing.
 void Cone::genTriangles() {
-	genCone();
+	verts.clear();
+	indices.clear();
+	indCount = 0;
+
+	int layers = 8;
+
+	glm::vec3 b = startingPos, t = pointPos;
+	float br = bottomRadius;
+	float tr = topRadius;
+
+	topRadius = bottomRadius = bottomRadius / 8.f;
+	color = shaftColor;
+
+	for (int ll = 0; ll <= layers; ll++) {
+		genCone();
+		if (ll == 0) {
+			topRadius = tr;
+			bottomRadius = br;
+			color = coneColor;
+		}
+		float scale = (ll / layers) * 0.25 + 0.5;
+		glm::vec3 startToPointDiff = (pointPos - startingPos) * scale;
+		bottomRadius /= 1.5;
+		//startToPointDiff.y *= scale;
+		startingPos += startToPointDiff;
+		pointPos += startToPointDiff * scale;
+	}
+	startingPos = b;
+	pointPos = t;
+	bottomRadius = br;
+	//genCone();
+
 	setVBOandEBO(verts, indices, "Cone");
 }
 
@@ -89,8 +140,6 @@ void Cone::genCone() {
 	// Whenever we generate a new set a vertices and indices, we want to wipe the old ones.
 	// In the future it'd be better to just add in the new vertices and update indices instead
 	// of clearing both indices and verts and starting over but it's fine for now.
-	verts.clear();
-	indices.clear();
 
 	if (level < 2)
 		level = 2;
@@ -104,10 +153,8 @@ void Cone::genCone() {
 	glm::vec2* newTexCoords = new glm::vec2[vertsPerCone + 2]; delete[] texCoords;
 	texCoords = newTexCoords;
 
-	preVerts[0] = glm::vec3(0.f);
+	preVerts[0] = startingPos;
 	preVerts[1] = pointPos;
-
-
 
 	float theta1 = 0.f, theta2 = 0.f;
 	float anglePerVertex = (360.f / level);
@@ -120,17 +167,8 @@ void Cone::genCone() {
 		theta1 = glm::radians(ii * anglePerVertex);
 		theta2 = glm::radians(ii * anglePerVertex);		//theta2 = glm::radians((ii + 0.5f) * anglePerVertex2);//anglePerVert;	// This is to offset the top/bottom vertices. It doesn't look very good tbh.
 
-		//glm::vec3 n = glm::normalize(pointPos) - glm::normalize(objPos);
-		//glm::vec3 v = glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius;
-		//glm::mat4 m = glm::mat4(1.f);
-		//m = glm::rotate(m, glm::dot(n, v), n);
-		//v = glm::vec3(m * glm::vec4(v,1));
-		//glm::vec3 n = glm::normalize(pointPos) - glm::vec3(0.f, 1.f, 0.f);
-		//float f = glm::dot(pointPos, glm::vec3(0.f, 1.f, 0.f));
-
-
-		preVerts[evenIndex] = (glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius);
-		preVerts[oddIndex] = glm::vec3(sin(theta2) * topRadius, 0.f, cos(theta2) * topRadius) + pointPos;
+		preVerts[evenIndex] = (glm::vec3(sin(theta1), 0.f, cos(theta1)) * bottomRadius)			+ startingPos;
+		preVerts[oddIndex] = glm::vec3(sin(theta2) * topRadius, 0.f, cos(theta2) * topRadius)	+ pointPos;
 
 		texCoords[evenIndex] = glm::vec2(u * 4, 0);
 		texCoords[oddIndex] = glm::vec2(u * 4, 1);	// 0.25 should be 1
@@ -152,7 +190,7 @@ void Cone::setVerticesVector() {
 	// Values for the vertices indexes.
 	int lwrCntr = 0, uprCntr = 1;
 	int lwrTriVrt1, lwrTriVrt2, uprTriVrt1, uprTriVrt2;
-	int indCount = 0;
+	//int indCount = 0;
 	// Algorithm will essentially be: n, n+1, 0		for all n >= 1.
 	for (int jj = 1; jj <= level; jj++) {
 		lwrTriVrt1 = (jj * 2);

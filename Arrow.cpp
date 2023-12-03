@@ -28,11 +28,50 @@ Arrow::Arrow(glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius
 	}	
 	model = glm::scale(model, glm::vec3(_objScale));
 
-	color = _color;
+	coneColor = shaftColor = _color;
 	startingIndex = _startingIndex;
 	objScale = _objScale;
 	genTriangles();
 }
+
+
+Arrow::Arrow(glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, glm::vec3 _pointingAt, bool _isSmooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, float _randomizationEffect, int _startingIndex) {
+	level = _level;
+	isSmooth = _isSmooth;
+	bottomRadius = _bottomRadius;
+	topRadius = _topRadius;
+	pointPos = _pointPos;
+	objPos = _objPos;
+	randomColor = false;
+	seed = 1;
+	model = glm::mat4(1.f);
+	glm::vec3 axis = glm::cross(_pointPos, _pointingAt);
+	float angle = acos(glm::dot(glm::normalize(_pointPos), glm::normalize(_pointingAt)));
+	//angle = glm::degrees(angle);	I cannot believe THIS was the problem the whole time.
+	//								I shall leave it here as a momento of my hubris, a warning.
+
+	//std::cout << "Angle = " << angle << "\n";
+	//std::cout << "axis = (" << axis.x << ", " << axis.y << ", " << axis.z << ")\n\n";
+
+	model = glm::translate(model, objPos);
+	if (ceil(abs(glm::degrees(angle))) < 179.f && floor(abs(glm::degrees(angle))) > 1.f) {
+		model = glm::rotate(model, angle, axis);
+	}
+	else if (floor(abs(glm::degrees(angle))) >= 179.f) {
+		pointPos.y *= -1;
+	}
+	model = glm::scale(model, glm::vec3(_objScale));
+
+	coneColor = _coneColor;
+	shaftColor = _shaftColor;
+	startingIndex = _startingIndex;
+	objScale = _objScale;
+
+	randomizationEffect = _randomizationEffect;
+
+	genTriangles();
+}
+
 
 
 /*
@@ -98,19 +137,40 @@ Arrow::Arrow(glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius
 |         \|         \|/         |/         |
 +----------+----------+----------+----------+
 */
+float Arrow::newrand(glm::vec2 co) {
+	return glm::fract(sin(glm::dot(co, glm::vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+float Arrow::noise(glm::vec2 n) {
+	const glm::vec2 d = glm::vec2(0.0, 1.0);
+	glm::vec2 b = floor(n), f = glm::smoothstep(glm::vec2(0.0), glm::vec2(1.0), fract(n));
+	return glm::mix(glm::mix(newrand(b), newrand(b + glm::vec2(d.y, d.x)), f.x), glm::mix(newrand(b + glm::vec2(d.x, d.y)), newrand(b + glm::vec2(d.y, d.y)), f.x), f.y);
+}
 
 // Creates a new set of Vertex's and their associated indices to send to the Object
 // class for drawing.
 void Arrow::genTriangles() {
+	// Adding some random offsets and height based on the noise generated from their x/z pos.
+	float randVal = (newrand(glm::vec2(objPos.x, objPos.z)) * 2 - 1) * (randomizationEffect * 2.f);
+	pointPos.y += (noise(glm::vec2(objPos.x, objPos.z) * 4.f) * 2 - 1) * randomizationEffect;
+	if (randomizationEffect > 0.01f) {
+		objPos.x += randVal;
+		objPos.z += randVal;
+	}
+	//objPos.y -= 0.5f;
+	//model = glm::translate(model, objPos);
+
 	indCount = 0;
 	verts.clear();
 	indices.clear();
 
 	// Top cone of arrow
+	color = coneColor;
 	model = glm::translate(model, pointPos);
 	genCone();
 
 	// Bottom shaft of arrow
+	color = shaftColor;
 	bottomRadius /= 3.f;
 	topRadius = bottomRadius;
 	model = glm::translate(model, -pointPos);

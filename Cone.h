@@ -29,12 +29,17 @@ private:
 	float bottomRadius;
 	float topRadius;
 	glm::vec3 pointPos;
+	glm::vec3 startingPos;
 	glm::vec3 objPos;
 	glm::vec3 pointingAt;
 
+	glm::vec4 shaftColor, coneColor;
+
+	int indCount;
 	int seed;
 public:
 	Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
+	Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, std::vector <Texture>& _textures, Camera* _camera);
 	~Cone();
 	void genCone();
 	void setLevel(int _level);

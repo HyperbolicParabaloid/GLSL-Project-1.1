@@ -1,57 +1,10 @@
-﻿  Arrow.cpp
-C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  Camera.cpp
-C:\Users\riley\source\repos\GLSL Project Working Directory\Camera.cpp(50,11): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Camera.cpp(51,11): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Camera.cpp(56,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Camera.cpp(57,16): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Camera.cpp(58,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Camera.cpp(59,10): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Camera.cpp(136,21): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  Cone.cpp
-C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  EditingSphere.cpp
-C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\riley\source\repos\GLSL Project Working Directory\EditingSphere.cpp(155,38): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\EditingSphere.cpp(238,19): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-  Mesh.cpp
-C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\riley\source\repos\GLSL Project Working Directory\Mesh.cpp(72,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-  Plane.cpp
-C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  Sphere.cpp
-C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  Cube.cpp
-C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  EBO.cpp
-C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-  main.cpp
+﻿  main.cpp
 C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(581,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(614,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(716,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(622,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(710,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(579,8): warning C4101: 'frac': unreferenced local variable
 C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(579,14): warning C4101: 'whole': unreferenced local variable
-  Object.cpp
-C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(34,74): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(37,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(49,70): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(62,15): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(73,26): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(164,19): warning C4244: 'return': conversion from 'genType' to 'float', possible loss of data
-          with
-          [
-              genType=double
-          ]
-  shaderClass.cpp
-  stb.cpp
-  Texture.cpp
-  VAO.cpp
-C:\Users\riley\source\repos\GLSL Project Working Directory\VAO.cpp(13,63): warning C4244: 'argument': conversion from 'GLsizeiptr' to 'GLsizei', possible loss of data
-  VBO.cpp
-  Generating Code...
-  glad.c
 glfw3.lib(input.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(input.obj)' or at ''; linking object as if no debug info
 glfw3.lib(init.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(init.obj)' or at ''; linking object as if no debug info
 glfw3.lib(window.obj) : warning LNK4099: PDB '' was not found with 'glfw3.lib(window.obj)' or at ''; linking object as if no debug info

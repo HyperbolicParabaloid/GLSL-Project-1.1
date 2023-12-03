@@ -101,6 +101,12 @@
     <None Include="computeShader.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="grass.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="grass.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaderClass.h">
@@ -160,6 +166,9 @@
       <Filter>Resource Files\Textures</Filter>
     </Image>
     <Image Include="..\..\..\Downloads\planks.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="seamless_green_grass_texture_01.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
   </ItemGroup>

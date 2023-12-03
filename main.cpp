@@ -597,14 +597,22 @@ int main()
 	//Texture tex("brick.png", GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE);
 	Texture textures[] = {
 		Texture("planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
-		Texture("planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
+		Texture("planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
+		Texture("seamless_green_grass_texture_01.png", "diffuse", 2, GL_RGBA, GL_UNSIGNED_BYTE),
+		Texture("planksSpec.png", "specular", 3, GL_RED, GL_UNSIGNED_BYTE)
 	};
+
+	//Texture grassTextures[] = {
+	//	Texture("137215-barack-face-vector-obama-png-image-high-quality.png", "diffuse", 2, GL_RGBA, GL_UNSIGNED_BYTE),
+	//	Texture("planksSpec.png", "specular", 3, GL_RED, GL_UNSIGNED_BYTE)
+	//};
 
 	// Store mesh data in vectors for the mesh
 	std::vector <Vertex> verts(vertices11, vertices11 + sizeof(vertices11) / sizeof(Vertex));
 	std::vector <GLuint> ind(indices11, indices11 + sizeof(indices11) / sizeof(GLuint));
 
 	std::vector <Texture> tex(textures, textures + sizeof(textures) / sizeof(Texture));
+	//std::vector <Texture> grassTex(grassTextures, grassTextures + sizeof(grassTextures) / sizeof(Texture));
 	std::vector <Texture> empty;
 
 	glm::vec3 plane1Pos = glm::vec3(0.0f, -1.5f, 0.0f);
@@ -632,35 +640,21 @@ int main()
 
 
 
-	glm::vec3 cone1Pos = glm::vec3(2.0f, .5f, -2.5f);
-	glm::vec3 cone1Tip = glm::vec3(0.0f, 1.0f, 0.0f);	// Tip Pos is relative to the cone's position.
+	glm::vec3 cone1Pos = glm::vec3(2.0f, 0.5f, -2.5f);
+	glm::vec3 cone1Tip = glm::vec3(0.0f, 2.0f, 0.0f);	// Tip Pos is relative to the cone's position.
+	glm::vec4 cone1ShaftColor = glm::vec4(0.3f, 0.2f, 0.f, 1.f); //glm::vec4(1.f, .2f, .1f, 1.f);
+	glm::vec4 cone1ConeColor = glm::vec4(0.2f, .8f, .1f, 1.f);
 
 	//						_bottomRadius<---sqrt(2), _topRadius, _height, _isSmooth
-	Cone cone1(window, cone1Pos, 1.f, coneLevel, 1.0f, 0.2f, cone1Tip, true, glm::vec4(1.f, .2f, .1f, 1.f), empty, &camera);
-
-	//glm::vec3 cone2Pos = glm::vec3(2.0f, .5f, -2.5f) + coneVerts[0].pos;
-	//glm::vec3 cone2Tip = glm::vec3(0.0f, 5.0f, 0.0f);
-	//Cone cone2(window, cone2Pos, 0.09f, coneLevel, 1.0f, 0.0f, cone2Tip, true, glm::vec4(1.f, .2f, .1f, 1.f), empty, &camera);
+	Cone cone1(window, cone1Pos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera);
 
 	std::vector <Object*> objectList;
-	//for (int ii = 0; ii < coneVerts.size(); ii++) {
-	//	glm::vec3 cone2Pos = sphere1Pos + coneVerts[ii].pos;
-	//	glm::vec3 cone2Tip = glm::vec3(0.0f, 5.0f, 0.0f);
-	//	Cone *cone2 = new Cone(window, cone2Pos, 0.05f, coneLevel, 1.0f, 0.0f, cone2Tip, true, glm::vec4(coneVerts[ii].norm, 1.f), empty, &camera);
-	//	glm::vec3 cone2pointingAt = coneVerts[ii].norm;	// Tip Pos is relative to the cone's position.
-	//	glm::vec3 axis = glm::cross(cone2Tip, cone2pointingAt);
-	//	float angle = acos(glm::dot(glm::normalize(cone2Tip), glm::normalize(cone2pointingAt)));
-	//	angle = glm::degrees(angle);
-	//	cone2->rotate(angle, axis);
-	//	//std::cout << "angle = " << angle << "\n";
-	//	//std::cout << "cone2pointingAt = (" << cone2pointingAt.x << ", " << cone2pointingAt.y << ", " << cone2pointingAt.z << ")\n";
-	//	objectList.push_back(cone2);
-	//}
+	
 
-
-
-
-	objectList.push_back(&cone1);
+	objectList.push_back(new Cone(window, cone1Pos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
+	cone1Pos = glm::vec3(4.0f, 0.5f, -2.5f);
+	objectList.push_back(new Cone(window, cone1Pos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
+	//objectList.push_back(&cone1);
 	//objectList.push_back(&cone2);
 	objectList.push_back(&sphere1);
 	objectList.push_back(&cube1);
@@ -669,7 +663,7 @@ int main()
 	objectList.push_back(&plane1);
 
 
-	camera.set_camera_speed(1);
+	camera.set_camera_speed(10);
 	level = 4;
 	int planeLevel = 2;
 	bool randomColor = true;
@@ -748,21 +742,21 @@ int main()
 			sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_MINUS) && lockoutTimer <= crntTime) {
-			//level--;
-			coneLevel--;
+			level--;
+			//coneLevel--;
 			std::cout << "\nLevel: " << level << "\n";
-			sphere1.setLevel(level);
+			//sphere1.setLevel(level);
 			plane1.setLevel(level);
-			cone1.setLevel(coneLevel);
+			//cone1.setLevel(coneLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_EQUAL) && lockoutTimer <= crntTime) {
-			//level++;
-			coneLevel++;
+			level++;
+			//coneLevel++;
 			std::cout << "\nLevel: " << level << "\n";
-			sphere1.setLevel(level);
+			//sphere1.setLevel(level);
 			plane1.setLevel(level);
-			cone1.setLevel(coneLevel);
+			//cone1.setLevel(coneLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_9) && lockoutTimer <= crntTime) {
@@ -792,13 +786,15 @@ int main()
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_N) && lockoutTimer <= crntTime) {
-			sphere1.toggleNormalArrows();
-			sphere1.setLevel(level);
+			//sphere1.toggleNormalArrows();
+			//sphere1.setLevel(level);
 
-			cube2.toggleNormalArrows();
-			cube2.reGenTriangles();
+			//cube2.toggleNormalArrows();
+			//cube2.reGenTriangles();
 
 
+			//cone1.toggleNormalArrows();
+			//cone1.setLevel(coneLevel);
 			cone1.toggleNormalArrows();
 			cone1.setLevel(coneLevel);
 

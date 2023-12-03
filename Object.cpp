@@ -45,7 +45,7 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 	// Generates Shader object using shaders object.vert and object.frag
 	delete shaderProgram;
 	if (msg == "Plane") {
-		shaderProgram = new Shader("wave.vert", "wave.frag");
+		shaderProgram = new Shader("grass.vert", "grass.frag");
 		glUniform1f(glGetUniformLocation(shaderProgram->ID, "offset"), 2.f / (sqrt(_vertices.size()) - 1.f));
 	}
 	else
@@ -69,14 +69,16 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 			glm::vec3 conePointPos = glm::vec3(0.f, 5.f, 0.f);
 			glm::vec3 conePointingAt = vertices[vv].norm;
 			bool coneIsSmooth = true;
-			glm::vec4 coneColor = vertices[vv].color;
+			glm::vec4 coneColor = glm::vec4(0.4f, 0.5f, 0.3f, 1.f); //vertices[vv].color;
+			glm::vec4 shaftColor = glm::vec4(0.5f, 0.3f, 0.f, 1.f);// vertices[vv].color;
 			int coneStartingIndex = indices.size();
+			float randomizationEffect = 0.f;
 
 			//std::cout << "Drawing arrows #" << vNum << " at pos (" << conePos.x << ", " << conePos.y << ", " << conePos.z << ")\n";
 			//vNum++;
 
 			//std::cout << "Drawing a " << msg << "\n";
-			Arrow newArrow(conePos, coneScale, coneLevel, coneBottomRadius, coneTopRadius, conePointPos, conePointingAt, coneIsSmooth, coneColor, coneStartingIndex);
+			Arrow newArrow(conePos, coneScale, coneLevel, coneBottomRadius, coneTopRadius, conePointPos, conePointingAt, coneIsSmooth, shaftColor, coneColor, randomizationEffect, coneStartingIndex);
 			std::vector <Vertex> coneVerts = newArrow.getVerts();
 			std::vector <GLuint> coneInds = newArrow.getInds();
 
