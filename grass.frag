@@ -79,7 +79,7 @@ vec4 directionalLight() {
 	float ambient = 0.2f;
 	
 	// Position of the light
-	vec3 lightVec = vec3(0.0, 1.0f, 5.0f);
+	vec3 lightVec = vec3(0.0, 1.0f, 1.0f);
 
 	// diffuse lighting
 	vec3 normal = normalize(Normal);

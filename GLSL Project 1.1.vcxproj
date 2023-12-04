@@ -199,6 +199,7 @@
     <Image Include="..\..\..\Downloads\planksSpec.png" />
     <Image Include="137215-barack-face-vector-obama-png-image-high-quality.png" />
     <Image Include="brick.png" />
+    <Image Include="grass-normal-map.png" />
     <Image Include="pop_cat.png" />
     <Image Include="seamless_green_grass_texture_01.png" />
   </ItemGroup>

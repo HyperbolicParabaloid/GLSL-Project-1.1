@@ -14,6 +14,11 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	textures = _textures;
 }
 
+
+std::vector <Vertex>& Object::getVerteices() {
+	return vertices;
+}
+
 // Rotates the object about a given acis by a set angle in degrees.
 void Object::rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation) {
 	model = glm::rotate(model, glm::radians(rotationDegreeAngle), axisOfRotation);

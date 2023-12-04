@@ -599,25 +599,20 @@ int main()
 		Texture("planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
 		Texture("planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
 		Texture("seamless_green_grass_texture_01.png", "diffuse", 2, GL_RGBA, GL_UNSIGNED_BYTE),
-		Texture("planksSpec.png", "specular", 3, GL_RED, GL_UNSIGNED_BYTE)
+		Texture("grass-normal-map.png", "specular", 3, GL_RED, GL_UNSIGNED_BYTE)
 	};
-
-	//Texture grassTextures[] = {
-	//	Texture("137215-barack-face-vector-obama-png-image-high-quality.png", "diffuse", 2, GL_RGBA, GL_UNSIGNED_BYTE),
-	//	Texture("planksSpec.png", "specular", 3, GL_RED, GL_UNSIGNED_BYTE)
-	//};
 
 	// Store mesh data in vectors for the mesh
 	std::vector <Vertex> verts(vertices11, vertices11 + sizeof(vertices11) / sizeof(Vertex));
 	std::vector <GLuint> ind(indices11, indices11 + sizeof(indices11) / sizeof(GLuint));
 
 	std::vector <Texture> tex(textures, textures + sizeof(textures) / sizeof(Texture));
-	//std::vector <Texture> grassTex(grassTextures, grassTextures + sizeof(grassTextures) / sizeof(Texture));
 	std::vector <Texture> empty;
 
+	int planeLevel = 5;
 	glm::vec3 plane1Pos = glm::vec3(0.0f, -1.5f, 0.0f);
 	//Plane plane1(window, plane1Pos, 40.f, true, glm::vec4(1.f, 1.f, 1.f, 1.f), tex, &camera);
-	Plane plane1(window, plane1Pos, 25.f, 2, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
+	Plane plane1(window, plane1Pos, 25.f, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
 
 	float cube1y = -1.5 + sqrt(3);
 	glm::vec3 cube1Pos = glm::vec3(-2.5f, cube1y, -2.5f);
@@ -640,7 +635,7 @@ int main()
 
 
 
-	glm::vec3 cone1Pos = glm::vec3(2.0f, 0.5f, -2.5f);
+	glm::vec3 cone1Pos = glm::vec3(2.0f, -1.5f, 2.5f);
 	glm::vec3 cone1Tip = glm::vec3(0.0f, 2.0f, 0.0f);	// Tip Pos is relative to the cone's position.
 	glm::vec4 cone1ShaftColor = glm::vec4(0.3f, 0.2f, 0.f, 1.f); //glm::vec4(1.f, .2f, .1f, 1.f);
 	glm::vec4 cone1ConeColor = glm::vec4(0.2f, .8f, .1f, 1.f);
@@ -649,11 +644,23 @@ int main()
 	Cone cone1(window, cone1Pos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera);
 
 	std::vector <Object*> objectList;
+	std::vector <Cone*> coneList;
 	
 
-	objectList.push_back(new Cone(window, cone1Pos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
-	cone1Pos = glm::vec3(4.0f, 0.5f, -2.5f);
-	objectList.push_back(new Cone(window, cone1Pos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
+	glm::vec3 newConePos = cone1Pos;
+	coneLevel = 3;
+
+	//for (int xx = 0; xx < 10; xx++) {
+	//	newConePos.z = cone1Pos.z;
+	//	for (int zz = 0; zz < 10; zz++) {
+	//		coneList.push_back(new Cone(window, newConePos, 2.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
+	//		newConePos.z += 4.f;
+	//	}
+	//	newConePos.x += 4.f;
+	//}
+	std::vector <Vertex> planeVerts = plane1.getVerteices();
+	for (const Vertex& v : planeVerts)
+		coneList.push_back(new Cone(window, glm::vec3(v.pos.x * 25.f, v.pos.y * 25.f - 1.5, v.pos.z * 25.f), 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
 	//objectList.push_back(&cone1);
 	//objectList.push_back(&cone2);
 	objectList.push_back(&sphere1);
@@ -665,7 +672,6 @@ int main()
 
 	camera.set_camera_speed(10);
 	level = 4;
-	int planeLevel = 2;
 	bool randomColor = true;
 	bool isSmooth = true;
 
@@ -742,20 +748,20 @@ int main()
 			sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_MINUS) && lockoutTimer <= crntTime) {
-			level--;
+			planeLevel--;
 			//coneLevel--;
 			std::cout << "\nLevel: " << level << "\n";
 			//sphere1.setLevel(level);
-			plane1.setLevel(level);
+			plane1.setLevel(planeLevel);
 			//cone1.setLevel(coneLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_EQUAL) && lockoutTimer <= crntTime) {
-			level++;
+			planeLevel++;
 			//coneLevel++;
 			std::cout << "\nLevel: " << level << "\n";
 			//sphere1.setLevel(level);
-			plane1.setLevel(level);
+			plane1.setLevel(planeLevel);
 			//cone1.setLevel(coneLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
@@ -778,7 +784,7 @@ int main()
 			sphere1.setLevel(level);
 
 			plane1.doRandomColors(randomColor);
-			plane1.setLevel(level);
+			plane1.setLevel(planeLevel);
 
 			cone1.doRandomColors(randomColor);
 			cone1.setLevel(coneLevel);
@@ -795,8 +801,13 @@ int main()
 
 			//cone1.toggleNormalArrows();
 			//cone1.setLevel(coneLevel);
-			cone1.toggleNormalArrows();
-			cone1.setLevel(coneLevel);
+			//cone1.toggleNormalArrows();
+			//cone1.setLevel(coneLevel);
+			//for (Cone* cn : coneList) {
+			//	cn->toggleNormalArrows();
+			//	cn->setLevel(coneLevel);
+			//}
+
 
 			lockoutTimer = crntTime + 0.2;
 		}
@@ -805,16 +816,16 @@ int main()
 			sphere1.setLevel(level);
 
 			plane1.reseed();
-			plane1.setLevel(level);
+			plane1.setLevel(planeLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Y) && lockoutTimer <= crntTime) {
 			isSmooth = !isSmooth;
 			sphere1.smoothSurface(isSmooth);
-			sphere1.setLevel(level);
+			sphere1.setLevel(planeLevel);
 
 			plane1.smoothSurface(isSmooth);
-			plane1.setLevel(level);
+			plane1.setLevel(planeLevel);
 
 			cone1.smoothSurface(isSmooth);
 			cone1.setLevel(coneLevel);
@@ -855,6 +866,9 @@ int main()
 		// Drawing all the Objects in the list.
 		for (auto obj : objectList)
 			obj->draw(lightPos, lightColor);
+
+		for (auto cn : coneList)
+			cn->draw(lightPos, lightColor);
 
 
 		// Drawing the Light.
