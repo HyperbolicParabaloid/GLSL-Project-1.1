@@ -32,8 +32,8 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 	glUniform3f(glGetUniformLocation(shaderProgram->ID, "lightPos"), _lightPos.x, _lightPos.y, _lightPos.z);
 	glUniform4f(glGetUniformLocation(shaderProgram->ID, "lightColor"), _lightColor.x, _lightColor.y, _lightColor.z, _lightColor.w);
 	glUniform1f(glGetUniformLocation(shaderProgram->ID, "time"), glfwGetTime());
-	glUniform3f(glGetUniformLocation(shaderProgram->ID, "startPos"), objPos.x / 25.f, objPos.y / 25.f, objPos.z / 25.f);
-
+	if (name == "Tree" || name == "Plane")
+		glUniform3f(glGetUniformLocation(shaderProgram->ID, "startPos"), objPos.x / 25.f, objPos.y / 25.f, objPos.z / 25.f);
 	// Draw the actual mesh
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
@@ -46,10 +46,12 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 	// Generates Shader object using shaders object.vert and object.frag
 	delete shaderProgram;
 	if (msg == "Plane") {
+		name = msg;
 		shaderProgram = new Shader("grass.vert", "grass.frag");
 		//glUniform3f(glGetUniformLocation(shaderProgram->ID, "startPos"), objPos.x / 25.f, objPos.y / 25.f, objPos.z / 25.f);
 	}
 	else if (msg == "Tree") {
+		name = msg;
 		shaderProgram = new Shader("tree.vert", "tree.frag");
 		//glUniform3f(glGetUniformLocation(shaderProgram->ID, "startPos"), objPos.x / 25.f, objPos.y / 25.f + 1.5f, objPos.z / 25.f);
 	}

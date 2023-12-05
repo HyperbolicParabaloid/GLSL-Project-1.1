@@ -1,10 +1,10 @@
 ﻿  Object.cpp
 C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(34,74): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(38,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(67,15): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(79,26): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(171,19): warning C4244: 'return': conversion from 'genType' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(40,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(71,15): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(83,26): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(175,19): warning C4244: 'return': conversion from 'genType' to 'float', possible loss of data
           with
           [
               genType=double

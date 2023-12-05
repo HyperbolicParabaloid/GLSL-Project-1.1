@@ -36,6 +36,7 @@ private:
 	std::vector <Texture> textures;
 
 	bool doNormalArrows;
+	std::string name;
 
 	VAO VAO;
 

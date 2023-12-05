@@ -611,13 +611,13 @@ int main()
 	std::vector <Texture> empty;
 
 	int planeLevel = 5;
-	glm::vec3 plane1Pos = glm::vec3(0.0f, -1.5f, 0.0f);
+	glm::vec3 plane1Pos = glm::vec3(-50.0f, -1.5f, 0.0f);
 	//Plane plane1(window, plane1Pos, 40.f, true, glm::vec4(1.f, 1.f, 1.f, 1.f), tex, &camera);
 	Plane plane1(window, plane1Pos, 25.f, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
 
-	glm::vec3 plane2Pos = glm::vec3(50.0f, -1.5f, 0.0f);
+	glm::vec3 plane2Pos = glm::vec3(0.0f, -1.5f, 0.0f);
 	//Plane plane1(window, plane1Pos, 40.f, true, glm::vec4(1.f, 1.f, 1.f, 1.f), tex, &camera);
-	Plane plane2(window, plane2Pos, 25.f, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), empty, &camera);
+	Plane plane2(window, plane2Pos, 25.f, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
 
 	float cube1y = -1.5 + sqrt(3);
 	glm::vec3 cube1Pos = glm::vec3(-2.5f, cube1y, -2.5f);
