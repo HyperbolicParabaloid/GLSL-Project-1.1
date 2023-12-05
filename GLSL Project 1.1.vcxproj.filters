@@ -72,6 +72,9 @@
     <ClCompile Include="Arrow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="HashTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="default.vert">
@@ -105,6 +108,12 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="grass.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="tree.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="tree.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>
@@ -149,6 +158,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Arrow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HashTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

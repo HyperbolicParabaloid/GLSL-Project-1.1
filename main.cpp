@@ -3,6 +3,7 @@
 #include"Sphere.h"
 #include"Plane.h"
 #include"Cone.h"
+#include"HashTable.h"
 
 
 // Setting up array of vertices.
@@ -614,6 +615,10 @@ int main()
 	//Plane plane1(window, plane1Pos, 40.f, true, glm::vec4(1.f, 1.f, 1.f, 1.f), tex, &camera);
 	Plane plane1(window, plane1Pos, 25.f, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
 
+	glm::vec3 plane2Pos = glm::vec3(50.0f, -1.5f, 0.0f);
+	//Plane plane1(window, plane1Pos, 40.f, true, glm::vec4(1.f, 1.f, 1.f, 1.f), tex, &camera);
+	Plane plane2(window, plane2Pos, 25.f, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), empty, &camera);
+
 	float cube1y = -1.5 + sqrt(3);
 	glm::vec3 cube1Pos = glm::vec3(-2.5f, cube1y, -2.5f);
 	Cube cube1(window, cube1Pos, 1.f, color, empty, &camera);
@@ -645,29 +650,30 @@ int main()
 
 	std::vector <Object*> objectList;
 	std::vector <Cone*> coneList;
-	
+
 
 	glm::vec3 newConePos = cone1Pos;
 	coneLevel = 3;
 
-	//for (int xx = 0; xx < 10; xx++) {
-	//	newConePos.z = cone1Pos.z;
-	//	for (int zz = 0; zz < 10; zz++) {
-	//		coneList.push_back(new Cone(window, newConePos, 2.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
-	//		newConePos.z += 4.f;
-	//	}
-	//	newConePos.x += 4.f;
-	//}
-	std::vector <Vertex> planeVerts = plane1.getVerteices();
-	for (const Vertex& v : planeVerts)
-		coneList.push_back(new Cone(window, glm::vec3(v.pos.x * 25.f, v.pos.y * 25.f - 1.5, v.pos.z * 25.f), 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
-	//objectList.push_back(&cone1);
-	//objectList.push_back(&cone2);
+	int hashTableSize = plane1.vertices.size() / 4;
+	HashTable hashTable(hashTableSize);
+	std::cout << "hashTableSize = " << hashTableSize << "\n";
+	for (const Vertex& v : plane1.vertices) {
+		int index = hashTable.isInTable(v.pos);
+		if (index == -1) {
+			//std::cout << "index = " << index << "\n";
+			hashTable.addItem(v.pos);
+			glm::vec3 treePos = glm::vec3(v.pos.x * 25.f + plane1Pos.x, v.pos.y * 25.f + plane1Pos.y, v.pos.z * 25.f + plane1Pos.z);
+			coneList.push_back(new Cone(window, treePos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
+		}
+		//std::cout << "Not in table, index = " << index << "\n";
+	}
 	objectList.push_back(&sphere1);
 	objectList.push_back(&cube1);
 	objectList.push_back(&cube2);
 	objectList.push_back(&cube3);
 	objectList.push_back(&plane1);
+	objectList.push_back(&plane2);
 
 
 	camera.set_camera_speed(10);
@@ -783,8 +789,11 @@ int main()
 			sphere1.doRandomColors(randomColor);
 			sphere1.setLevel(level);
 
+			plane2.doRandomColors(randomColor);
+			plane2.setLevel(planeLevel);
 			plane1.doRandomColors(randomColor);
 			plane1.setLevel(planeLevel);
+			
 
 			cone1.doRandomColors(randomColor);
 			cone1.setLevel(coneLevel);
@@ -822,7 +831,7 @@ int main()
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Y) && lockoutTimer <= crntTime) {
 			isSmooth = !isSmooth;
 			sphere1.smoothSurface(isSmooth);
-			sphere1.setLevel(planeLevel);
+			sphere1.setLevel(level);
 
 			plane1.smoothSurface(isSmooth);
 			plane1.setLevel(planeLevel);

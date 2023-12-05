@@ -181,7 +181,7 @@ void Plane::genOctahedron() {
 			GLfloat x, y, z = 0.f;
 			x = ((uu * 2) - (vertsPerSide - 1)) / (float)(vertsPerSide - 1);	// Goes from -1.f =>  1.f
 			y = ((vertsPerSide - 1) - (vv * 2)) / (float)(vertsPerSide - 1);	// Goes from  1.f => -1.f
-			z += noise(glm::vec2(x, y)) / 10.f + noise(glm::vec2(x, y) * 10.f) / 20.f;
+			//z += noise(glm::vec2(x, y)) / 10.f + noise(glm::vec2(x, y) * 10.f) / 20.f;
 
 			if (false) {
 				// Transforming the 2D plane to a 3D Octahedron.
@@ -236,45 +236,16 @@ void Plane::setVerticesVector() {
 
 	int indCount = 0;
 
+	glm::vec3 v1, v2, v3, v4, v5, v6;
+	glm::vec3 n1, n2, n3, n4, n5, n6;
+	glm::vec2 tex1, tex2, tex3, tex4, tex5, tex6;
 	srand(seed);
 	// This nested for-loop updates verts with all its Vertex information and
 	// updates indices with all the right values.
 	for (int vv = 0; vv <= setpsPerSide; vv++) {
 		for (int uu = 0; uu <= setpsPerSide; uu++) {
-			//	+-+
-			//	|\|
-			//	+-+
-			if ((uu >= (vertsPerSide - 1) / 2 && vv < (vertsPerSide - 1) / 2) || ((uu < (vertsPerSide - 1) / 2 && vv >= (vertsPerSide - 1) / 2))) {
-				t0 = (uu + 0) + (vertsPerSide * (vv + 0));
-				t1 = (uu + 0) + (vertsPerSide * (vv + 1));
-				t2 = (uu + 1) + (vertsPerSide * (vv + 1));
-
-				t3 = (uu + 1) + (vertsPerSide * (vv + 1));
-				t4 = (uu + 1) + (vertsPerSide * (vv + 0));
-				t5 = (uu + 0) + (vertsPerSide * (vv + 0));
-			}
-
-			//	+-+
-			//	|/|
-			//	+-+
-			else {
-				t0 = (uu + 1) + (vertsPerSide * (vv + 0));
-				t1 = (uu + 0) + (vertsPerSide * (vv + 0));
-				t2 = (uu + 0) + (vertsPerSide * (vv + 1));
-
-				t3 = (uu + 0) + (vertsPerSide * (vv + 1));
-				t4 = (uu + 1) + (vertsPerSide * (vv + 1));
-				t5 = (uu + 1) + (vertsPerSide * (vv + 0));
-			}
-
-			// These are the position and texture coordiante glm::vecs for each of the two triangles per-square.
-			glm::vec3 v1 = preVerts[t0];	glm::vec2 tex1 = texCoords[t0];
-			glm::vec3 v2 = preVerts[t1];	glm::vec2 tex2 = texCoords[t1];
-			glm::vec3 v3 = preVerts[t2];	glm::vec2 tex3 = texCoords[t2];
-
-			glm::vec3 v4 = preVerts[t3];	glm::vec2 tex4 = texCoords[t3];
-			glm::vec3 v5 = preVerts[t4];	glm::vec2 tex5 = texCoords[t4];
-			glm::vec3 v6 = preVerts[t5];	glm::vec2 tex6 = texCoords[t5];
+			getPositions(uu, vv, vertsPerSide, v1, n1, v2, n2, v3, n3, v4, n4, v5, n5, v6, n6);
+			getPositions(uu, vv, vertsPerSide, tex1, tex2, tex3, tex4, tex5, tex6);
 
 			// Setting the colors of the object:
 			glm::vec4 color1, color2;
@@ -298,29 +269,17 @@ void Plane::setVerticesVector() {
 			// If we'd rather they appear angular, we can set that by getting the normal of the triangle
 			// the vertexs are a part of, and using that for each Vertex.
 			if (!isSmooth) {
-				glm::vec3 n1 = glm::normalize(glm::cross(v3 - v2, v1 - v2));
-				glm::vec3 n2 = glm::normalize(glm::cross(v6 - v5, v4 - v5));
-
-				verts.push_back(Vertex{ v1, n1, color1, tex1 });
-				verts.push_back(Vertex{ v2, n1, color1, tex2 });
-				verts.push_back(Vertex{ v3, n1, color1, tex3 });
-
-				verts.push_back(Vertex{ v4, n2, color2, tex4 });
-				verts.push_back(Vertex{ v5, n2, color2, tex5 });
-				verts.push_back(Vertex{ v6, n2, color2, tex6 });
+				n1 = n2 = n3 = glm::normalize(glm::cross(v3 - v2, v1 - v2));
+				n4 = n5 = n6 = glm::normalize(glm::cross(v6 - v5, v4 - v5));
 			}
-			else {
-				glm::vec3 n1 = glm::vec3(0.f, 1.f, 0.f); // glm::normalize(glm::cross(v3 - v2, v1 - v2));
-				glm::vec3 n2 = glm::vec3(0.f, 1.f, 0.f); // glm::normalize(glm::cross(v6 - v5, v4 - v5));
+			
+			verts.push_back(Vertex{ v1, n1, color1, tex1 });
+			verts.push_back(Vertex{ v2, n2, color1, tex2 });
+			verts.push_back(Vertex{ v3, n3, color1, tex3 });
 
-				verts.push_back(Vertex{ v1, n1, color1, tex1 });
-				verts.push_back(Vertex{ v2, n1, color1, tex2 });
-				verts.push_back(Vertex{ v3, n1, color1, tex3 });
-
-				verts.push_back(Vertex{ v4, n2, color2, tex4 });
-				verts.push_back(Vertex{ v5, n2, color2, tex5 });
-				verts.push_back(Vertex{ v6, n2, color2, tex6 });
-			}
+			verts.push_back(Vertex{ v4, n4, color2, tex4 });
+			verts.push_back(Vertex{ v5, n5, color2, tex5 });
+			verts.push_back(Vertex{ v6, n6, color2, tex6 });
 			// Finally, setting the values of the Indices. I have it in such a way,
 			// that indices[n] = n; for all n; >= 0, < indices.size().
 			for (int ii = 0; ii < 6; ii++) {
@@ -330,6 +289,125 @@ void Plane::setVerticesVector() {
 		}
 	}
 
+}
+
+glm::vec3 Plane::averageNormals(int _uu, int _vv, int vertsPerSide) {
+
+	return glm::vec3(0.f, -1.f, 0.f);
+
+	//	+-+
+	//	|\|
+	//	+-+
+	glm::vec3 n = glm::vec3(0.f);
+	int uu = _uu, vv = _vv;
+	glm::vec3 vecs[9];
+	int vecsCount = 0;
+	for (int yy = 1; yy >= -1; yy--) {
+		for (int xx = -1; xx <= 1; xx++) {
+			if (uu + xx > 0 && uu + xx < vertsPerSide - 1 && vv + yy > 0 && vv + yy < vertsPerSide - 1) {
+				uu += xx;
+				vv += yy;
+				vecs[vecsCount] = preVerts[uu + vertsPerSide * vv];
+			}
+			//vecs[vecsCount] = preVerts[uu + vertsPerSide * vv];
+			vecsCount++;
+		}
+	}
+	uu = _uu;
+	vv = _vv;
+
+	// / | \
+	// --+--
+	// \ | /
+	if (uu == (vertsPerSide - 1) / 2 && vv == (vertsPerSide - 1) / 2) {
+		n += glm::cross(vecs[1] - vecs[4], vecs[3] - vecs[4]);	// 1
+		n += glm::cross(vecs[5] - vecs[4], vecs[1] - vecs[4]);	// 2
+		n += glm::cross(vecs[7] - vecs[4], vecs[5] - vecs[4]);	// 3
+		n += glm::cross(vecs[3] - vecs[4], vecs[7] - vecs[4]);	// 4
+	}
+	//	+-+
+	//	|\|
+	//	+-+
+	else if ((uu >= (vertsPerSide - 1) / 2 && vv < (vertsPerSide - 1) / 2) || ((uu < (vertsPerSide - 1) / 2 && vv >= (vertsPerSide - 1) / 2))) {
+		n += glm::cross(vecs[0] - vecs[4], vecs[3] - vecs[4]);	// 1
+		n += glm::cross(vecs[1] - vecs[4], vecs[0] - vecs[4]);	// 2
+		n += glm::cross(vecs[5] - vecs[4], vecs[1] - vecs[4]);	// 3
+		n += glm::cross(vecs[8] - vecs[4], vecs[5] - vecs[4]);	// 4
+		n += glm::cross(vecs[7] - vecs[4], vecs[8] - vecs[4]);	// 5
+		n += glm::cross(vecs[3] - vecs[4], vecs[7] - vecs[4]);	// 6
+	}
+
+	//	+-+
+	//	|/|
+	//	+-+
+	else {
+		n += glm::cross(vecs[1] - vecs[4], vecs[3] - vecs[4]);	// 1
+		n += glm::cross(vecs[2] - vecs[4], vecs[1] - vecs[4]);	// 2
+		n += glm::cross(vecs[5] - vecs[4], vecs[2] - vecs[4]);	// 3
+		n += glm::cross(vecs[7] - vecs[4], vecs[5] - vecs[4]);	// 4
+		n += glm::cross(vecs[6] - vecs[4], vecs[7] - vecs[4]);	// 5
+		n += glm::cross(vecs[3] - vecs[4], vecs[6] - vecs[4]);	// 6
+	}
+	std::cout << "n = (" << n.x << ", " << n.y << ", " << n.z << ")\n";
+	return n;
+}
+
+
+void Plane::getPositions(int uu, int vv, int vertsPerSide, glm::vec3& v1, glm::vec3& n1, glm::vec3& v2, glm::vec3& n2, glm::vec3& v3, glm::vec3& n3, glm::vec3& v4, glm::vec3& n4, glm::vec3& v5, glm::vec3& n5, glm::vec3& v6, glm::vec3& n6)
+{
+	//	+-+
+	//	|\|
+	//	+-+
+	if ((uu >= (vertsPerSide - 1) / 2 && vv < (vertsPerSide - 1) / 2) || ((uu < (vertsPerSide - 1) / 2 && vv >= (vertsPerSide - 1) / 2))) {
+		v1 = preVerts[(uu + 0) + (vertsPerSide * (vv + 0))]; n1 = averageNormals((uu + 0), (vertsPerSide * (vv + 0)), vertsPerSide);
+		v2 = preVerts[(uu + 0) + (vertsPerSide * (vv + 1))]; n2 = averageNormals((uu + 0), (vertsPerSide * (vv + 1)), vertsPerSide);
+		v3 = preVerts[(uu + 1) + (vertsPerSide * (vv + 1))]; n3 = averageNormals((uu + 1), (vertsPerSide * (vv + 1)), vertsPerSide);
+
+		v4 = preVerts[(uu + 1) + (vertsPerSide * (vv + 1))]; n4 = averageNormals((uu + 1), (vertsPerSide * (vv + 1)), vertsPerSide);
+		v5 = preVerts[(uu + 1) + (vertsPerSide * (vv + 0))]; n5 = averageNormals((uu + 1), (vertsPerSide * (vv + 0)), vertsPerSide);
+		v6 = preVerts[(uu + 0) + (vertsPerSide * (vv + 0))]; n6 = averageNormals((uu + 0), (vertsPerSide * (vv + 0)), vertsPerSide);
+	}
+
+	//	+-+
+	//	|/|
+	//	+-+
+	else {
+		v1 = preVerts[(uu + 1) + (vertsPerSide * (vv + 0))]; n1 = averageNormals((uu + 1), (vertsPerSide * (vv + 0)), vertsPerSide);
+		v2 = preVerts[(uu + 0) + (vertsPerSide * (vv + 0))]; n2 = averageNormals((uu + 0), (vertsPerSide * (vv + 0)), vertsPerSide);
+		v3 = preVerts[(uu + 0) + (vertsPerSide * (vv + 1))]; n3 = averageNormals((uu + 0), (vertsPerSide * (vv + 1)), vertsPerSide);
+
+		v4 = preVerts[(uu + 0) + (vertsPerSide * (vv + 1))]; n4 = averageNormals((uu + 0), (vertsPerSide * (vv + 1)), vertsPerSide);
+		v5 = preVerts[(uu + 1) + (vertsPerSide * (vv + 1))]; n5 = averageNormals((uu + 1), (vertsPerSide * (vv + 1)), vertsPerSide);
+		v6 = preVerts[(uu + 1) + (vertsPerSide * (vv + 0))]; n6 = averageNormals((uu + 1), (vertsPerSide * (vv + 0)), vertsPerSide);
+	}
+}
+
+void Plane::getPositions(int uu, int vv, int vertsPerSide, glm::vec2& t1, glm::vec2& t2, glm::vec2& t3, glm::vec2& t4, glm::vec2& t5, glm::vec2& t6) {
+	//	+-+
+	//	|\|
+	//	+-+
+	if ((uu >= (vertsPerSide - 1) / 2 && vv < (vertsPerSide - 1) / 2) || ((uu < (vertsPerSide - 1) / 2 && vv >= (vertsPerSide - 1) / 2))) {
+		t1 = texCoords[(uu + 0) + (vertsPerSide * (vv + 0))];
+		t2 = texCoords[(uu + 0) + (vertsPerSide * (vv + 1))];
+		t3 = texCoords[(uu + 1) + (vertsPerSide * (vv + 1))];
+		
+		t4 = texCoords[(uu + 1) + (vertsPerSide * (vv + 1))];
+		t5 = texCoords[(uu + 1) + (vertsPerSide * (vv + 0))];
+		t6 = texCoords[(uu + 0) + (vertsPerSide * (vv + 0))];
+	}
+
+	//	+-+
+	//	|/|
+	//	+-+
+	else {
+		t1 = texCoords[(uu + 1) + (vertsPerSide * (vv + 0))];
+		t2 = texCoords[(uu + 0) + (vertsPerSide * (vv + 0))];
+		t3 = texCoords[(uu + 0) + (vertsPerSide * (vv + 1))];
+		
+		t4 = texCoords[(uu + 0) + (vertsPerSide * (vv + 1))];
+		t5 = texCoords[(uu + 1) + (vertsPerSide * (vv + 1))];
+		t6 = texCoords[(uu + 1) + (vertsPerSide * (vv + 0))];
+	}
 }
 
 // Destructor of Sphere class.

@@ -35,9 +35,6 @@ private:
 	glm::vec3 objPos;
 	std::vector <Texture> textures;
 
-	std::vector <Vertex> vertices;
-	std::vector <GLuint> indices;
-
 	bool doNormalArrows;
 
 	VAO VAO;
@@ -61,7 +58,8 @@ public:
 
 	void toggleNormalArrows();
 
-	std::vector <Vertex>& getVerteices();
+	std::vector <Vertex> vertices;
+	std::vector <GLuint> indices;
 };
 
 #endif

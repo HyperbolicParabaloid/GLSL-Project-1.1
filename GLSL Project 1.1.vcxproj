@@ -151,6 +151,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Cone.cpp" />
     <ClCompile Include="EditingSphere.cpp" />
+    <ClCompile Include="HashTable.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Sphere.cpp" />
@@ -175,6 +176,8 @@
     <None Include="light.vert" />
     <None Include="object.frag" />
     <None Include="object.vert" />
+    <None Include="tree.frag" />
+    <None Include="tree.vert" />
     <None Include="wave.frag" />
     <None Include="wave.vert" />
   </ItemGroup>
@@ -183,6 +186,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Cone.h" />
     <ClInclude Include="EditingSphere.h" />
+    <ClInclude Include="HashTable.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Sphere.h" />

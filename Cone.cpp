@@ -105,7 +105,8 @@ void Cone::genTriangles() {
 	indices.clear();
 	indCount = 0;
 
-	int layers = 8;
+	int layers = 4;
+	float scaleMax = .75f, scaleMin = .5f;
 
 	glm::vec3 b = startingPos, t = pointPos;
 	float br = bottomRadius;
@@ -121,19 +122,17 @@ void Cone::genTriangles() {
 			bottomRadius = br;
 			color = coneColor;
 		}
-		float scale = (ll / layers) * 0.25 + 0.5;
+		float scale = (ll / layers) * (scaleMax - scaleMin) + scaleMin;
 		glm::vec3 startToPointDiff = (pointPos - startingPos) * scale;
 		bottomRadius /= 1.5;
-		//startToPointDiff.y *= scale;
 		startingPos += startToPointDiff;
 		pointPos += startToPointDiff * scale;
 	}
 	startingPos = b;
 	pointPos = t;
 	bottomRadius = br;
-	//genCone();
 
-	setVBOandEBO(verts, indices, "Cone");
+	setVBOandEBO(verts, indices, "Tree");
 }
 
 void Cone::genCone() {

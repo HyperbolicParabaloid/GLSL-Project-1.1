@@ -14,12 +14,7 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	textures = _textures;
 }
 
-
-std::vector <Vertex>& Object::getVerteices() {
-	return vertices;
-}
-
-// Rotates the object about a given acis by a set angle in degrees.
+// Rotates the object about a given axis by a set angle in degrees.
 void Object::rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation) {
 	model = glm::rotate(model, glm::radians(rotationDegreeAngle), axisOfRotation);
 }
@@ -30,13 +25,14 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 	shaderProgram->Activate();
 	VAO.Bind();
 
-	// Assigning all relvant info to the shader.
+	// Assigning all relevant info to the shader.
 	glUniform3f(glGetUniformLocation(shaderProgram->ID, "camPos"), camera->cameraPos.x, camera->cameraPos.y, camera->cameraPos.z);
 	camera->camMatrixForShader(*shaderProgram, "camMatrix");
 	glUniformMatrix4fv(glGetUniformLocation(shaderProgram->ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	glUniform3f(glGetUniformLocation(shaderProgram->ID, "lightPos"), _lightPos.x, _lightPos.y, _lightPos.z);
 	glUniform4f(glGetUniformLocation(shaderProgram->ID, "lightColor"), _lightColor.x, _lightColor.y, _lightColor.z, _lightColor.w);
 	glUniform1f(glGetUniformLocation(shaderProgram->ID, "time"), glfwGetTime());
+	glUniform3f(glGetUniformLocation(shaderProgram->ID, "startPos"), objPos.x / 25.f, objPos.y / 25.f, objPos.z / 25.f);
 
 	// Draw the actual mesh
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
@@ -51,7 +47,11 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 	delete shaderProgram;
 	if (msg == "Plane") {
 		shaderProgram = new Shader("grass.vert", "grass.frag");
-		glUniform1f(glGetUniformLocation(shaderProgram->ID, "offset"), 2.f / (sqrt(_vertices.size()) - 1.f));
+		//glUniform3f(glGetUniformLocation(shaderProgram->ID, "startPos"), objPos.x / 25.f, objPos.y / 25.f, objPos.z / 25.f);
+	}
+	else if (msg == "Tree") {
+		shaderProgram = new Shader("tree.vert", "tree.frag");
+		//glUniform3f(glGetUniformLocation(shaderProgram->ID, "startPos"), objPos.x / 25.f, objPos.y / 25.f + 1.5f, objPos.z / 25.f);
 	}
 	else
 		shaderProgram = new Shader("object.vert", "object.frag");

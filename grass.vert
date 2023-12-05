@@ -26,8 +26,8 @@ uniform mat4 model;
 uniform mat4 camMatrix;
 // For time
 uniform float time;
-// For the level of the objects tesselation
-uniform float offset;
+// Starting position of object
+uniform vec3 startPos;
 
 float rand(vec2 co) {
     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
@@ -48,41 +48,70 @@ float noise(vec2 n) {
 }
 
 float applyNoise(vec3 p) {
-	float newY = (noise(p.xz + time) * 2.f) + (noise((p.xz + time) * 1.2) * 1/8) + (noise((p.xz + time) * 2) * 1/16);
-	return newY / 10.f;
+	float scaledTime = time / 4.f;
+	float newY = (noise((p.xz - startPos.xz) + scaledTime) * 2.f) + (noise(((p.xz - startPos.xz) + scaledTime) * 1.2) * 1/8) + (noise(((p.xz - startPos.xz) + scaledTime) * 2) * 1/16) * 2 - 1;
+	//float newY = (noise(-startPos.xz + p.xz) * 2.f) + (noise((-startPos.xz + p.xz) * 1.2) * 1/8) + (noise((-startPos.xz + p.xz) * 2) * 1/16);
+	return newY / 5.f;
 }
 
 vec3 calculateNoiseWave() {
-	//// TL:DR, aPos.xy: (-1, -1) => (1, 1)
-	//if ((aPos.x >= 0.f && aPos.z < 0.f) || (aPos.x < 0.f && aPos.z >= 0)) {
-	//
-	//}
+	float scalingFactor = sqrt(model[0][0] * model[0][0] + model[0][1] * model[0][1] + model[0][2] * model[0][2]);
+	if (aNormal == vec3(0.f, -1.f, 0.f)) {
+		vec3 cPos = aPos; cPos.y = applyNoise(cPos);
+		vec3 v1 = vec3(cPos.x + 0.0001, cPos.yz); v1.y = applyNoise(v1);
+		vec3 v2 = vec3(cPos.xy, cPos.z - 0.0001); v2.y = applyNoise(v2);
+		vec3 c1 = cross(v1 - cPos, v2 - cPos);
+		return normalize(c1);
+	} else
+		return aNormal;
 
-	/*
-	Pos1	Pos2	Pos3
-
-	Pos4	aPos	Pos5
-
-	Pos6	Pos7	Pos8
+	/*	
+	vec3 Pos0 = vec3(aPos.x - offset, aPos.y,	aPos.z + offset	);	//Pos0.y = applyNoise(Pos0);
+	vec3 Pos1 = vec3(aPos.x			, aPos.y,	aPos.z + offset );	//Pos1.y = applyNoise(Pos1);
+	vec3 Pos2 = vec3(aPos.x	+ offset, aPos.y,	aPos.z + offset );	//Pos2.y = applyNoise(Pos2);
+																	//
+	vec3 Pos3 = vec3(aPos.x - offset, aPos.y,	aPos.z			);	//Pos3.y = applyNoise(Pos3);
+	vec3 Pos5 = vec3(aPos.x	+ offset, aPos.y,	aPos.z			);	//Pos5.y = applyNoise(Pos5);
+																	//
+	vec3 Pos6 = vec3(aPos.x - offset, aPos.y,	aPos.z - offset	);	//Pos6.y = applyNoise(Pos6);
+	vec3 Pos7 = vec3(aPos.x			, aPos.y,	aPos.z - offset );	//Pos7.y = applyNoise(Pos7);
+	vec3 Pos8 = vec3(aPos.x	+ offset, aPos.y,	aPos.z - offset );	//Pos8.y = applyNoise(Pos8);
+	// / | \
+	// --+--
+	// \ | /
+	if (aPos.x == 0.f && aPos.z == 0.f) {
+		n += normalize(cross(Pos1 - aPos, Pos3 - aPos));	// 1
+		n += normalize(cross(Pos5 - aPos, Pos1 - aPos));	// 2
+		n += normalize(cross(Pos7 - aPos, Pos5 - aPos));	// 3
+		n += normalize(cross(Pos3 - aPos, Pos7 - aPos));	// 4
+		n /= 4.f;
+	}
+	//	+-+
+	//	|\|
+	//	+-+
+	else if ((aPos.x > 0.f && aPos.z < 0.f) || (aPos.x < 0.f && aPos.z > 0.f)) {
+		n += normalize(cross(Pos0 - aPos, Pos3 - aPos));	// 1
+		n += normalize(cross(Pos1 - aPos, Pos0 - aPos));	// 2
+		n += normalize(cross(Pos5 - aPos, Pos1 - aPos));	// 3
+		n += normalize(cross(Pos8 - aPos, Pos5 - aPos));	// 4
+		n += normalize(cross(Pos7 - aPos, Pos8 - aPos));	// 5
+		n += normalize(cross(Pos3 - aPos, Pos7 - aPos));	// 6
+		n /= 6.f;
+	}
+	//	+-+
+	//	|/|
+	//	+-+
+	else {
+		n += normalize(cross(Pos1 - aPos, Pos3 - aPos));	// 1
+		n += normalize(cross(Pos2 - aPos, Pos1 - aPos));	// 2
+		n += normalize(cross(Pos5 - aPos, Pos2 - aPos));	// 3
+		n += normalize(cross(Pos7 - aPos, Pos5 - aPos));	// 4
+		n += normalize(cross(Pos6 - aPos, Pos7 - aPos));	// 5
+		n += normalize(cross(Pos3 - aPos, Pos6 - aPos));	// 6
+		n /= 6.f;
+	}
+	return n;
 	*/
-	//vec3 Pos1 = vec3(aPos.x - offset, aPos.y,	aPos.z - offset	);	Pos1.y = applyNoise(Pos1);
-	vec3 Pos2 = vec3(aPos.x			, aPos.y,	aPos.z - offset );	Pos2.y = applyNoise(Pos2);
-	//vec3 Pos3 = vec3(aPos.x	+ offset, aPos.y,	aPos.z - offset );	Pos3.y = applyNoise(Pos3);
-
-	vec3 Pos4 = vec3(aPos.x - offset, aPos.y,	aPos.z			);	Pos4.y = applyNoise(Pos4);
-	vec3 Pos5 = vec3(aPos.x	+ offset, aPos.y,	aPos.z			);	Pos5.y = applyNoise(Pos5);
-
-	//vec3 Pos6 = vec3(aPos.x - offset, aPos.y,	aPos.z + offset	);	Pos6.y = applyNoise(Pos6);
-	vec3 Pos7 = vec3(aPos.x			, aPos.y,	aPos.z + offset );	Pos7.y = applyNoise(Pos7);
-	//vec3 Pos8 = vec3(aPos.x	+ offset, aPos.y,	aPos.z + offset );	Pos8.y = applyNoise(Pos8);
-
-	vec3 newNormal = vec3(0);
-	newNormal = cross(Pos2 - aPos, Pos4 - aPos);
-	//newNormal += cross(Pos5 - aPos, Pos2 - aPos);
-	//newNormal += cross(Pos7 - aPos, Pos5 - aPos);
-	//newNormal += cross(Pos4 - aPos, Pos7 - aPos);
-
-	return newNormal;
 }
 
 
@@ -90,7 +119,7 @@ vec3 calculateNoiseWave() {
 void main()
 {
 	crntPos = aPos;
-	//crntPos.y = applyNoise(crntPos);
+	crntPos.y = applyNoise(crntPos);
 	//float newY = (noise(aPos.xz + time) * 2.f) + (noise((aPos.xz + time) * 1.2) * 1/8) + (noise((aPos.xz + time) * 2) * 1/16);
 	//crntPos.y += newY / 10.f;
 	crntPos = vec3(model * vec4(crntPos, 1.f));
@@ -109,6 +138,9 @@ void main()
 	//color = clamp(aColor * newY, aColor * 0.7, vec4(1));//clamp(aColor * crntPos.y, vec4(0.1, 0.1, 0.1, 1), vec4(1));
 	
 	// This will rotate the surface normals along with the model
-	Normal = transpose(inverse(mat3(model))) * aNormal;
+	//if (aNormal == vec3(0.f, -1.f, 0.f))
+		//Normal = transpose(inverse(mat3(model))) * calculateNoiseWave();
+	//else
+	Normal = transpose(inverse(mat3(model))) * calculateNoiseWave();
 
 }

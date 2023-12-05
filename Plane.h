@@ -15,6 +15,9 @@ private:
 	void genTriangles();
 	int numVertsPerSide(int _level);
 	void setVerticesVector();
+	void getPositions(int uu, int vv, int vertsPerSide, glm::vec3& v1, glm::vec3& n1, glm::vec3& v2, glm::vec3& n2, glm::vec3& v3, glm::vec3& n3, glm::vec3& v4, glm::vec3& n4, glm::vec3& v5, glm::vec3& n5, glm::vec3& v6, glm::vec3& n6);
+	void getPositions(int uu, int vv, int vertsPerSide, glm::vec2& t1, glm::vec2& t2, glm::vec2& t3, glm::vec2& t4, glm::vec2& t5, glm::vec2& t6);
+	glm::vec3 averageNormals(int _uu, int _vv, int vertsPerSide);
 
 	std::vector <Vertex> verts;		// Vertex vector that gets sent to Object class to put information into the GPU.
 	std::vector <GLuint> indices;	// GLuint vector that gets sent to Object class to put indices into the GPU.
