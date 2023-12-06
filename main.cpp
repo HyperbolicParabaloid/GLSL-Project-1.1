@@ -3,6 +3,7 @@
 #include"Sphere.h"
 #include"Plane.h"
 #include"Cone.h"
+#include"Tree.h"
 #include"HashTable.h"
 
 
@@ -589,7 +590,7 @@ int main()
 	glm::mat4 view = glm::mat4(1.f);
 
 	Camera camera(window, glm::vec2(viewWidth, viewHeight), glm::vec3(0.f, 0.5f, 2.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
-	camera.set_projection(glm::radians(60.f), (float)(viewWidth / viewHeight), 0.1f, 100.f);
+	camera.set_projection(glm::radians(60.f), (float)(viewWidth / viewHeight), 0.1f, 500.f);
 
 	double lockoutTimer = 0;
 	bool shouldRotate = false, shouldFly = false, capturingMotion = false;
@@ -610,14 +611,45 @@ int main()
 	std::vector <Texture> tex(textures, textures + sizeof(textures) / sizeof(Texture));
 	std::vector <Texture> empty;
 
-	int planeLevel = 5;
-	glm::vec3 plane1Pos = glm::vec3(-50.0f, -1.5f, 0.0f);
-	//Plane plane1(window, plane1Pos, 40.f, true, glm::vec4(1.f, 1.f, 1.f, 1.f), tex, &camera);
-	Plane plane1(window, plane1Pos, 25.f, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
+	int planeLevel = 4;
+	float planeaScale = 25.f;
+	std::vector <Plane*> planeList;
+	glm::vec3 planeaPos = glm::vec3(0.f, -1.5f, 0.0f);
+	Plane planea(window, planeaPos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
 
-	glm::vec3 plane2Pos = glm::vec3(0.0f, -1.5f, 0.0f);
-	//Plane plane1(window, plane1Pos, 40.f, true, glm::vec4(1.f, 1.f, 1.f, 1.f), tex, &camera);
-	Plane plane2(window, plane2Pos, 25.f, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+	glm::vec3 plane1Pos = glm::vec3(-planeaScale * 2, -1.5f, -planeaScale * 2);
+	Plane plane1(window, plane1Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+
+	glm::vec3 plane2Pos = glm::vec3(0.f, -1.5f, -planeaScale * 2);
+	Plane plane2(window, plane2Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+
+	glm::vec3 plane3Pos = glm::vec3(planeaScale * 2, -1.5f, -planeaScale * 2);
+	Plane plane3(window, plane3Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+
+	glm::vec3 plane4Pos = glm::vec3(-planeaScale * 2, -1.5f, 0.0f);
+	Plane plane4(window, plane4Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+
+	glm::vec3 plane6Pos = glm::vec3(planeaScale * 2, -1.5f, 0.0f);
+	Plane plane6(window, plane6Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+
+	glm::vec3 plane7Pos = glm::vec3(-planeaScale * 2, -1.5f, planeaScale * 2);
+	Plane plane7(window, plane7Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+
+	glm::vec3 plane8Pos = glm::vec3(0.f, -1.5f, planeaScale * 2);
+	Plane plane8(window, plane8Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+
+	glm::vec3 plane9Pos = glm::vec3(planeaScale * 2, -1.5f, planeaScale * 2);
+	Plane plane9(window, plane9Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+
+	planeList.push_back(&planea);
+	planeList.push_back(&plane1);
+	planeList.push_back(&plane2);
+	planeList.push_back(&plane3);
+	planeList.push_back(&plane4);
+	planeList.push_back(&plane6);
+	planeList.push_back(&plane7);
+	planeList.push_back(&plane8);
+	planeList.push_back(&plane9);
 
 	float cube1y = -1.5 + sqrt(3);
 	glm::vec3 cube1Pos = glm::vec3(-2.5f, cube1y, -2.5f);
@@ -648,6 +680,13 @@ int main()
 	//						_bottomRadius<---sqrt(2), _topRadius, _height, _isSmooth
 	Cone cone1(window, cone1Pos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera);
 
+
+	glm::vec3 tree1Pos = glm::vec3(0.f, 2.f, 0.f);
+	glm::vec3 tree1PointPos = glm::vec3(0.f, 5.f, 0.f);
+	int tree1ConeLevel = 10, tree1SphereLevel = 4;
+	//(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _coneLevel, int _sphereLevel, float _bottomRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
+	Tree tree1(window, tree1Pos, 1.f, tree1ConeLevel, tree1SphereLevel, 1.0f, tree1PointPos, true, cone1ShaftColor, empty, &camera);
+
 	std::vector <Object*> objectList;
 	std::vector <Cone*> coneList;
 
@@ -655,25 +694,24 @@ int main()
 	glm::vec3 newConePos = cone1Pos;
 	coneLevel = 3;
 
-	int hashTableSize = plane1.vertices.size() / 4;
-	HashTable hashTable(hashTableSize);
-	std::cout << "hashTableSize = " << hashTableSize << "\n";
-	for (const Vertex& v : plane1.vertices) {
-		int index = hashTable.isInTable(v.pos);
-		if (index == -1) {
-			//std::cout << "index = " << index << "\n";
-			hashTable.addItem(v.pos);
-			glm::vec3 treePos = glm::vec3(v.pos.x * 25.f + plane1Pos.x, v.pos.y * 25.f + plane1Pos.y, v.pos.z * 25.f + plane1Pos.z);
-			coneList.push_back(new Cone(window, treePos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
-		}
-		//std::cout << "Not in table, index = " << index << "\n";
-	}
+	//int hashTableSize = planea.vertices.size() / 2;
+	//HashTable hashTable(hashTableSize);
+	//std::cout << "hashTableSize = " << hashTableSize << "\n";
+	//for (const Vertex& v : planea.vertices) {
+	//	int index = hashTable.isInTable(v.pos);
+	//	if (index == -1) {
+	//		//std::cout << "index = " << index << "\n";
+	//		hashTable.addItem(v.pos);
+	//		glm::vec3 treePos = glm::vec3(v.pos.x * planeaScale, v.pos.y * planeaScale , v.pos.z * planeaScale) + planeaPos;
+	//		coneList.push_back(new Cone(window, treePos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
+	//	}
+	//	//std::cout << "Not in table, index = " << index << "\n";
+	//}
+	objectList.push_back(&tree1);
 	objectList.push_back(&sphere1);
 	objectList.push_back(&cube1);
 	objectList.push_back(&cube2);
 	objectList.push_back(&cube3);
-	objectList.push_back(&plane1);
-	objectList.push_back(&plane2);
 
 
 	camera.set_camera_speed(10);
@@ -738,65 +776,85 @@ int main()
 			std::cout << "Crotation\n";
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
-			cone1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
+			tree1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
 			sphere1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_UP)) {
-			cone1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
+			tree1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
 			sphere1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_DOWN)) {
-			cone1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
+			tree1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
 			sphere1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_RIGHT)) {
-			cone1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
+			tree1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 			sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_MINUS) && lockoutTimer <= crntTime) {
-			planeLevel--;
+			//planeLevel--;
 			//coneLevel--;
-			std::cout << "\nLevel: " << level << "\n";
+			//std::cout << "\nLevel: " << level << "\n";
 			//sphere1.setLevel(level);
-			plane1.setLevel(planeLevel);
+			//for (Plane* p : planeList)
+			//	p->setLevel(planeLevel);
 			//cone1.setLevel(coneLevel);
+			tree1ConeLevel--;
+			tree1.setConeLevel(tree1ConeLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_EQUAL) && lockoutTimer <= crntTime) {
-			planeLevel++;
+			//planeLevel++;
 			//coneLevel++;
-			std::cout << "\nLevel: " << level << "\n";
+			//std::cout << "\nLevel: " << level << "\n";
 			//sphere1.setLevel(level);
-			plane1.setLevel(planeLevel);
+			//for (Plane* p : planeList)
+			//	p->setLevel(planeLevel);
+			tree1ConeLevel++;
+			tree1.setConeLevel(tree1ConeLevel);
 			//cone1.setLevel(coneLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_9) && lockoutTimer <= crntTime) {
-			std::cout << "\nLevel: " << level << "\n";
-			planeScale1 -= 1.f;
-			plane1.setScale(planeScale1);
-			plane1.setLevel(planeLevel);
+			//std::cout << "\nLevel: " << level << "\n";
+			//planeScale1 -= 1.f;
+			//
+			//for (Plane* p : planeList) {
+			//	p->setScale(planeScale1);
+			//	p->setLevel(planeLevel);
+			//}
+			tree1SphereLevel--;
+			tree1.setSphereLevel(tree1SphereLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_0) && lockoutTimer <= crntTime) {
-			std::cout << "\nLevel: " << level << "\n";
-			planeScale1 += 1.f;
-			plane1.setScale(planeScale1);
-			plane1.setLevel(planeLevel);
+			//std::cout << "\nLevel: " << level << "\n";
+			//planeScale1 += 1.f;
+			//for (Plane* p : planeList) {
+			//	p->setScale(planeScale1);
+			//	p->setLevel(planeLevel);
+			//}
+			tree1SphereLevel++;
+			tree1.setSphereLevel(tree1SphereLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_R) && lockoutTimer <= crntTime) {
-			sphere1.doRandomColors(randomColor);
-			sphere1.setLevel(level);
+			//sphere1.doRandomColors(randomColor);
+			//sphere1.setLevel(level);
+			//
+			////plane2.doRandomColors(randomColor);
+			////plane2.setLevel(planeLevel);
+			//for (Plane* p : planeList) {
+			//	p->doRandomColors(randomColor);
+			//	p->setLevel(planeLevel);
+			//}
+			//
+			//
+			//cone1.doRandomColors(randomColor);
+			//cone1.setLevel(coneLevel);
+			tree1.doRandomColors(randomColor);
+			tree1.setConeLevel(tree1ConeLevel);
 
-			plane2.doRandomColors(randomColor);
-			plane2.setLevel(planeLevel);
-			plane1.doRandomColors(randomColor);
-			plane1.setLevel(planeLevel);
-			
-
-			cone1.doRandomColors(randomColor);
-			cone1.setLevel(coneLevel);
 			randomColor = !randomColor;
 			lockoutTimer = crntTime + 0.2;
 		}
@@ -808,14 +866,11 @@ int main()
 			//cube2.reGenTriangles();
 
 
-			//cone1.toggleNormalArrows();
-			//cone1.setLevel(coneLevel);
-			//cone1.toggleNormalArrows();
-			//cone1.setLevel(coneLevel);
-			//for (Cone* cn : coneList) {
-			//	cn->toggleNormalArrows();
-			//	cn->setLevel(coneLevel);
+			//for (Plane* p : planeList) {
+			//	p->toggleNormalArrows();
+			//	p->setLevel(planeLevel);
 			//}
+
 
 
 			lockoutTimer = crntTime + 0.2;
@@ -824,20 +879,21 @@ int main()
 			sphere1.reseed();
 			sphere1.setLevel(level);
 
-			plane1.reseed();
-			plane1.setLevel(planeLevel);
+			for (Plane* p : planeList) {
+				p->reseed();
+				p->setLevel(planeLevel);
+			}
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Y) && lockoutTimer <= crntTime) {
 			isSmooth = !isSmooth;
-			sphere1.smoothSurface(isSmooth);
-			sphere1.setLevel(level);
-
-			plane1.smoothSurface(isSmooth);
-			plane1.setLevel(planeLevel);
-
-			cone1.smoothSurface(isSmooth);
-			cone1.setLevel(coneLevel);
+			//sphere1.smoothSurface(isSmooth);
+			//sphere1.setLevel(level);
+			//
+			//cone1.smoothSurface(isSmooth);
+			//cone1.setLevel(coneLevel);
+			tree1.smoothSurface(isSmooth);
+			tree1.setConeLevel(tree1ConeLevel);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_T) && lockoutTimer <= crntTime) {
@@ -849,7 +905,7 @@ int main()
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_I) && lockoutTimer <= crntTime) {
 			std::cout << "\nMessing with Vertex: " << level << "\n";
 			lockoutTimer = crntTime + 0.2;
-			plane1.moveFirstVertex();
+			planea.moveFirstVertex();
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_H) && lockoutTimer <= crntTime) {
 			std::cout << "\nReloading Shader: " << level << "\n";
@@ -878,6 +934,10 @@ int main()
 
 		for (auto cn : coneList)
 			cn->draw(lightPos, lightColor);
+
+		for (Plane* p : planeList) {
+			p->draw(lightPos, lightColor);
+		}
 
 
 		// Drawing the Light.

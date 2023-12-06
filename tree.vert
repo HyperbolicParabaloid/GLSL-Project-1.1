@@ -49,8 +49,8 @@ float noise(vec2 n) {
 
 float applyNoise(vec3 p) {
 	float scaledTime = time / 4.f;
-	float newY = (noise(p.xz + scaledTime) * 2.f) + (noise((p.xz + scaledTime) * 1.2) * 1/8) + (noise((p.xz + scaledTime) * 2) * 1/16) * 2 - 1;
-	//float newY = (noise(p.xz) * 2.f) + (noise((p.xz) * 1.2) * 1/8) + (noise((p.xz) * 2) * 1/16);
+	//float newY = (noise(p.xz + scaledTime) * 2.f) + (noise((p.xz + scaledTime) * 1.2) * 1/8) + (noise((p.xz + scaledTime) * 2) * 1/16) * 2 - 1;
+	float newY = (noise(p.xz) * 2.f) + (noise((p.xz) * 1.2) * 1/8) + (noise((p.xz) * 2) * 1/16);
 	return newY / 5.f;
 }
 
@@ -63,54 +63,6 @@ vec3 calculateNoiseWave() {
 		return normalize(c1);
 	} else
 		return aNormal;
-
-	/*	
-	vec3 Pos0 = vec3(aPos.x - offset, aPos.y,	aPos.z + offset	);	//Pos0.y = applyNoise(Pos0);
-	vec3 Pos1 = vec3(aPos.x			, aPos.y,	aPos.z + offset );	//Pos1.y = applyNoise(Pos1);
-	vec3 Pos2 = vec3(aPos.x	+ offset, aPos.y,	aPos.z + offset );	//Pos2.y = applyNoise(Pos2);
-																	//
-	vec3 Pos3 = vec3(aPos.x - offset, aPos.y,	aPos.z			);	//Pos3.y = applyNoise(Pos3);
-	vec3 Pos5 = vec3(aPos.x	+ offset, aPos.y,	aPos.z			);	//Pos5.y = applyNoise(Pos5);
-																	//
-	vec3 Pos6 = vec3(aPos.x - offset, aPos.y,	aPos.z - offset	);	//Pos6.y = applyNoise(Pos6);
-	vec3 Pos7 = vec3(aPos.x			, aPos.y,	aPos.z - offset );	//Pos7.y = applyNoise(Pos7);
-	vec3 Pos8 = vec3(aPos.x	+ offset, aPos.y,	aPos.z - offset );	//Pos8.y = applyNoise(Pos8);
-	// / | \
-	// --+--
-	// \ | /
-	if (aPos.x == 0.f && aPos.z == 0.f) {
-		n += normalize(cross(Pos1 - aPos, Pos3 - aPos));	// 1
-		n += normalize(cross(Pos5 - aPos, Pos1 - aPos));	// 2
-		n += normalize(cross(Pos7 - aPos, Pos5 - aPos));	// 3
-		n += normalize(cross(Pos3 - aPos, Pos7 - aPos));	// 4
-		n /= 4.f;
-	}
-	//	+-+
-	//	|\|
-	//	+-+
-	else if ((aPos.x > 0.f && aPos.z < 0.f) || (aPos.x < 0.f && aPos.z > 0.f)) {
-		n += normalize(cross(Pos0 - aPos, Pos3 - aPos));	// 1
-		n += normalize(cross(Pos1 - aPos, Pos0 - aPos));	// 2
-		n += normalize(cross(Pos5 - aPos, Pos1 - aPos));	// 3
-		n += normalize(cross(Pos8 - aPos, Pos5 - aPos));	// 4
-		n += normalize(cross(Pos7 - aPos, Pos8 - aPos));	// 5
-		n += normalize(cross(Pos3 - aPos, Pos7 - aPos));	// 6
-		n /= 6.f;
-	}
-	//	+-+
-	//	|/|
-	//	+-+
-	else {
-		n += normalize(cross(Pos1 - aPos, Pos3 - aPos));	// 1
-		n += normalize(cross(Pos2 - aPos, Pos1 - aPos));	// 2
-		n += normalize(cross(Pos5 - aPos, Pos2 - aPos));	// 3
-		n += normalize(cross(Pos7 - aPos, Pos5 - aPos));	// 4
-		n += normalize(cross(Pos6 - aPos, Pos7 - aPos));	// 5
-		n += normalize(cross(Pos3 - aPos, Pos6 - aPos));	// 6
-		n /= 6.f;
-	}
-	return n;
-	*/
 }
 
 

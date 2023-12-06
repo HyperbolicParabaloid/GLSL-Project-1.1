@@ -1,12 +1,8 @@
-﻿  Object.cpp
+﻿  main.cpp
 C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(34,74): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(40,43): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(71,15): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(83,26): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Object.cpp(175,19): warning C4244: 'return': conversion from 'genType' to 'float', possible loss of data
-          with
-          [
-              genType=double
-          ]
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(583,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(654,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(760,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(581,8): warning C4101: 'frac': unreferenced local variable
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(581,14): warning C4101: 'whole': unreferenced local variable
   GLSL Project 1.1.vcxproj -> C:\Users\riley\source\repos\GLSL Project Working Directory\x64\Debug\GLSL Project 1.1.exe

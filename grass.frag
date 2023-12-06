@@ -182,7 +182,7 @@ void main()
 
 	vec2 uv = texCoord;
 	
-	vec4 noiseColor = pntLgt;
+	vec4 noiseColor = FragColor;
 	float n = noise(uv + time);
 	//float n = noise(uv);
 

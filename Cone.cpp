@@ -241,9 +241,6 @@ void Cone::setVerticesVector() {
 			else
 				futrjj = jj + 1;
 
-			// NOTE! // The top-to-bottom triangle is the problem! Not sure why, I'm investigating.
-
-
 			// Getting the previous faces nromal.
 			lwrTriVrt1 = (prevjj * 2);
 			lwrTriVrt2 = ((prevjj * 2) % evenLength) + 2;
@@ -252,10 +249,6 @@ void Cone::setVerticesVector() {
 			glm::vec3 prev1 = preVerts[lwrTriVrt1]; glm::vec3 prev2 = preVerts[lwrTriVrt2]; glm::vec3 prev5 = preVerts[uprTriVrt1]; glm::vec3 prev6 = preVerts[uprTriVrt2];
 			glm::vec3 preNorm = glm::normalize(glm::cross((prev5 - prev2), (prev1 - prev2)));
 
-			//std::cout << "prev2 = (" << prev2.x << ", " << prev2.y << ", " << prev2.z << "\n";
-			//std::cout << "prev5 = (" << prev5.x << ", " << prev5.y << ", " << prev5.z << "\n";
-			//std::cout << "prev6 = (" << prev6.x << ", " << prev6.y << ", " << prev6.z << "\n\n";
-
 			// Getting the future faces nromal.
 			lwrTriVrt1 = (futrjj * 2);
 			lwrTriVrt2 = ((futrjj * 2) % evenLength) + 2;
@@ -263,16 +256,9 @@ void Cone::setVerticesVector() {
 			glm::vec3 ftrv1 = preVerts[lwrTriVrt1]; glm::vec3 ftrv2 = preVerts[lwrTriVrt2]; glm::vec3 ftrv5 = preVerts[uprTriVrt1];
 			glm::vec3 ftrNorm = glm::normalize(glm::cross((ftrv5 - ftrv2), (ftrv1 - ftrv2)));
 
-			//std::cout << "ftrv5 = (" << ftrv5.x << ", " << ftrv5.y << ", " << ftrv5.z << "\n";
-			//std::cout << "ftrv2 = (" << ftrv2.x << ", " << ftrv2.y << ", " << ftrv2.z << "\n";
-			//std::cout << "ftrv1 = (" << ftrv1.x << ", " << ftrv1.y << ", " << ftrv1.z << "\n\n";
-
 			// Finally, setting the future normal and previous normals.
 			glm::vec3 avgNorm1 = glm::normalize((preNorm + n2) / 2.f);
 			glm::vec3 avgNorm2 = glm::normalize((ftrNorm + n2) / 2.f);
-
-			//std::cout << "avgNorm1 = (" << avgNorm1.x << ", " << avgNorm1.y << ", " << avgNorm1.z << "\n";
-			//std::cout << "avgNorm2 = (" << avgNorm2.x << ", " << avgNorm2.y << ", " << avgNorm2.z << "\n\n";
 
 			// Lower circle triangle.
 			verts.push_back(Vertex{ v1, n1, color1, tex1 });
