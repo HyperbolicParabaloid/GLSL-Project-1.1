@@ -49,8 +49,8 @@ float noise(vec2 n) {
 
 float applyNoise(vec3 p) {
 	float scaledTime = time / 4.f;
-	float newY = (noise((p.xz + startPos.xz) + scaledTime) * 2.f) + (noise(((p.xz + startPos.xz) + scaledTime) * 1.2) * 1/8) + (noise(((p.xz + startPos.xz) + scaledTime) * 2) * 1/16) * 2 - 1;
-	//float newY = (noise(-startPos.xz + p.xz) * 2.f) + (noise((-startPos.xz + p.xz) * 1.2) * 1/8) + (noise((-startPos.xz + p.xz) * 2) * 1/16);
+	//float newY = (noise((p.xz + startPos.xz) + scaledTime) * 2.f) + (noise(((p.xz + startPos.xz) + scaledTime) * 1.2) * 1/8) + (noise(((p.xz + startPos.xz) + scaledTime) * 2) * 1/16) * 2 - 1;
+	float newY = (noise(startPos.xz + p.xz) * 2.f) + (noise((startPos.xz + p.xz) * 1.2) * 1/8) + (noise((startPos.xz + p.xz) * 2) * 1/16);
 	return newY / 5.f;
 }
 

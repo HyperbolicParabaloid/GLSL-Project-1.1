@@ -83,12 +83,15 @@ void Tree::newLimbs(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingA
 	newLimbPos = glm::vec3(limbModel * glm::vec4(newLimbPointPos, 1));
 
 	branchNum += 1;
-	int numBranchesPerNode = ceil(newrand(glm::vec2(newLimbPointPos * 506683.f)) * 3.f);
+	float crntTime = float(glfwGetTime());
+
+	int numBranchesPerNode = (floor(newrand(glm::vec2(newLimbPos * crntTime * 506683.f)) * 1.5f) + 2.f) * (_crntDepth < 4) + 1.f * (_crntDepth >= 4);
 	for (int bb = 0; bb < numBranchesPerNode; bb++) {
 
-		newLimbPointingAt.x += newrand(glm::vec2(newLimbPointPos.y + branchNum, newLimbPointPos.z) * 3637.f * float(glfwGetTime())) * 2 - 1;
-		newLimbPointingAt.y += (newrand(glm::vec2(newLimbPointPos.x - branchNum, newLimbPointPos.z) * 1787.f * float(glfwGetTime())) * 2 - 0.5) * (_crntDepth >= 6);
-		newLimbPointingAt.z += newrand(glm::vec2(newLimbPointPos.x + branchNum, newLimbPointPos.y) * 7841.f * float(glfwGetTime())) * 2 - 1;
+		newLimbPointingAt = glm::normalize(newLimbPointingAt);
+		newLimbPointingAt.x += newrand(glm::vec2(newLimbPointPos.y * branchNum, newLimbPointPos.z * -branchNum) * 3637.f * crntTime) * 2.f - 1.f;
+		newLimbPointingAt.y += (newrand(glm::vec2(newLimbPointPos.x * -branchNum, newLimbPointPos.z * branchNum) * 1787.f * crntTime) * 2.f - 0.25f) * (_crntDepth >= 5);
+		newLimbPointingAt.z += newrand(glm::vec2(newLimbPointPos.x * branchNum, newLimbPointPos.y * branchNum) * 7841.f * crntTime) * 2.f - 1.f;
 		newLimbs(newLimbPos, newLimbPointPos, newLimbPointingAt, newLimbRadius, _crntDepth + 1);
 		//newLimbPointingAt.x -= 0.8f;
 		//newLimbs(newLimbPos, newLimbPointPos, newLimbPointingAt, newLimbRadius, _crntDepth + 1);
@@ -103,7 +106,7 @@ void Tree::genTriangles() {
 	indices.clear();
 	indCount = 0;
 	branchNum = 0;
-	maxDepth = 7;
+	maxDepth = 6;
 	newLimbs(glm::vec3(0.f), trunkPointPos, trunkPointingAt, trunkRadius, 0);
 	setVBOandEBO(verts, indices, "Tree");
 	std::cout << "Time: " << glfwGetTime() - time << "\n";

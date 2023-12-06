@@ -617,7 +617,7 @@ int main()
 	float planeaScale = 25.f;
 	std::vector <Plane*> planeList;
 	glm::vec3 planeaPos = glm::vec3(0.f, -1.5f, 0.0f);
-	Plane planea(window, planeaPos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
+	Plane planea(window, planeaPos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), tex, &camera);
 
 	glm::vec3 plane1Pos = glm::vec3(-planeaScale * 2, -1.5f, -planeaScale * 2);
 	Plane plane1(window, plane1Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
@@ -683,7 +683,7 @@ int main()
 	Cone cone1(window, cone1Pos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera);
 
 
-	glm::vec3 tree1Pos = glm::vec3(0.f, 2.f, 0.f);
+	glm::vec3 tree1Pos = glm::vec3(0.f, 15.f, 0.f);
 	glm::vec3 tree1PointPos = glm::vec3(0.f, 5.f, 0.f);
 	int tree1ConeLevel = 5, tree1SphereLevel = 3;
 	//(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _coneLevel, int _sphereLevel, float _bottomRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
@@ -697,20 +697,22 @@ int main()
 	glm::vec3 newConePos = cone1Pos;
 	coneLevel = 3;
 
-	//int hashTableSize = planea.vertices.size() / 2;
-	//HashTable hashTable(hashTableSize);
-	//std::cout << "hashTableSize = " << hashTableSize << "\n";
-	//for (const Vertex& v : planea.vertices) {
-	//	int index = hashTable.isInTable(v.pos);
-	//	if (index == -1) {
-	//		//std::cout << "index = " << index << "\n";
-	//		hashTable.addItem(v.pos);
-	//		glm::vec3 treePos = glm::vec3(v.pos.x * planeaScale, v.pos.y * planeaScale , v.pos.z * planeaScale) + planeaPos;
-	//		treeList.push_back(new Tree(window, treePos, 1.f, tree1ConeLevel, tree1SphereLevel, 1.0f, tree1PointPos, true, cone1ShaftColor, tex, &camera));
-	//		//coneList.push_back(new Cone(window, treePos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
-	//	}
-	//	//std::cout << "Not in table, index = " << index << "\n";
-	//}
+	int hashTableSize = planea.vertices.size() / 2;
+	HashTable hashTable(hashTableSize);
+	int hashCount = 0;
+	std::cout << "hashTableSize = " << hashTableSize << "\n";
+	for (const Vertex& v : planea.vertices) {
+		int index = hashTable.isInTable(v.pos);
+		hashCount++;
+		if (index == -1 && hashCount % 11 == 0) {
+			//std::cout << "index = " << index << "\n";
+			hashTable.addItem(v.pos);
+			glm::vec3 treePos = glm::vec3(v.pos.x * planeaScale, v.pos.y * planeaScale , v.pos.z * planeaScale) + planeaPos;
+			treeList.push_back(new Tree(window, treePos, 1.f, tree1ConeLevel, tree1SphereLevel, 1.0f, tree1PointPos, true, cone1ShaftColor, tex, &camera));
+			//coneList.push_back(new Cone(window, treePos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
+		}
+		//std::cout << "Not in table, index = " << index << "\n";
+	}
 	objectList.push_back(&tree1);
 	objectList.push_back(&sphere1);
 	objectList.push_back(&cube1);

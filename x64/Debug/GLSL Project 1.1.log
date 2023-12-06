@@ -1,12 +1,9 @@
-﻿  Tree.cpp
+﻿  main.cpp
 C:\Users\riley\source\repos\GLSL Project Working Directory\EBO.h(5,9): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-C:\Users\riley\source\repos\GLSL Project Working Directory\Tree.cpp(86,25): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Tree.cpp(90,139): warning C4244: '+=': conversion from 'double' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
-C:\Users\riley\source\repos\GLSL Project Working Directory\Tree.cpp(101,13): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\Tree.cpp(189,12): warning C4101: 'n1': unreferenced local variable
-C:\Users\riley\source\repos\GLSL Project Working Directory\Tree.cpp(189,20): warning C4101: 'n3': unreferenced local variable
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(583,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(656,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(700,20): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(766,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(581,8): warning C4101: 'frac': unreferenced local variable
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(581,14): warning C4101: 'whole': unreferenced local variable
   GLSL Project 1.1.vcxproj -> C:\Users\riley\source\repos\GLSL Project Working Directory\x64\Debug\GLSL Project 1.1.exe
