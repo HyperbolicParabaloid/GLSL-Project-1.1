@@ -192,5 +192,11 @@
     <Image Include="grass-normal-map.png">
       <Filter>Resource Files\Textures</Filter>
     </Image>
+    <Image Include="tree_bark.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
+    <Image Include="tree_bark_spec.png">
+      <Filter>Resource Files\Textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>

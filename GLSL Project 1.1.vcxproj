@@ -208,6 +208,8 @@
     <Image Include="grass-normal-map.png" />
     <Image Include="pop_cat.png" />
     <Image Include="seamless_green_grass_texture_01.png" />
+    <Image Include="tree_bark.png" />
+    <Image Include="tree_bark_spec.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

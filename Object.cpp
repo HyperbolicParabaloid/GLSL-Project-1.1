@@ -48,12 +48,10 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 	if (msg == "Plane") {
 		name = msg;
 		shaderProgram = new Shader("grass.vert", "grass.frag");
-		//glUniform3f(glGetUniformLocation(shaderProgram->ID, "startPos"), objPos.x / 25.f, objPos.y / 25.f, objPos.z / 25.f);
 	}
 	else if (msg == "Tree") {
 		name = msg;
 		shaderProgram = new Shader("tree.vert", "tree.frag");
-		//glUniform3f(glGetUniformLocation(shaderProgram->ID, "startPos"), objPos.x / 25.f, objPos.y / 25.f + 1.5f, objPos.z / 25.f);
 	}
 	else
 		shaderProgram = new Shader("object.vert", "object.frag");

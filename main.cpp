@@ -601,7 +601,9 @@ int main()
 		Texture("planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
 		Texture("planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE),
 		Texture("seamless_green_grass_texture_01.png", "diffuse", 2, GL_RGBA, GL_UNSIGNED_BYTE),
-		Texture("grass-normal-map.png", "specular", 3, GL_RED, GL_UNSIGNED_BYTE)
+		Texture("grass-normal-map.png", "specular", 3, GL_RED, GL_UNSIGNED_BYTE),
+		Texture("tree_bark.png", "diffuse", 4, GL_RGBA, GL_UNSIGNED_BYTE),
+		Texture("tree_bark_spec.png", "specular", 5, GL_RED, GL_UNSIGNED_BYTE)
 	};
 
 	// Store mesh data in vectors for the mesh
@@ -683,12 +685,13 @@ int main()
 
 	glm::vec3 tree1Pos = glm::vec3(0.f, 2.f, 0.f);
 	glm::vec3 tree1PointPos = glm::vec3(0.f, 5.f, 0.f);
-	int tree1ConeLevel = 10, tree1SphereLevel = 4;
+	int tree1ConeLevel = 5, tree1SphereLevel = 3;
 	//(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _coneLevel, int _sphereLevel, float _bottomRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
-	Tree tree1(window, tree1Pos, 1.f, tree1ConeLevel, tree1SphereLevel, 1.0f, tree1PointPos, true, cone1ShaftColor, empty, &camera);
+	Tree tree1(window, tree1Pos, 1.f, tree1ConeLevel, tree1SphereLevel, 1.0f, tree1PointPos, true, cone1ShaftColor, tex, &camera);
 
 	std::vector <Object*> objectList;
 	std::vector <Cone*> coneList;
+	std::vector <Tree*> treeList;
 
 
 	glm::vec3 newConePos = cone1Pos;
@@ -703,7 +706,8 @@ int main()
 	//		//std::cout << "index = " << index << "\n";
 	//		hashTable.addItem(v.pos);
 	//		glm::vec3 treePos = glm::vec3(v.pos.x * planeaScale, v.pos.y * planeaScale , v.pos.z * planeaScale) + planeaPos;
-	//		coneList.push_back(new Cone(window, treePos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
+	//		treeList.push_back(new Tree(window, treePos, 1.f, tree1ConeLevel, tree1SphereLevel, 1.0f, tree1PointPos, true, cone1ShaftColor, tex, &camera));
+	//		//coneList.push_back(new Cone(window, treePos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
 	//	}
 	//	//std::cout << "Not in table, index = " << index << "\n";
 	//}
@@ -934,6 +938,9 @@ int main()
 
 		for (auto cn : coneList)
 			cn->draw(lightPos, lightColor);
+
+		for (auto tr : treeList)
+			tr->draw(lightPos, lightColor);
 
 		for (Plane* p : planeList) {
 			p->draw(lightPos, lightColor);

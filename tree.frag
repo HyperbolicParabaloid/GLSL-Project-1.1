@@ -15,8 +15,8 @@ in vec2 texCoord;
 
 
 // Gets the Texture Unit from the main function
-uniform sampler2D diffuse1;
-uniform sampler2D specular1;
+uniform sampler2D diffuse2;
+uniform sampler2D specular2;
 uniform int useTex;
 uniform int useTexSpec;
 uniform vec4 lightColor;
@@ -59,11 +59,11 @@ vec4 pointLight() {
 		FragColor = color * (diffuse * intensity + ambient + specular * intensity * lightColor);
 	}
 	else {
-		FragColor = texture(diffuse1, texCoord) * (diffuse * intensity + ambient + specular * intensity) * lightColor;
+		FragColor = texture(diffuse2, texCoord) * (diffuse * intensity + ambient + specular * intensity) * lightColor;
 		if (useTex == 0)
-			FragColor = texture(diffuse1, texCoord) * (diffuse * intensity + ambient + specular * intensity) * lightColor;
+			FragColor = texture(diffuse2, texCoord) * (diffuse * intensity + ambient + specular * intensity) * lightColor;
 		else
-			FragColor = texture(diffuse1, texCoord) * (diffuse * intensity + ambient) + (specular * texture(specular1, texCoord).r * intensity) * lightColor;
+			FragColor = texture(diffuse2, texCoord) * (diffuse * intensity + ambient) + (specular * texture(specular2, texCoord).r * intensity) * lightColor;
 
 	}
 	return FragColor;
@@ -98,11 +98,11 @@ vec4 directionalLight() {
 		FragColor = color * (diffuse + ambient + specular * lightColor);
 	}
 	else {
-		FragColor = texture(diffuse1, texCoord) * (diffuse + ambient + specular) * lightColor;
+		FragColor = texture(diffuse2, texCoord) * (diffuse + ambient + specular) * lightColor;
 		if (useTex == 0)
-			FragColor = texture(diffuse1, texCoord) * (diffuse + ambient + specular) * lightColor;
+			FragColor = texture(diffuse2, texCoord) * (diffuse + ambient + specular) * lightColor;
 		else
-			FragColor = texture(diffuse1, texCoord) * (diffuse + ambient) + (specular * texture(specular1, texCoord).r) * lightColor;
+			FragColor = texture(diffuse2, texCoord) * (diffuse + ambient) + (specular * texture(specular2, texCoord).r) * lightColor;
 
 	}
 	return FragColor;
@@ -139,11 +139,11 @@ vec4 spotLight() {
 		FragColor = color * lightColor * (diffuse * intensity + ambient + specular * intensity);
 	}
 	else {
-		FragColor = texture(diffuse1, texCoord) * lightColor * (diffuse * intensity + ambient + specular * intensity);
+		FragColor = texture(diffuse2, texCoord) * lightColor * (diffuse * intensity + ambient + specular * intensity);
 		if (useTex == 0)
-			FragColor = texture(diffuse1, texCoord) * lightColor * (diffuse * intensity + ambient + specular * intensity);
+			FragColor = texture(diffuse2, texCoord) * lightColor * (diffuse * intensity + ambient + specular * intensity);
 		else
-			FragColor = texture(diffuse1, texCoord) * lightColor * (diffuse * intensity + ambient) + (specular * texture(specular1, texCoord).r * intensity);
+			FragColor = texture(diffuse2, texCoord) * lightColor * (diffuse * intensity + ambient) + (specular * texture(specular2, texCoord).r * intensity);
 
 	}
 	return FragColor;

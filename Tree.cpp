@@ -24,7 +24,7 @@ void Tree::newLimb(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingAt
 	glm::vec3 endPos = _endPos;
 	glm::vec3 pointingAt = _pointingAt;
 	float bottomRadius = _radius;
-	float topRadius = bottomRadius * 0.8f;
+	float topRadius = bottomRadius * globalScale;
 
 	limbModel = glm::mat4(1.f);
 	glm::vec3 axis = glm::cross(endPos, pointingAt);
@@ -41,41 +41,102 @@ void Tree::newLimb(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingAt
 	limbModel = glm::translate(limbModel, endPos); limbModel = glm::scale(limbModel, glm::vec3(topRadius));
 	genDome(topRadius);
 }
-glm::vec3 Tree::newPointingAt(glm::vec3 _parentPointingAt) {
-	return _parentPointingAt;
+
+
+void Tree::newLimbs(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingAt, float _radius, int _crntDepth) {
+
+	if (_crntDepth >= maxDepth)
+		return;
+
+	glm::vec3 startPos = _startPos;
+	glm::vec3 endPos = _endPos;
+	glm::vec3 pointingAt = _pointingAt;
+	float bottomRadius = _radius;
+	float topRadius = bottomRadius * globalScale;
+
+
+	limbModel = glm::mat4(1.f);
+	glm::vec3 axis = glm::cross(endPos, pointingAt);
+	float angle = acos(glm::dot(glm::normalize(endPos), glm::normalize(pointingAt)));
+	limbModel = glm::translate(limbModel, startPos);
+	if (ceil(abs(glm::degrees(angle))) < 179.f && floor(abs(glm::degrees(angle))) > 1.f) {
+		limbModel = glm::rotate(limbModel, angle, axis);
+	}
+	else if (floor(abs(glm::degrees(angle))) >= 179.f) {
+		endPos.y *= -1;
+	}
+
+	genCone(startPos, endPos, bottomRadius, topRadius);
+	limbModel = glm::translate(limbModel, endPos); limbModel = glm::scale(limbModel, glm::vec3(topRadius));
+	genDome(topRadius);
+
+	glm::vec3 newLimbPos = startPos;
+	glm::vec3 newLimbPointPos = endPos * globalScale;
+	glm::vec3 newLimbPointingAt = pointingAt;
+	float newLimbRadius = topRadius;
+
+	// You have to reset the scale and then translate the new position in order to put it where
+	// it needs to be, A.K.A., the end of the last limb.
+	//newLimbPointPos = newLimbPointPos * 0.8f;
+	//newLimbRadius = newLimbRadius * 0.8f;
+	limbModel = glm::scale(limbModel, glm::vec3(0.f));
+	newLimbPos = glm::vec3(limbModel * glm::vec4(newLimbPointPos, 1));
+
+	branchNum += 1;
+	int numBranchesPerNode = ceil(newrand(glm::vec2(newLimbPointPos * 506683.f)) * 3.f);
+	for (int bb = 0; bb < numBranchesPerNode; bb++) {
+
+		newLimbPointingAt.x += newrand(glm::vec2(newLimbPointPos.y + branchNum, newLimbPointPos.z) * 3637.f * float(glfwGetTime())) * 2 - 1;
+		newLimbPointingAt.y += (newrand(glm::vec2(newLimbPointPos.x - branchNum, newLimbPointPos.z) * 1787.f * float(glfwGetTime())) * 2 - 0.5) * (_crntDepth >= 6);
+		newLimbPointingAt.z += newrand(glm::vec2(newLimbPointPos.x + branchNum, newLimbPointPos.y) * 7841.f * float(glfwGetTime())) * 2 - 1;
+		newLimbs(newLimbPos, newLimbPointPos, newLimbPointingAt, newLimbRadius, _crntDepth + 1);
+		//newLimbPointingAt.x -= 0.8f;
+		//newLimbs(newLimbPos, newLimbPointPos, newLimbPointingAt, newLimbRadius, _crntDepth + 1);
+	}
 }
 
 // This function should determine how it needs to add the limbs and whatnot.
 void Tree::genTriangles() {
-	int limbs = 4;
-
+	globalScale = 0.7f;
+	float time = glfwGetTime();
 	verts.clear();
 	indices.clear();
 	indCount = 0;
-	newLimb(glm::vec3(0.f), trunkPointPos, trunkPointingAt, trunkRadius, 0);
+	branchNum = 0;
+	maxDepth = 7;
+	newLimbs(glm::vec3(0.f), trunkPointPos, trunkPointingAt, trunkRadius, 0);
+	setVBOandEBO(verts, indices, "Tree");
+	std::cout << "Time: " << glfwGetTime() - time << "\n";
+	return;
+	/*
+	int limbs = 20;
 
+
+	newLimb(glm::vec3(0.f), trunkPointPos, trunkPointingAt, trunkRadius, 0);
+	
 	glm::vec3 newLimbPos = trunkPointPos;
 	glm::vec3 newLimbPointPos = trunkPointPos * 0.8f;
 	glm::vec3 newLimbPointingAt = trunkPointingAt;
 	float newLimbRadius = trunkRadius * 0.8f;
-
+	
 	for (int ll = 0; ll < limbs; ll++) {
 		// You have to reset the scale and then translate the new position in order to put it where
 		// it needs to be, A.K.A., the end of the last limb.
 		limbModel = glm::scale(limbModel, glm::vec3(0.f));
 		newLimbPos = glm::vec3(limbModel * glm::vec4(newLimbPointPos, 1));
 		newLimb(newLimbPos, newLimbPointPos, newLimbPointingAt, newLimbRadius, 0);
-
+	
 		newLimbPointPos = newLimbPointPos * 0.8f;
 		newLimbRadius = newLimbRadius * 0.8f;
-
+	
 		if (ll % 2 == 0)
 			newLimbPointingAt.x += 0.2f;
 		else
 			newLimbPointingAt.x -= 0.2f;
-
+	
 	}
 	setVBOandEBO(verts, indices, "Tree");
+	*/
 }
 
 // Generates the cone's vertices.

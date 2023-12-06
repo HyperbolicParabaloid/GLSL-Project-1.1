@@ -37,6 +37,8 @@ private:
 	bool randomColor;
 
 	float trunkRadius;
+	float globalScale;
+
 	glm::vec3 trunkPointPos;
 	glm::vec3 trunkPointingAt;
 	glm::vec3 objPos;
@@ -45,7 +47,9 @@ private:
 
 	glm::vec4 shaftColor, coneColor;
 
+	int branchNum;
 	int indCount;
+	int maxDepth;
 	int seed;
 public:
 	Tree(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _coneLevel, int _sphereLevel, float _bottomRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
@@ -57,7 +61,7 @@ public:
 	void smoothSurface(bool _isSmooth);
 
 	void newLimb(glm::vec3 _parentStartPos, glm::vec3 _parentEndPos, glm::vec3 _parentPointingAt, float _parentEndRadius, int _crntDepth);
-	glm::vec3 newPointingAt(glm::vec3 _parentPointingAt);
+	void newLimbs(glm::vec3 _parentStartPos, glm::vec3 _parentEndPos, glm::vec3 _parentPointingAt, float _parentEndRadius, int _crntDepth);
 };
 
 #endif
