@@ -38,7 +38,7 @@ void Tree::newLimb(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingAt
 	}
 
 	genCone(startPos, endPos, bottomRadius, topRadius);
-	limbModel = glm::mat4(1.f); limbModel = glm::translate(limbModel, endPos); limbModel = glm::scale(limbModel, glm::vec3(topRadius));
+	limbModel = glm::translate(limbModel, endPos); limbModel = glm::scale(limbModel, glm::vec3(topRadius));
 	genDome(topRadius);
 }
 glm::vec3 Tree::newPointingAt(glm::vec3 _parentPointingAt) {
@@ -47,13 +47,38 @@ glm::vec3 Tree::newPointingAt(glm::vec3 _parentPointingAt) {
 
 // This function should determine how it needs to add the limbs and whatnot.
 void Tree::genTriangles() {
+	int limbs = 4;
+
 	verts.clear();
 	indices.clear();
 	indCount = 0;
 	newLimb(glm::vec3(0.f), trunkPointPos, trunkPointingAt, trunkRadius, 0);
+
+	glm::vec3 newLimbPos = trunkPointPos;
+	glm::vec3 newLimbPointPos = trunkPointPos * 0.8f;
+	glm::vec3 newLimbPointingAt = trunkPointingAt;
+	float newLimbRadius = trunkRadius * 0.8f;
+
+	for (int ll = 0; ll < limbs; ll++) {
+		// You have to reset the scale and then translate the new position in order to put it where
+		// it needs to be, A.K.A., the end of the last limb.
+		limbModel = glm::scale(limbModel, glm::vec3(0.f));
+		newLimbPos = glm::vec3(limbModel * glm::vec4(newLimbPointPos, 1));
+		newLimb(newLimbPos, newLimbPointPos, newLimbPointingAt, newLimbRadius, 0);
+
+		newLimbPointPos = newLimbPointPos * 0.8f;
+		newLimbRadius = newLimbRadius * 0.8f;
+
+		if (ll % 2 == 0)
+			newLimbPointingAt.x += 0.2f;
+		else
+			newLimbPointingAt.x -= 0.2f;
+
+	}
 	setVBOandEBO(verts, indices, "Tree");
 }
 
+// Generates the cone's vertices.
 void Tree::genCone(glm::vec3 _startPos, glm::vec3 _endPos, float _bottomRadius, float _topRadius) {
 	// Whenever we generate a new set a vertices and indices, we want to wipe the old ones.
 	// In the future it'd be better to just add in the new vertices and update indices instead
@@ -96,6 +121,7 @@ void Tree::genCone(glm::vec3 _startPos, glm::vec3 _endPos, float _bottomRadius, 
 	texCoords[vertsPerCone + 1] = glm::vec2(4, 1);// 0.25 should be 1
 	setConeVertices();
 }
+// Adds the new cone's vertices and indices into the classes vertices and indcies vectors.
 void Tree::setConeVertices() {
 	srand(seed);
 	glm::vec4 color1, color2;
@@ -229,8 +255,7 @@ void Tree::setConeVertices() {
 	}
 }
 
-
-
+// Generates the dome's vertices.
 void Tree::genDome(float endRadius) {
 	// Whenever we generate a new set a vertices and indices, we want to wipe the old ones.
 	// In the future it'd be better to just add in the new vertices and update indices instead
@@ -261,7 +286,7 @@ void Tree::genDome(float endRadius) {
 	for (int vv = 0; vv < vertsPerSide; vv++) {
 		for (int uu = 0; uu < vertsPerSide; uu++) {
 
-			// Can I just make uu and vv go from 0->1, and make that my UV texture coodiantes?
+			// Can I just make uu and vv go from 0->1, and make that my UV texture coordinates?
 			// If so, I just need a new array to hold them, and assign them along with the preVerts.
 			// then, when preVerts get mapped into postVerts inside of the setNorms function, I can
 			// do the same thing with the texture coords. Perhaps. We shall see. Tomorrow. When I have coffee.
@@ -305,13 +330,16 @@ void Tree::genDome(float endRadius) {
 				}
 			}
 
+			//glm::mat4 rotatingModel = glm::mat4(1.f);
+			//rotatingModel = glm::rotate(rotatingModel, glm::radians(-45.f), glm::vec3(0.f, 0.f, 1.f));
 			// Normalizing the vector, places the vertices of the Octehdron on the surface of the sphere.
-			//preVerts[vertsPerSide * vv + uu] = glm::normalize(glm::vec3(x, y, z));
+			//preVerts[vertsPerSide * vv + uu] = glm::vec3(rotatingModel * glm::vec4(x, y, z, 1));
 			preVerts[vertsPerSide * vv + uu] = glm::normalize(glm::vec3(x, y, z));
 		}
 	}
 	setDomeVertices();
 }
+// Adds the new dome's vertices and indices into the classes vertices and indcies vectors.
 void Tree::setDomeVertices() {
 	int vertsPerSide = numVertsPerSide(sphereLevel);
 	int setpsPerSide = vertsPerSide - 2;
@@ -324,79 +352,81 @@ void Tree::setDomeVertices() {
 	// updates indices with all the right values.
 	for (int vv = 0; vv <= setpsPerSide; vv++) {
 		for (int uu = 0; uu <= setpsPerSide; uu++) {
-			//	+-+
-			//	|\|
-			//	+-+
-			if ((uu >= (vertsPerSide - 1) / 2 && vv < (vertsPerSide - 1) / 2) || ((uu < (vertsPerSide - 1) / 2 && vv >= (vertsPerSide - 1) / 2))) {
-				t0 = (uu + 0) + (vertsPerSide * (vv + 0));
-				t1 = (uu + 0) + (vertsPerSide * (vv + 1));
-				t2 = (uu + 1) + (vertsPerSide * (vv + 1));
+			if (true){//(vv + uu <= setpsPerSide) {
+				//	+-+
+				//	|\|
+				//	+-+
+				if ((uu >= (vertsPerSide - 1) / 2 && vv < (vertsPerSide - 1) / 2) || ((uu < (vertsPerSide - 1) / 2 && vv >= (vertsPerSide - 1) / 2))) {
+					t0 = (uu + 0) + (vertsPerSide * (vv + 0));
+					t1 = (uu + 0) + (vertsPerSide * (vv + 1));
+					t2 = (uu + 1) + (vertsPerSide * (vv + 1));
 
-				t3 = (uu + 1) + (vertsPerSide * (vv + 1));
-				t4 = (uu + 1) + (vertsPerSide * (vv + 0));
-				t5 = (uu + 0) + (vertsPerSide * (vv + 0));
-			}
+					t3 = (uu + 1) + (vertsPerSide * (vv + 1));
+					t4 = (uu + 1) + (vertsPerSide * (vv + 0));
+					t5 = (uu + 0) + (vertsPerSide * (vv + 0));
+				}
 
-			//	+-+
-			//	|/|
-			//	+-+
-			else {
-				t0 = (uu + 1) + (vertsPerSide * (vv + 0));
-				t1 = (uu + 0) + (vertsPerSide * (vv + 0));
-				t2 = (uu + 0) + (vertsPerSide * (vv + 1));
+				//	+-+
+				//	|/|
+				//	+-+
+				else {
+					t0 = (uu + 1) + (vertsPerSide * (vv + 0));
+					t1 = (uu + 0) + (vertsPerSide * (vv + 0));
+					t2 = (uu + 0) + (vertsPerSide * (vv + 1));
 
-				t3 = (uu + 0) + (vertsPerSide * (vv + 1));
-				t4 = (uu + 1) + (vertsPerSide * (vv + 1));
-				t5 = (uu + 1) + (vertsPerSide * (vv + 0));
-			}
+					t3 = (uu + 0) + (vertsPerSide * (vv + 1));
+					t4 = (uu + 1) + (vertsPerSide * (vv + 1));
+					t5 = (uu + 1) + (vertsPerSide * (vv + 0));
+				}
 
-			// These are the position and texture coordiante glm::vecs for each of the two triangles per-square.
-			//glm::vec3(limbModel * glm::vec4(n1, 1))
-			glm::vec3 n1 = glm::normalize(preVerts[t0]); glm::vec3 v1 = glm::vec3(limbModel * glm::vec4(n1, 1));	glm::vec2 tex1 = texCoords[t0];
-			glm::vec3 n2 = glm::normalize(preVerts[t1]); glm::vec3 v2 = glm::vec3(limbModel * glm::vec4(n2, 1));	glm::vec2 tex2 = texCoords[t1];
-			glm::vec3 n3 = glm::normalize(preVerts[t2]); glm::vec3 v3 = glm::vec3(limbModel * glm::vec4(n3, 1));	glm::vec2 tex3 = texCoords[t2];
-					  	 						   
-			glm::vec3 n4 = glm::normalize(preVerts[t3]); glm::vec3 v4 = glm::vec3(limbModel * glm::vec4(n4, 1));	glm::vec2 tex4 = texCoords[t3];
-			glm::vec3 n5 = glm::normalize(preVerts[t4]); glm::vec3 v5 = glm::vec3(limbModel * glm::vec4(n5, 1));	glm::vec2 tex5 = texCoords[t4];
-			glm::vec3 n6 = glm::normalize(preVerts[t5]); glm::vec3 v6 = glm::vec3(limbModel * glm::vec4(n6, 1));	glm::vec2 tex6 = texCoords[t5];
+				// These are the position and texture coordiante glm::vecs for each of the two triangles per-square.
+				//glm::vec3(limbModel * glm::vec4(n1, 1))
+				glm::vec3 n1 = glm::normalize(preVerts[t0]); glm::vec3 v1 = glm::vec3(limbModel * glm::vec4(n1, 1));	glm::vec2 tex1 = texCoords[t0];
+				glm::vec3 n2 = glm::normalize(preVerts[t1]); glm::vec3 v2 = glm::vec3(limbModel * glm::vec4(n2, 1));	glm::vec2 tex2 = texCoords[t1];
+				glm::vec3 n3 = glm::normalize(preVerts[t2]); glm::vec3 v3 = glm::vec3(limbModel * glm::vec4(n3, 1));	glm::vec2 tex3 = texCoords[t2];
 
-			// Setting the colors of the object:
-			glm::vec4 color1, color2;
-			if (randomColor) {
-				float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				float r3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				color1 = glm::vec4(r1, r2, r3, 1.f);
+				glm::vec3 n4 = glm::normalize(preVerts[t3]); glm::vec3 v4 = glm::vec3(limbModel * glm::vec4(n4, 1));	glm::vec2 tex4 = texCoords[t3];
+				glm::vec3 n5 = glm::normalize(preVerts[t4]); glm::vec3 v5 = glm::vec3(limbModel * glm::vec4(n5, 1));	glm::vec2 tex5 = texCoords[t4];
+				glm::vec3 n6 = glm::normalize(preVerts[t5]); glm::vec3 v6 = glm::vec3(limbModel * glm::vec4(n6, 1));	glm::vec2 tex6 = texCoords[t5];
 
-				float r4 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				float r5 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				float r6 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				color2 = glm::vec4(r4, r5, r6, 1.f);
-			}
-			else
-				color1 = color2 = color;
+				// Setting the colors of the object:
+				glm::vec4 color1, color2;
+				if (randomColor) {
+					float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					float r3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					color1 = glm::vec4(r1, r2, r3, 1.f);
 
-			// If the Sphere's lighting is supposed to be smooth, these normals will be the same
-			// as the position (on a sphere, all vertex's point directly away from the center already).
-			//
-			// If we'd rather they appear angular, we can set that by getting the normal of the triangle
-			// the vertexs are a part of, and using that for each Vertex.
-			if (!isSmooth) {
-				glm::vec3 n1 = n2 = n3 = glm::normalize(glm::cross(v3 - v2, v1 - v2));
-				glm::vec3 n4 = n5 = n6 = glm::normalize(glm::cross(v6 - v5, v4 - v5));
-			}
-			verts.push_back(Vertex{ v1, n1, color1, tex1 });
-			verts.push_back(Vertex{ v2, n2, color1, tex2 });
-			verts.push_back(Vertex{ v3, n3, color1, tex3 });
+					float r4 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					float r5 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					float r6 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					color2 = glm::vec4(r4, r5, r6, 1.f);
+				}
+				else
+					color1 = color2 = color;
 
-			verts.push_back(Vertex{ v4, n4, color2, tex4 });
-			verts.push_back(Vertex{ v5, n5, color2, tex5 });
-			verts.push_back(Vertex{ v6, n6, color2, tex6 });
-			// Finally, setting the values of the Indices. I have it in such a way,
-			// that indices[n] = n; for all n; >= 0, < indices.size().
-			for (int ii = 0; ii < 6; ii++) {
-				indices.push_back(indCount);
-				indCount++;
+				// If the Sphere's lighting is supposed to be smooth, these normals will be the same
+				// as the position (on a sphere, all vertex's point directly away from the center already).
+				//
+				// If we'd rather they appear angular, we can set that by getting the normal of the triangle
+				// the vertexs are a part of, and using that for each Vertex.
+				if (!isSmooth) {
+					glm::vec3 n1 = n2 = n3 = glm::normalize(glm::cross(v3 - v2, v1 - v2));
+					glm::vec3 n4 = n5 = n6 = glm::normalize(glm::cross(v6 - v5, v4 - v5));
+				}
+				verts.push_back(Vertex{ v1, n1, color1, tex1 });
+				verts.push_back(Vertex{ v2, n2, color1, tex2 });
+				verts.push_back(Vertex{ v3, n3, color1, tex3 });
+
+				verts.push_back(Vertex{ v4, n4, color2, tex4 });
+				verts.push_back(Vertex{ v5, n5, color2, tex5 });
+				verts.push_back(Vertex{ v6, n6, color2, tex6 });
+				// Finally, setting the values of the Indices. I have it in such a way,
+				// that indices[n] = n; for all n; >= 0, < indices.size().
+				for (int ii = 0; ii < 6; ii++) {
+					indices.push_back(indCount);
+					indCount++;
+				}
 			}
 		}
 	}
