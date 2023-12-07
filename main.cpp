@@ -708,7 +708,7 @@ int main()
 			//std::cout << "index = " << index << "\n";
 			hashTable.addItem(v.pos);
 			glm::vec3 treePos = glm::vec3(v.pos.x * planeaScale, v.pos.y * planeaScale , v.pos.z * planeaScale) + planeaPos;
-			treeList.push_back(new Tree(window, treePos, 1.f, tree1ConeLevel, tree1SphereLevel, 1.0f, tree1PointPos, true, cone1ShaftColor, tex, &camera));
+			treeList.push_back(new Tree(window, treePos, 0.4f, tree1ConeLevel, tree1SphereLevel, 1.0f, tree1PointPos, true, cone1ShaftColor, tex, &camera));
 			//coneList.push_back(new Cone(window, treePos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
 		}
 		//std::cout << "Not in table, index = " << index << "\n";

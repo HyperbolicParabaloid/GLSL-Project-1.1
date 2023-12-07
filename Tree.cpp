@@ -44,7 +44,6 @@ void Tree::newLimb(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingAt
 
 
 void Tree::newLimbs(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingAt, float _radius, int _crntDepth) {
-
 	if (_crntDepth >= maxDepth)
 		return;
 
@@ -52,7 +51,7 @@ void Tree::newLimbs(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingA
 	glm::vec3 endPos = _endPos;
 	glm::vec3 pointingAt = _pointingAt;
 	float bottomRadius = _radius;
-	float topRadius = bottomRadius * globalScale;
+	float topRadius = bottomRadius * globalScale * (_crntDepth != maxDepth - 1);
 
 
 	limbModel = glm::mat4(1.f);
@@ -60,18 +59,21 @@ void Tree::newLimbs(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingA
 	float angle = acos(glm::dot(glm::normalize(endPos), glm::normalize(pointingAt)));
 	limbModel = glm::translate(limbModel, startPos);
 	if (ceil(abs(glm::degrees(angle))) < 179.f && floor(abs(glm::degrees(angle))) > 1.f) {
+	//angle *= !(ceil(abs(glm::degrees(angle))) < 179.f && floor(abs(glm::degrees(angle))) > 1.f);
 		limbModel = glm::rotate(limbModel, angle, axis);
 	}
-	else if (floor(abs(glm::degrees(angle))) >= 179.f) {
-		endPos.y *= -1;
+	else  {
+		endPos.y *= 1 + -2 * (floor(abs(glm::degrees(angle))) >= 179.f);
 	}
 
 	genCone(startPos, endPos, bottomRadius, topRadius);
+	if (topRadius == 0.f)
+		return;
 	limbModel = glm::translate(limbModel, endPos); limbModel = glm::scale(limbModel, glm::vec3(topRadius));
 	genDome(topRadius);
 
 	glm::vec3 newLimbPos = startPos;
-	glm::vec3 newLimbPointPos = endPos * globalScale;
+	glm::vec3 newLimbPointPos = endPos * globalScale * (newrand(endPos + startPos) * 0.5f + 1.0f);
 	glm::vec3 newLimbPointingAt = pointingAt;
 	float newLimbRadius = topRadius;
 
@@ -93,8 +95,6 @@ void Tree::newLimbs(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingA
 		newLimbPointingAt.y += (newrand(glm::vec2(newLimbPointPos.x * -branchNum, newLimbPointPos.z * branchNum) * 1787.f * crntTime) * 2.f - 0.25f) * (_crntDepth >= 5);
 		newLimbPointingAt.z += newrand(glm::vec2(newLimbPointPos.x * branchNum, newLimbPointPos.y * branchNum) * 7841.f * crntTime) * 2.f - 1.f;
 		newLimbs(newLimbPos, newLimbPointPos, newLimbPointingAt, newLimbRadius, _crntDepth + 1);
-		//newLimbPointingAt.x -= 0.8f;
-		//newLimbs(newLimbPos, newLimbPointPos, newLimbPointingAt, newLimbRadius, _crntDepth + 1);
 	}
 }
 
@@ -106,7 +106,7 @@ void Tree::genTriangles() {
 	indices.clear();
 	indCount = 0;
 	branchNum = 0;
-	maxDepth = 6;
+	maxDepth = 7;
 	newLimbs(glm::vec3(0.f), trunkPointPos, trunkPointingAt, trunkRadius, 0);
 	setVBOandEBO(verts, indices, "Tree");
 	std::cout << "Time: " << glfwGetTime() - time << "\n";
