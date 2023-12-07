@@ -60,6 +60,7 @@ public:
 	bool setMousePos(glm::vec3 _newForward, bool lockCursorMovement);	// forward and option to lock camera
 
 	void camMatrixForShader(Shader& _newShader, const char* uniformName);	// Sets the view matrix for the camera whatever shader program and uniform name are provided
+	//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 };
 
 #endif

@@ -1,5 +1,10 @@
 #include "Camera.h"
 
+//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+//{
+//	std::cout << "offset = (" << xoffset << ", " << yoffset << ")\n";
+//}
+
 // Constructor takes in a window and the screen dimensions to initialize view
 // matrix, with default values for cameraUp, cameraPos and cameraForward being
 // assumed to be vec3(0.f, 1.f, 0.f), vec3(0.f, 0.5f, 2.f) and vec3(0.f, 0.f, -1.f)
@@ -21,6 +26,8 @@ Camera::Camera(GLFWwindow* _window, glm::vec2 _screenDimensions, glm::vec3 _came
 	// tracking mouse movements.
 	yaw = -90;
 	pitch = 0;
+
+	//glfwSetScrollCallback(window, scroll_callback);
 }
 
 void Camera::set_projection(float angle, float aspectRatio, float nearClip, float farClip) {

@@ -229,6 +229,13 @@ GLuint sqrIndices_2[] = {
 };
 
 int viewWidth = 1600, viewHeight = 1600;
+int setCamera = 0;
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	setCamera = yoffset;
+	std::cout << "LEMON = (" << xoffset << ", " << yoffset << ")\n";
+}
 
 
 
@@ -725,8 +732,8 @@ int main()
 	objectList.push_back(&cube2);
 	objectList.push_back(&cube3);
 
-
-	camera.set_camera_speed(10);
+	float camSpeed = 10.f;
+	camera.set_camera_speed(camSpeed);
 	level = 4;
 	bool randomColor = true;
 	bool isSmooth = true;
@@ -759,6 +766,8 @@ int main()
 	// Main while loop
 	float lastTime = glfwGetTime();
 	int frames = 0;
+
+	glfwSetScrollCallback(window, scroll_callback);
 	while (!glfwWindowShouldClose(window))
 	{
 		frames++;
@@ -789,6 +798,14 @@ int main()
 		//cone1.setBottomRadius(newTopRadius);
 
 
+		if (setCamera != 0) {
+			if (setCamera > 0)
+				camSpeed *= 1.5f;
+			else 
+				camSpeed /= 1.5f;
+			camera.set_camera_speed(camSpeed);
+			setCamera = 0;
+		}
 		// Rotating the view about the x and y axis, and loads of other neat things.
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_F) && lockoutTimer <= crntTime) {
 			lockoutTimer = crntTime + 0.2;
@@ -914,6 +931,7 @@ int main()
 			}
 			lockoutTimer = crntTime + 0.2;
 		}
+
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Y) && lockoutTimer <= crntTime) {
 			isSmooth = !isSmooth;
 			//sphere1.smoothSurface(isSmooth);
@@ -944,8 +962,11 @@ int main()
 				pln->hotRealoadShader();
 		}
 		if (shouldFly) {
+			camera.set_camera_speed(2.f);
+			camSpeed = 10.f;
 			if (camera.fly_to(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 0.125f, -1.f), true)) {
 				shouldFly = false;
+				camera.set_camera_speed(camSpeed);
 			}
 		}
 
