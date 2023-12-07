@@ -619,42 +619,46 @@ int main()
 	float planeaScale = 25.f;
 	std::vector <Plane*> planeList;
 	glm::vec3 planeaPos = glm::vec3(0.f, -1.5f, 0.0f);
-	Plane planea(window, planeaPos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), tex, &camera);
+	Plane planea(window, planeaPos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
 
-	glm::vec3 plane1Pos = glm::vec3(-planeaScale * 2, -1.5f, -planeaScale * 2);
-	Plane plane1(window, plane1Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
-
-	glm::vec3 plane2Pos = glm::vec3(0.f, -1.5f, -planeaScale * 2);
-	Plane plane2(window, plane2Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
-
-	glm::vec3 plane3Pos = glm::vec3(planeaScale * 2, -1.5f, -planeaScale * 2);
-	Plane plane3(window, plane3Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
-
-	glm::vec3 plane4Pos = glm::vec3(-planeaScale * 2, -1.5f, 0.0f);
-	Plane plane4(window, plane4Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
-
-	glm::vec3 plane6Pos = glm::vec3(planeaScale * 2, -1.5f, 0.0f);
-	Plane plane6(window, plane6Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
-
-	glm::vec3 plane7Pos = glm::vec3(-planeaScale * 2, -1.5f, planeaScale * 2);
-	Plane plane7(window, plane7Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
-
-	glm::vec3 plane8Pos = glm::vec3(0.f, -1.5f, planeaScale * 2);
-	Plane plane8(window, plane8Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
-
-	glm::vec3 plane9Pos = glm::vec3(planeaScale * 2, -1.5f, planeaScale * 2);
-	Plane plane9(window, plane9Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
-
+	/*
+	//glm::vec3 plane1Pos = glm::vec3(-planeaScale * 2, -1.5f, -planeaScale * 2);
+	//Plane plane1(window, plane1Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+	//
+	//glm::vec3 plane2Pos = glm::vec3(0.f, -1.5f, -planeaScale * 2);
+	//Plane plane2(window, plane2Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+	//
+	//glm::vec3 plane3Pos = glm::vec3(planeaScale * 2, -1.5f, -planeaScale * 2);
+	//Plane plane3(window, plane3Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+	//
+	//glm::vec3 plane4Pos = glm::vec3(-planeaScale * 2, -1.5f, 0.0f);
+	//Plane plane4(window, plane4Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+	//
+	//glm::vec3 plane6Pos = glm::vec3(planeaScale * 2, -1.5f, 0.0f);
+	//Plane plane6(window, plane6Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+	//
+	//glm::vec3 plane7Pos = glm::vec3(-planeaScale * 2, -1.5f, planeaScale * 2);
+	//Plane plane7(window, plane7Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+	//
+	//glm::vec3 plane8Pos = glm::vec3(0.f, -1.5f, planeaScale * 2);
+	//Plane plane8(window, plane8Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+	//
+	//glm::vec3 plane9Pos = glm::vec3(planeaScale * 2, -1.5f, planeaScale * 2);
+	//Plane plane9(window, plane9Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
+	*/
 	planeList.push_back(&planea);
-	planeList.push_back(&plane1);
-	planeList.push_back(&plane2);
-	planeList.push_back(&plane3);
-	planeList.push_back(&plane4);
-	planeList.push_back(&plane6);
-	planeList.push_back(&plane7);
-	planeList.push_back(&plane8);
-	planeList.push_back(&plane9);
-
+	
+	int start = -8, end = 8;
+	float offset = (planeaScale * 2);
+	for (int vv = end; vv >= start; vv--) {
+		for (int uu = start; uu <= end; uu++) {
+			if (uu != vv || vv != 0) {
+				glm::vec3 newPlanePos = glm::vec3(offset * vv, -1.5f, offset * uu);
+				planeList.push_back(new Plane(window, newPlanePos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera));
+			}
+		}
+	}
+	
 	float cube1y = -1.5 + sqrt(3);
 	glm::vec3 cube1Pos = glm::vec3(-2.5f, cube1y, -2.5f);
 	Cube cube1(window, cube1Pos, 1.f, color, empty, &camera);
@@ -795,18 +799,26 @@ int main()
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
 			tree1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
 			sphere1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
+			//planeaPos.x -= 0.01f;
+			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_UP)) {
 			tree1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
 			sphere1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
+			//planeaPos.y += 0.01f;
+			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_DOWN)) {
 			tree1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
 			sphere1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
+			//planeaPos.y -= 0.01f;
+			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_RIGHT)) {
 			tree1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 			sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
+			//planeaPos.x += 0.01f;
+			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_MINUS) && lockoutTimer <= crntTime) {
 			//planeLevel--;
@@ -911,6 +923,7 @@ int main()
 			//cone1.setLevel(coneLevel);
 			tree1.smoothSurface(isSmooth);
 			tree1.setConeLevel(tree1ConeLevel);
+
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_T) && lockoutTimer <= crntTime) {
@@ -927,8 +940,8 @@ int main()
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_H) && lockoutTimer <= crntTime) {
 			std::cout << "\nReloading Shader: " << level << "\n";
 			lockoutTimer = crntTime + 0.2;
-			for (auto obj : objectList)
-				obj->hotRealoadShader();
+			for (auto pln : planeList)
+				pln->hotRealoadShader();
 		}
 		if (shouldFly) {
 			if (camera.fly_to(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 0.125f, -1.f), true)) {

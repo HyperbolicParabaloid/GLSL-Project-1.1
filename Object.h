@@ -59,6 +59,7 @@ public:
 	float noise(glm::vec2 n);
 
 	void toggleNormalArrows();
+	void setNewPos(glm::vec3 _objPos);
 
 	std::vector <Vertex> vertices;
 	std::vector <GLuint> indices;

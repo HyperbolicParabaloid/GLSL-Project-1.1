@@ -14,6 +14,12 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	textures = _textures;
 }
 
+void Object::setNewPos(glm::vec3 _objPos) {
+	objPos = _objPos;
+	model = glm::translate(glm::mat4(1.f), objPos);
+	model = glm::scale(model, glm::vec3(objScale));
+}
+
 // Rotates the object about a given axis by a set angle in degrees.
 void Object::rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation) {
 	model = glm::rotate(model, glm::radians(rotationDegreeAngle), axisOfRotation);

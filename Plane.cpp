@@ -1,11 +1,6 @@
 #include "Plane.h"
 
 /*
-Plane::Plane(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
-	genTriangles();
-}
-
-
 /*
 * To explain what's going on: behold, my ASCII art.
 +---------------------+---------------------+

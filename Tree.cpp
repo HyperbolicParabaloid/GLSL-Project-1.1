@@ -29,7 +29,7 @@ void Tree::genTriangles() {
 	//setVBOandEBO(vertices, indices, "Tree");
 	setVBOandEBO("Tree");
 	//std::cout << "Time: " << glfwGetTime() - time << "\n";
-	std::cout << "Time: " << glfwGetTime() - time << "\tsize: " << vertices.size() << "\n";
+	std::cout << "Time: " << glfwGetTime() - time << "\tsize: " << vertices.size() / sizeof(Vertex) << "\n";
 	return;
 	/*
 	int limbs = 20;
@@ -326,7 +326,7 @@ void Tree::genDome(float endRadius) {
 			// do the same thing with the texture coords. Perhaps. We shall see. Tomorrow. When I have coffee.
 			//
 			// I lied. A little. Should be something like:
-			texCoords[vertsPerSide * vv + uu] = glm::vec2(static_cast<float>(-uu) / (vertsPerSide - 1), static_cast<float>(-vv) / (vertsPerSide - 1));	// (0->1, 0->1)
+			texCoords[vertsPerSide * vv + uu] = glm::vec2(static_cast<float>(-uu) * 4 / (vertsPerSide - 1), static_cast<float>(-vv) * 4 / (vertsPerSide - 1));	// (0->1, 0->1)
 			GLfloat x, y, z = 0.f;
 			x = ((uu * 2) - (vertsPerSide - 1)) / (float)(vertsPerSide - 1);	// Goes from -1.f =>  1.f
 			y = ((vertsPerSide - 1) - (vv * 2)) / (float)(vertsPerSide - 1);	// Goes from  1.f => -1.f
@@ -363,16 +363,15 @@ void Tree::genDome(float endRadius) {
 					z = -1.f + (abs(x) + abs(y));
 				}
 			}
-
 			//glm::mat4 rotatingModel = glm::mat4(1.f);
-			//limbModel = glm::rotate(limbModel, glm::radians(-45.f), glm::vec3(0.f, 0.f, 1.f));
 			//preVerts[vertsPerSide * vv + uu] = glm::vec3(rotatingModel * glm::vec4(x, y, z, 1));
 			// Normalizing the vector, places the vertices of the Octehdron on the surface of the sphere.
 			preVerts[vertsPerSide * vv + uu] = glm::normalize(glm::vec3(x, y, z));
 		}
+		limbModel = glm::rotate(limbModel, glm::radians(135.f), glm::vec3(0.f, 0.f, 1.f));
 	}
-	glm::mat4 rotatingModel = glm::mat4(1.f);
-	limbModel = glm::rotate(limbModel, glm::radians(-45.f), glm::vec3(0.f, 0.f, 1.f));
+	//glm::mat4 rotatingModel = glm::mat4(1.f);
+	//limbModel = glm::rotate(limbModel, glm::radians(-45.f), glm::vec3(0.f, 0.f, 1.f));
 	setDomeVertices();
 }
 // Adds the new dome's vertices and indices into the classes vertices and indcies vectors.
