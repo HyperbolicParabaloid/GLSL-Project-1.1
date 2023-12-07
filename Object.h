@@ -49,6 +49,7 @@ public:
 	glm::vec4 color;
 	float objScale;
 	void setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg);
+	void setVBOandEBO(std::string msg);
 	void rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation);
 	void moveFirstVertex();
 

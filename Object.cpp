@@ -42,6 +42,97 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 
 // Creates a new shader program and binds the adds the appropriate information into the GPU's memory so it can draw the
 // object.
+
+void Object::setVBOandEBO(std::string msg) {
+	// Generates Shader object using shaders object.vert and object.frag
+	delete shaderProgram;
+	if (msg == "Plane") {
+		name = msg;
+		shaderProgram = new Shader("grass.vert", "grass.frag");
+	}
+	else if (msg == "Tree") {
+		name = msg;
+		shaderProgram = new Shader("tree.vert", "tree.frag");
+	}
+	else
+		shaderProgram = new Shader("object.vert", "object.frag");
+	shaderProgram->Activate();
+
+	//std::cout << "doNormalArrows = " << doNormalArrows << " for " << msg << "\n";
+	//if (doNormalArrows == true) {
+	//	//std::cout << "Drawing the arrows for " << msg <<  "\n";
+	//	int vNum = 1;
+	//	int maxSize = vertices.size();
+	//	for (int vv = 0; vv < maxSize; vv++) {
+	//		glm::vec3 conePos = vertices[vv].pos;
+	//		float coneScale = 0.02f;
+	//		int coneLevel = 4;
+	//		float coneBottomRadius = 1.f;
+	//		float coneTopRadius = 0.f;
+	//		glm::vec3 conePointPos = glm::vec3(0.f, 5.f, 0.f);
+	//		glm::vec3 conePointingAt = vertices[vv].norm;
+	//		bool coneIsSmooth = true;
+	//		glm::vec4 coneColor = glm::vec4(0.4f, 0.5f, 0.3f, 1.f); //vertices[vv].color;
+	//		glm::vec4 shaftColor = glm::vec4(0.5f, 0.3f, 0.f, 1.f);// vertices[vv].color;
+	//		int coneStartingIndex = indices.size();
+	//		float randomizationEffect = 0.f;
+	//
+	//		//std::cout << "Drawing arrows #" << vNum << " at pos (" << conePos.x << ", " << conePos.y << ", " << conePos.z << ")\n";
+	//		//vNum++;
+	//
+	//		//std::cout << "Drawing a " << msg << "\n";
+	//		Arrow newArrow(conePos, coneScale, coneLevel, coneBottomRadius, coneTopRadius, conePointPos, conePointingAt, coneIsSmooth, shaftColor, coneColor, randomizationEffect, coneStartingIndex);
+	//		std::vector <Vertex> coneVerts = newArrow.getVerts();
+	//		std::vector <GLuint> coneInds = newArrow.getInds();
+	//
+	//		//std::cout << "vertices.size() BEFORE = " << vertices.size() << "\n";
+	//		vertices.insert(vertices.end(), coneVerts.begin(), coneVerts.end());
+	//		indices.insert(indices.end(), coneInds.begin(), coneInds.end());
+	//	}
+	//}
+
+	VAO.Bind();
+	// Setting VBO and EBO
+	// Generates Vertex Buffer Object and links it to vertices
+	VBO VBO(vertices);
+	// Generates Element Buffer Object and links it to indices
+	EBO EBO(indices);
+
+	// Links VBO attributes such as coordinates and colors to VAO
+	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 2, 4, GL_FLOAT, sizeof(Vertex), (void*)(6 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)(10 * sizeof(float)));
+
+	// Keep track of how many of each type of textures we have
+	unsigned int numDiffuse = 0;
+	unsigned int numSpecular = 0;
+
+	// Assign all the relevant information to the shader.
+	for (unsigned int i = 0; i < textures.size(); i++)
+	{
+		std::string num;
+		std::string type = textures[i].type;
+		if (type == "diffuse")
+		{
+			num = std::to_string(numDiffuse++);
+			glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTex"), 1);
+		}
+		else if (type == "specular")
+		{
+			num = std::to_string(numSpecular++);
+			glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTexSpec"), 1);
+		}
+		textures[i].texUnit(*shaderProgram, (type + num).c_str(), i);
+		textures[i].Bind();
+	}
+
+	// Unbind all to prevent accidentally modifying them
+	VAO.Unbind();
+	VBO.Unbind();
+	EBO.Unbind();
+}
+
 void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg) {
 	// Generates Shader object using shaders object.vert and object.frag
 	delete shaderProgram;

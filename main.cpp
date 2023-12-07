@@ -230,6 +230,8 @@ GLuint sqrIndices_2[] = {
 
 int viewWidth = 1600, viewHeight = 1600;
 
+
+
 #if 0
 int main()
 {
@@ -729,7 +731,7 @@ int main()
 	Shader shaderProgram("object.vert", "object.frag");
 
 	// Create floor mesh
-	Mesh floor(verts, ind, tex);
+	//Mesh floor(verts, ind, tex);
 
 	glm::vec3 objectPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::mat4 objectModel = glm::mat4(1.0f);
@@ -751,8 +753,11 @@ int main()
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "useTexSpec"), 1);
 
 	// Main while loop
+	float lastTime = glfwGetTime();
+	int frames = 0;
 	while (!glfwWindowShouldClose(window))
 	{
+		frames++;
 		// Specify the color of the background
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		// Clean the back buffer and assign the new color to it
@@ -760,6 +765,12 @@ int main()
 
 		// Simple timer
 		double crntTime = glfwGetTime();
+		if (floor(crntTime) > floor(lastTime)) {
+			std::cout << "Frames/second = " << frames << "\n";
+			lastTime = crntTime;
+			frames = 0;
+		}
+
 		if (crntTime - prevTime >= 1 / 60)
 		{
 			//rotation = 0.1f;

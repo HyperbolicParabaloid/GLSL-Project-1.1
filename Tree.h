@@ -22,10 +22,6 @@ private:
 	void setDomeVertices();
 	int numVertsPerSide(int _level);
 
-
-	std::vector <Vertex> verts;		// Vertex vector that gets sent to Object class to put information into the GPU.
-	std::vector <GLuint> indices;	// GLuint vector that gets sent to Object class to put indices into the GPU.
-
 	glm::vec3* preVerts = new glm::vec3[1];		// glm:V:ec3 array that gets resized and stuffed with vertex information.
 	glm::vec2* texCoords = new glm::vec2[1];	// glm::VecW array that gets resized and stuffed with texture coordinate information.
 

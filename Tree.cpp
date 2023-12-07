@@ -16,6 +16,51 @@ Tree::Tree(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _coneLev
 	genTriangles();
 }
 
+// This function should determine how it needs to add the limbs and whatnot.
+void Tree::genTriangles() {
+	globalScale = 0.7f;
+	float time = glfwGetTime();
+	vertices.clear();
+	indices.clear();
+	indCount = 0;
+	branchNum = 0;
+	maxDepth = 7;
+	newLimbs(glm::vec3(0.f), trunkPointPos, trunkPointingAt, trunkRadius, 0);
+	//setVBOandEBO(vertices, indices, "Tree");
+	setVBOandEBO("Tree");
+	//std::cout << "Time: " << glfwGetTime() - time << "\n";
+	std::cout << "Time: " << glfwGetTime() - time << "\tsize: " << vertices.size() << "\n";
+	return;
+	/*
+	int limbs = 20;
+
+
+	newLimb(glm::vec3(0.f), trunkPointPos, trunkPointingAt, trunkRadius, 0);
+
+	glm::vec3 newLimbPos = trunkPointPos;
+	glm::vec3 newLimbPointPos = trunkPointPos * 0.8f;
+	glm::vec3 newLimbPointingAt = trunkPointingAt;
+	float newLimbRadius = trunkRadius * 0.8f;
+
+	for (int ll = 0; ll < limbs; ll++) {
+		// You have to reset the scale and then translate the new position in order to put it where
+		// it needs to be, A.K.A., the end of the last limb.
+		limbModel = glm::scale(limbModel, glm::vec3(0.f));
+		newLimbPos = glm::vec3(limbModel * glm::vec4(newLimbPointPos, 1));
+		newLimb(newLimbPos, newLimbPointPos, newLimbPointingAt, newLimbRadius, 0);
+
+		newLimbPointPos = newLimbPointPos * 0.8f;
+		newLimbRadius = newLimbRadius * 0.8f;
+
+		if (ll % 2 == 0)
+			newLimbPointingAt.x += 0.2f;
+		else
+			newLimbPointingAt.x -= 0.2f;
+
+	}
+	setVBOandEBO(verts, indices, "Tree");
+	*/
+}
 
 
 void Tree::newLimb(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingAt, float _radius, int _crntDepth) {
@@ -87,7 +132,7 @@ void Tree::newLimbs(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingA
 	branchNum += 1;
 	float crntTime = float(glfwGetTime());
 
-	int numBranchesPerNode = (floor(newrand(glm::vec2(newLimbPos * crntTime * 506683.f)) * 1.5f) + 2.f) * (_crntDepth < 4) + 1.f * (_crntDepth >= 4);
+	int numBranchesPerNode = (floor(newrand(glm::vec2(newLimbPos * crntTime * 506683.f)) * 1.25f) + 2.f) * (_crntDepth < 4) + 1.f * (_crntDepth >= 4);
 	for (int bb = 0; bb < numBranchesPerNode; bb++) {
 
 		newLimbPointingAt = glm::normalize(newLimbPointingAt);
@@ -96,50 +141,6 @@ void Tree::newLimbs(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _pointingA
 		newLimbPointingAt.z += newrand(glm::vec2(newLimbPointPos.x * branchNum, newLimbPointPos.y * branchNum) * 7841.f * crntTime) * 2.f - 1.f;
 		newLimbs(newLimbPos, newLimbPointPos, newLimbPointingAt, newLimbRadius, _crntDepth + 1);
 	}
-}
-
-// This function should determine how it needs to add the limbs and whatnot.
-void Tree::genTriangles() {
-	globalScale = 0.7f;
-	float time = glfwGetTime();
-	verts.clear();
-	indices.clear();
-	indCount = 0;
-	branchNum = 0;
-	maxDepth = 7;
-	newLimbs(glm::vec3(0.f), trunkPointPos, trunkPointingAt, trunkRadius, 0);
-	setVBOandEBO(verts, indices, "Tree");
-	std::cout << "Time: " << glfwGetTime() - time << "\n";
-	return;
-	/*
-	int limbs = 20;
-
-
-	newLimb(glm::vec3(0.f), trunkPointPos, trunkPointingAt, trunkRadius, 0);
-	
-	glm::vec3 newLimbPos = trunkPointPos;
-	glm::vec3 newLimbPointPos = trunkPointPos * 0.8f;
-	glm::vec3 newLimbPointingAt = trunkPointingAt;
-	float newLimbRadius = trunkRadius * 0.8f;
-	
-	for (int ll = 0; ll < limbs; ll++) {
-		// You have to reset the scale and then translate the new position in order to put it where
-		// it needs to be, A.K.A., the end of the last limb.
-		limbModel = glm::scale(limbModel, glm::vec3(0.f));
-		newLimbPos = glm::vec3(limbModel * glm::vec4(newLimbPointPos, 1));
-		newLimb(newLimbPos, newLimbPointPos, newLimbPointingAt, newLimbRadius, 0);
-	
-		newLimbPointPos = newLimbPointPos * 0.8f;
-		newLimbRadius = newLimbRadius * 0.8f;
-	
-		if (ll % 2 == 0)
-			newLimbPointingAt.x += 0.2f;
-		else
-			newLimbPointingAt.x -= 0.2f;
-	
-	}
-	setVBOandEBO(verts, indices, "Tree");
-	*/
 }
 
 // Generates the cone's vertices.
@@ -231,9 +232,9 @@ void Tree::setConeVertices() {
 
 		// Norms for each of the 4 triangles.
 		//n1 = glm::normalize(glm::cross((v1 - v2), (v3 - v2)));
-		n2 = glm::normalize(glm::cross((v5 - v2), (v1 - v2)));
+		n1 = n2 = glm::normalize(glm::cross((v5 - v2), (v1 - v2)));
 		//n3 = glm::normalize(glm::cross((v4 - v6), (v5 - v6)));
-		n4 = glm::normalize(glm::cross((v5 - v6), (v2 - v6)));
+		n3 = n4 = glm::normalize(glm::cross((v5 - v6), (v2 - v6)));
 
 		if (isSmooth) {
 			// Setting the previous and future indices.
@@ -265,50 +266,19 @@ void Tree::setConeVertices() {
 			glm::vec3 ftrNorm = glm::normalize(glm::cross((ftrv5 - ftrv2), (ftrv1 - ftrv2)));
 
 			// Finally, setting the future normal and previous normals.
-			glm::vec3 avgNorm1 = glm::normalize((preNorm + n2) / 2.f);
-			glm::vec3 avgNorm2 = glm::normalize((ftrNorm + n2) / 2.f);
-
-			// Lower circle triangle.
-			//verts.push_back(Vertex{ v1, n1, color1, tex1 });
-			//verts.push_back(Vertex{ v2, n1, color1, tex2 });
-			//verts.push_back(Vertex{ v3, n1, color1, tex3 });
-
-			// Low-to-high side triangle.
-			verts.push_back(Vertex{ v1, avgNorm1, color1, tex1 });
-			verts.push_back(Vertex{ v2, avgNorm2, color1, tex2 });
-			verts.push_back(Vertex{ v5, avgNorm1, color1, tex5 });
-
-			// Upper circle triangle.
-			//verts.push_back(Vertex{ v5, n3, color2, tex5 });
-			//verts.push_back(Vertex{ v6, n3, color2, tex6 });
-			//verts.push_back(Vertex{ v4, n3, color2, tex4 });
-
-			// High-to-low side triangle.	// NOTE! // The top-to-bottom triangle is the problem! Not sure why, I'm investigating.
-			verts.push_back(Vertex{ v5, avgNorm1, color2, tex5 });	// Change back
-			verts.push_back(Vertex{ v6, avgNorm2, color2, tex6 });
-			verts.push_back(Vertex{ v2, avgNorm2, color2, tex2 });
+			n1 = n3 = glm::normalize((preNorm + n2) / 2.f);
+			n2 = n4 = glm::normalize((ftrNorm + n2) / 2.f);
 		}
-		else {
-			// Lower circle triangle.
-			//verts.push_back(Vertex{ v1, n1, color1, tex1 });
-			//verts.push_back(Vertex{ v2, n1, color1, tex2 });
-			//verts.push_back(Vertex{ v3, n1, color1, tex3 });
 
-			// Low-to-high side triangle.f
-			verts.push_back(Vertex{ v1, n2, color1, tex1 });
-			verts.push_back(Vertex{ v2, n2, color1, tex2 });
-			verts.push_back(Vertex{ v5, n2, color1, tex5 });
+		// Low-to-high side triangle.
+		vertices.push_back(Vertex{ v1, n1, color1, tex1 });
+		vertices.push_back(Vertex{ v2, n2, color1, tex2 });
+		vertices.push_back(Vertex{ v5, n1, color1, tex5 });
 
-			// Upper circle triangle.
-			//verts.push_back(Vertex{ v5, n3, color2, tex5 });
-			//verts.push_back(Vertex{ v6, n3, color2, tex6 });
-			//verts.push_back(Vertex{ v4, n3, color2, tex4 });
-
-			// High-to-low side triangle.
-			verts.push_back(Vertex{ v5, n4, color2, tex5 });
-			verts.push_back(Vertex{ v6, n4, color2, tex6 });
-			verts.push_back(Vertex{ v2, n4, color2, tex2 });
-		}
+		// High-to-low side triangle.
+		vertices.push_back(Vertex{ v5, n3, color2, tex5 });
+		vertices.push_back(Vertex{ v6, n4, color2, tex6 });
+		vertices.push_back(Vertex{ v2, n4, color2, tex2 });
 
 		// Finally, setting the values of the Indices. I have it in such a way,
 		// that indices[n] = n; for all n; >= 0, < indices.size().
@@ -395,12 +365,14 @@ void Tree::genDome(float endRadius) {
 			}
 
 			//glm::mat4 rotatingModel = glm::mat4(1.f);
-			//rotatingModel = glm::rotate(rotatingModel, glm::radians(-45.f), glm::vec3(0.f, 0.f, 1.f));
-			// Normalizing the vector, places the vertices of the Octehdron on the surface of the sphere.
+			//limbModel = glm::rotate(limbModel, glm::radians(-45.f), glm::vec3(0.f, 0.f, 1.f));
 			//preVerts[vertsPerSide * vv + uu] = glm::vec3(rotatingModel * glm::vec4(x, y, z, 1));
+			// Normalizing the vector, places the vertices of the Octehdron on the surface of the sphere.
 			preVerts[vertsPerSide * vv + uu] = glm::normalize(glm::vec3(x, y, z));
 		}
 	}
+	glm::mat4 rotatingModel = glm::mat4(1.f);
+	limbModel = glm::rotate(limbModel, glm::radians(-45.f), glm::vec3(0.f, 0.f, 1.f));
 	setDomeVertices();
 }
 // Adds the new dome's vertices and indices into the classes vertices and indcies vectors.
@@ -416,7 +388,7 @@ void Tree::setDomeVertices() {
 	// updates indices with all the right values.
 	for (int vv = 0; vv <= setpsPerSide; vv++) {
 		for (int uu = 0; uu <= setpsPerSide; uu++) {
-			if (true){//(vv + uu <= setpsPerSide) {
+			if (vv + uu <= setpsPerSide) {
 				//	+-+
 				//	|\|
 				//	+-+
@@ -478,13 +450,13 @@ void Tree::setDomeVertices() {
 					glm::vec3 n1 = n2 = n3 = glm::normalize(glm::cross(v3 - v2, v1 - v2));
 					glm::vec3 n4 = n5 = n6 = glm::normalize(glm::cross(v6 - v5, v4 - v5));
 				}
-				verts.push_back(Vertex{ v1, n1, color1, tex1 });
-				verts.push_back(Vertex{ v2, n2, color1, tex2 });
-				verts.push_back(Vertex{ v3, n3, color1, tex3 });
+				vertices.push_back(Vertex{ v1, n1, color1, tex1 });
+				vertices.push_back(Vertex{ v2, n2, color1, tex2 });
+				vertices.push_back(Vertex{ v3, n3, color1, tex3 });
 
-				verts.push_back(Vertex{ v4, n4, color2, tex4 });
-				verts.push_back(Vertex{ v5, n5, color2, tex5 });
-				verts.push_back(Vertex{ v6, n6, color2, tex6 });
+				vertices.push_back(Vertex{ v4, n4, color2, tex4 });
+				vertices.push_back(Vertex{ v5, n5, color2, tex5 });
+				vertices.push_back(Vertex{ v6, n6, color2, tex6 });
 				// Finally, setting the values of the Indices. I have it in such a way,
 				// that indices[n] = n; for all n; >= 0, < indices.size().
 				for (int ii = 0; ii < 6; ii++) {
