@@ -5,6 +5,8 @@
 #include"Cone.h"
 #include"Tree.h"
 #include"HashTable.h"
+#include"EditingSphere.h"
+
 
 
 // Setting up array of vertices.
@@ -599,7 +601,7 @@ int main()
 	glm::mat4 view = glm::mat4(1.f);
 
 	Camera camera(window, glm::vec2(viewWidth, viewHeight), glm::vec3(0.f, 0.5f, 2.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
-	camera.set_projection(glm::radians(60.f), (float)(viewWidth / viewHeight), 0.1f, 500.f);
+	camera.set_projection(glm::radians(60.f), (float)(viewWidth / viewHeight), 0.01f, 1000.f);
 
 	double lockoutTimer = 0;
 	bool shouldRotate = false, shouldFly = false, capturingMotion = false;
@@ -627,6 +629,11 @@ int main()
 	std::vector <Plane*> planeList;
 	glm::vec3 planeaPos = glm::vec3(0.f, -1.5f, 0.0f);
 	Plane planea(window, planeaPos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
+	planea.doRandomColors(true);
+	planea.setLevel(planeLevel);
+
+	//glm::vec3 editingSpherePos = glm::vec3(0.f, 25.f, 0.0f);
+	//EditingSphere editingSphere(window, editingSpherePos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
 
 	/*
 	//glm::vec3 plane1Pos = glm::vec3(-planeaScale * 2, -1.5f, -planeaScale * 2);
@@ -717,7 +724,7 @@ int main()
 	for (const Vertex& v : planea.vertices) {
 		int index = hashTable.isInTable(v.pos);
 		hashCount++;
-		if (index == -1 && hashCount % 11 == 0) {
+		if (index == -1){//}&& hashCount % 2 == 0) {
 			//std::cout << "index = " << index << "\n";
 			hashTable.addItem(v.pos);
 			glm::vec3 treePos = glm::vec3(v.pos.x * planeaScale, v.pos.y * planeaScale , v.pos.z * planeaScale) + planeaPos;
@@ -960,6 +967,11 @@ int main()
 			lockoutTimer = crntTime + 0.2;
 			for (auto pln : planeList)
 				pln->hotRealoadShader();
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_G) && lockoutTimer <= crntTime) {
+			std::cout << "\nAdding Gravity\n";
+			lockoutTimer = crntTime + 0.2;
+			
 		}
 		if (shouldFly) {
 			camera.set_camera_speed(2.f);

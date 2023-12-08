@@ -63,6 +63,8 @@ public:
 
 	std::vector <Vertex> vertices;
 	std::vector <GLuint> indices;
+
+	GLuint triangleType = GL_TRIANGLES;
 };
 
 #endif

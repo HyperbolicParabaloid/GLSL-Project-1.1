@@ -180,10 +180,10 @@ void Tree::genCone(glm::vec3 _startPos, glm::vec3 _endPos, float _bottomRadius, 
 		preVerts[oddIndex] = glm::vec3(limbModel * glm::vec4(x * _topRadius, _endPos.y, y * _topRadius, 1));//glm::mat3(model) * (glm::vec3(sin(theta2) * topRadius, 0.f, cos(theta2) * topRadius) + objPos + pointPos);
 
 		texCoords[evenIndex] = glm::vec2(u * 4, 0);
-		texCoords[oddIndex] = glm::vec2(u * 4, 1);	// 0.25 should be 1
+		texCoords[oddIndex] = glm::vec2(u * 4, 1 * 4);	// 0.25 should be 1
 	}
 	texCoords[vertsPerCone] = glm::vec2(4, 0);
-	texCoords[vertsPerCone + 1] = glm::vec2(4, 1);// 0.25 should be 1
+	texCoords[vertsPerCone + 1] = glm::vec2(4, 1 * 4);// 0.25 should be 1
 	setConeVertices();
 }
 // Adds the new cone's vertices and indices into the classes vertices and indcies vectors.
@@ -326,7 +326,7 @@ void Tree::genDome(float endRadius) {
 			// do the same thing with the texture coords. Perhaps. We shall see. Tomorrow. When I have coffee.
 			//
 			// I lied. A little. Should be something like:
-			texCoords[vertsPerSide * vv + uu] = glm::vec2(static_cast<float>(-uu) * 4 / (vertsPerSide - 1), static_cast<float>(-vv) * 4 / (vertsPerSide - 1));	// (0->1, 0->1)
+			texCoords[vertsPerSide * vv + uu] = glm::vec2(static_cast<float>(-uu) * 2 / (vertsPerSide - 1), static_cast<float>(-vv) * 2 / (vertsPerSide - 1));	// (0->1, 0->1)
 			GLfloat x, y, z = 0.f;
 			x = ((uu * 2) - (vertsPerSide - 1)) / (float)(vertsPerSide - 1);	// Goes from -1.f =>  1.f
 			y = ((vertsPerSide - 1) - (vv * 2)) / (float)(vertsPerSide - 1);	// Goes from  1.f => -1.f

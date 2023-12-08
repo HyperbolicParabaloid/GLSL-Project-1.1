@@ -48,14 +48,19 @@ float noise(vec2 n) {
 }
 
 float applyNoise(vec3 p) {
+	//if (p.x <= 0.f)
+		//return 0.f;
+
 	float scaledTime = time / 4.f;
-	float newY = (noise((p.xz + startPos.xz) + scaledTime) * 2.f) + (noise(((p.xz + startPos.xz) + scaledTime) * 1.2) * 1/8) + (noise(((p.xz + startPos.xz) + scaledTime) * 2) * 1/16) * 2 - 1;
+
+
+	float newY = (noise((p.xz + startPos.xz) + scaledTime) * 2.f) + (noise(((p.xz + startPos.xz) + scaledTime) * 1.2) * 1/2) + (noise(((p.xz + startPos.xz) + scaledTime) * 0.8) * 1/4) * 2 - 1;
 	//float newY = (noise(startPos.xz + p.xz) * 2.f) + (noise((startPos.xz + p.xz) * 1.2) * 1/8) + (noise((startPos.xz + p.xz) * 2) * 1/16);
-	return newY / 5.f;
+	return newY / 10.f;
 }
 
 vec3 calculateNoiseWave() {
-	float scalingFactor = sqrt(model[0][0] * model[0][0] + model[0][1] * model[0][1] + model[0][2] * model[0][2]);
+	//float scalingFactor = sqrt(model[0][0] * model[0][0] + model[0][1] * model[0][1] + model[0][2] * model[0][2]);
 	if (aNormal == vec3(0.f, -1.f, 0.f)) {
 		vec3 cPos = aPos; cPos.y = applyNoise(cPos);
 		vec3 v1 = vec3(cPos.x + 0.0001, cPos.yz); v1.y = applyNoise(v1);
@@ -119,10 +124,16 @@ vec3 calculateNoiseWave() {
 void main()
 {
 	crntPos = aPos;
+	float oldY = vec3(model * vec4(crntPos, 1.f)).y;	// In case this vert shouldn't have noise applied to it.
 	crntPos.y = applyNoise(crntPos);
-	//float newY = (noise(aPos.xz + time) * 2.f) + (noise((aPos.xz + time) * 1.2) * 1/8) + (noise((aPos.xz + time) * 2) * 1/16);
-	//crntPos.y += newY / 10.f;
+
 	crntPos = vec3(model * vec4(crntPos, 1.f));
+	if ((crntPos.x <= 0.f && crntPos.x >= -20.f) && (crntPos.z >= 0.f && crntPos.z <= 70.f)){// && crntPos.z <= 0.f && crntPos.z >= -20.f) {
+		Normal = transpose(inverse(mat3(model))) * vec3(0.f, 1.f, 0.f);
+		crntPos.y = oldY;
+	} else {
+		Normal = transpose(inverse(mat3(model))) * calculateNoiseWave();
+	}
 
 	//crntPos = vec3(model * vec4(aPos, 1.f));
 
@@ -141,6 +152,5 @@ void main()
 	//if (aNormal == vec3(0.f, -1.f, 0.f))
 		//Normal = transpose(inverse(mat3(model))) * calculateNoiseWave();
 	//else
-	Normal = transpose(inverse(mat3(model))) * calculateNoiseWave();
 
 }

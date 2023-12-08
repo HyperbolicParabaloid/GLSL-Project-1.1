@@ -41,7 +41,7 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 	if (name == "Tree" || name == "Plane")
 		glUniform3f(glGetUniformLocation(shaderProgram->ID, "startPos"), objPos.x / 25.f, objPos.y / 25.f, objPos.z / 25.f);
 	// Draw the actual mesh
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(triangleType, indices.size(), GL_UNSIGNED_INT, 0);
 
 
 }
