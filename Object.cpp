@@ -14,6 +14,14 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	textures = _textures;
 }
 
+bool Object::isTouching(Object* obj) {
+	float lenA = objScale * objRadius;
+	float lenB = obj->objScale * obj->objRadius;
+	if (glm::length(obj->objPos - objPos) <= lenA + lenB)
+		return true;
+	return false;
+}
+
 void Object::setNewPos(glm::vec3 _objPos) {
 	objPos = _objPos;
 	model = glm::translate(glm::mat4(1.f), objPos);

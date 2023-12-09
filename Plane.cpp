@@ -6,6 +6,7 @@ Plane::Plane(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level
 	isSmooth = _isSmooth;
 	randomColor = false;
 	seed = 1;
+	objRadius = sqrt(2);
 	genTriangles();
 }
 

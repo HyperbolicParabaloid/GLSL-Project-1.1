@@ -31,8 +31,6 @@ class Object
 private:
 	GLFWwindow* window;
 
-	glm::mat4 model;
-	glm::vec3 objPos;
 	std::vector <Texture> textures;
 
 	bool doNormalArrows;
@@ -46,8 +44,6 @@ public:
 	Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 color, std::vector <Texture>& _textures, Camera* _camera);
 	~Object();
 	void draw(glm::vec3 _lightPos, glm::vec4 _lightColor);
-	glm::vec4 color;
-	float objScale;
 	void setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg);
 	void setVBOandEBO(std::string msg);
 	void rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation);
@@ -61,10 +57,19 @@ public:
 	void toggleNormalArrows();
 	void setNewPos(glm::vec3 _objPos);
 
+	bool isTouching(Object* obj);
+
 	std::vector <Vertex> vertices;
 	std::vector <GLuint> indices;
 
 	GLuint triangleType = GL_TRIANGLES;
+	bool doPhysics = false;
+	bool isSolid = false;
+	glm::vec4 color;
+	float objScale;
+	float objRadius = 1.f;
+	glm::mat4 model;
+	glm::vec3 objPos;
 };
 
 #endif

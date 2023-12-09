@@ -19,6 +19,7 @@ private:
 
 	glm::vec3* preVerts = new glm::vec3[1];		// glm:V:ec3 array that gets resized and stuffed with vertex information.
 	glm::vec2* texCoords = new glm::vec2[1];	// glm::VecW array that gets resized and stuffed with texture coordinate information.
+	glm::vec3 radi;
 
 	int preVertsSize;
 	int level;
@@ -28,13 +29,14 @@ private:
 
 	int seed;
 public:
-	Sphere(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
+	Sphere(GLFWwindow* _window, glm::vec3 _objPos, glm::vec3 _radi, float _objScale, int _level, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
 	~Sphere();
 	void genOctahedron();
 	void setLevel(int _level);
 	void doRandomColors(bool _randomColor);
 	void reseed();
 	void smoothSurface(bool _isSmooth);
+	void setRadi(glm::vec3 _radi);
 };
 
 #endif

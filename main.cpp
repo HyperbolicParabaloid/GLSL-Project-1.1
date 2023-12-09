@@ -7,6 +7,16 @@
 #include"HashTable.h"
 #include"EditingSphere.h"
 
+float rand(glm::vec2 co) {
+	return glm::fract(sin(glm::dot(co, glm::vec2(12.9898, 78.233))) * 43758.5453);
+}
+
+float noise(glm::vec2 n) {
+	const glm::vec2 d = glm::vec2(0.0, 1.0);
+	glm::vec2 b = floor(n), f = glm::smoothstep(glm::vec2(0.0), glm::vec2(1.0), glm::fract(n));
+	return glm::mix(glm::mix(rand(b), rand(b + glm::vec2(d.y, b.x)), f.x), glm::mix(rand(b + glm::vec2(d.x, b.y)), rand(b + glm::vec2(d.y, b.y)), f.x), f.y);
+}
+
 
 
 // Setting up array of vertices.
@@ -153,7 +163,6 @@ GLfloat* finalVerts2 = new GLfloat[1];
 int finalVerts2Size;
 int vertsSize;
 int indicesSize;
-int level;
 
 glm::vec3 v1 = glm::vec3(1.f, 1.f, 1.f);	// 0
 glm::vec3 v2 = glm::vec3(1.f, 1.f, -1.f);	// 1
@@ -600,7 +609,8 @@ int main()
 	// Initializing matrices for model, view and projection
 	glm::mat4 view = glm::mat4(1.f);
 
-	Camera camera(window, glm::vec2(viewWidth, viewHeight), glm::vec3(0.f, 0.5f, 2.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
+	glm::vec3 camPos = glm::vec3(0.f, 0.5f, 2.f);
+	Camera camera(window, glm::vec2(viewWidth, viewHeight), camPos, glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
 	camera.set_projection(glm::radians(60.f), (float)(viewWidth / viewHeight), 0.01f, 1000.f);
 
 	double lockoutTimer = 0;
@@ -627,13 +637,12 @@ int main()
 	int planeLevel = 4;
 	float planeaScale = 25.f;
 	std::vector <Plane*> planeList;
-	glm::vec3 planeaPos = glm::vec3(0.f, -1.5f, 0.0f);
+	glm::vec3 planeaPos = glm::vec3(0.f, 0.f, 0.0f);
 	Plane planea(window, planeaPos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
+	//planea.rotate(45, glm::vec3(0.f, 0.f, 1.f));
+	//planea.rotate(90, glm::vec3(1.f, 0.f, 0.f));
 	planea.doRandomColors(true);
 	planea.setLevel(planeLevel);
-
-	//glm::vec3 editingSpherePos = glm::vec3(0.f, 25.f, 0.0f);
-	//EditingSphere editingSphere(window, editingSpherePos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
 
 	/*
 	//glm::vec3 plane1Pos = glm::vec3(-planeaScale * 2, -1.5f, -planeaScale * 2);
@@ -685,8 +694,10 @@ int main()
 	glm::vec3 cube3Pos = glm::vec3(0.0f, 2.f, -2.5f);
 	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), empty, &camera);
 
-	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
-	Sphere sphere1(window, sphere1Pos, 1.f, 4, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
+	int level = 4;
+	glm::vec3 sphere1Pos = glm::vec3(0.0f, 1.5f, 0.0f);
+	glm::vec3 sphere1Radi = glm::vec3(1.0f, 1.0f, 1.0f);
+	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.f, level, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 
 
 
@@ -713,6 +724,7 @@ int main()
 	std::vector <Cone*> coneList;
 	std::vector <Tree*> treeList;
 
+	
 
 	glm::vec3 newConePos = cone1Pos;
 	coneLevel = 3;
@@ -720,7 +732,7 @@ int main()
 	int hashTableSize = planea.vertices.size() / 2;
 	HashTable hashTable(hashTableSize);
 	int hashCount = 0;
-	std::cout << "hashTableSize = " << hashTableSize << "\n";
+	//std::cout << "hashTableSize = " << hashTableSize << "\n";
 	for (const Vertex& v : planea.vertices) {
 		int index = hashTable.isInTable(v.pos);
 		hashCount++;
@@ -741,7 +753,6 @@ int main()
 
 	float camSpeed = 10.f;
 	camera.set_camera_speed(camSpeed);
-	level = 4;
 	bool randomColor = true;
 	bool isSmooth = true;
 
@@ -775,6 +786,17 @@ int main()
 	int frames = 0;
 
 	glfwSetScrollCallback(window, scroll_callback);
+
+	
+
+
+	for (int pp = 0; pp < planeList.size(); pp++) {
+		if (planeList[pp]->isTouching(&sphere1))std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
+		//else									std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is NOT touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
+		if (sphere1.isTouching(planeList[pp]))	std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
+		//else									std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is NOT touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
+	}
+	
 	while (!glfwWindowShouldClose(window))
 	{
 		frames++;
@@ -793,10 +815,11 @@ int main()
 
 		if (crntTime - prevTime >= 1 / 60)
 		{
-			//rotation = 0.1f;
+			rotation = 0.1f;
 			prevTime = crntTime;
 			topRadius += 0.002f;
 		}
+		//planea.rotate(rotation, glm::vec3(1.f, 0.f, 0.f));
 
 
 		//float newTopRadius = (1 - glm::fract(topRadius)) * (int(glm::floor(topRadius)) % 2) + (glm::fract(topRadius)) * (int(glm::floor(topRadius + 1)) % 2);
@@ -805,6 +828,9 @@ int main()
 		//cone1.setBottomRadius(newTopRadius);
 
 
+		//camera.cameraPos.y = (noise((p.xz + startPos.xz) + scaledTime) * 2.f) + (noise(((p.xz + startPos.xz) + scaledTime) * 1.2) * 1 / 2) + (noise(((p.xz + startPos.xz) + scaledTime) * 0.8) * 1 / 4) * 2 - 1;
+
+		
 		if (setCamera != 0) {
 			if (setCamera > 0)
 				camSpeed *= 1.5f;
@@ -941,8 +967,8 @@ int main()
 
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Y) && lockoutTimer <= crntTime) {
 			isSmooth = !isSmooth;
-			//sphere1.smoothSurface(isSmooth);
-			//sphere1.setLevel(level);
+			sphere1.smoothSurface(isSmooth);
+			sphere1.setLevel(level);
 			//
 			//cone1.smoothSurface(isSmooth);
 			//cone1.setLevel(coneLevel);

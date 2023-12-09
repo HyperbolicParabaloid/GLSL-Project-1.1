@@ -1,11 +1,13 @@
 #include "Sphere.h"
 
 // Constructor for Sphere.
-Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
+Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, glm::vec3 _radi, float _objScale, int _level, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
 	level = _level;
 	isSmooth = _isSmooth;
 	randomColor = false;
 	seed = 1;
+	objRadius = 1.f;
+	radi = _radi;
 	genTriangles();
 }
 
@@ -158,7 +160,7 @@ void Sphere::genOctahedron() {
 			}
 
 			// Normalizing the vector, places the vertices of the Octehdron on the surface of the sphere.
-			preVerts[vertsPerSide * vv + uu] = glm::normalize(glm::vec3(x, y, z));
+			preVerts[vertsPerSide * vv + uu] = glm::normalize(glm::vec3(x, y, z)) * radi;
 			//preVerts[vertsPerSide * vv + uu] = glm::vec3(x, y, z);
 			//preVerts[vertsPerSide * vv + uu] = glm::vec3(-x, z, y);
 		}
@@ -250,13 +252,13 @@ void Sphere::setVerticesVector() {
 				verts.push_back(Vertex{ v6, n2, color2, tex6 });
 			}
 			else {
-				verts.push_back(Vertex{ v1, v1, color1, tex1 });
-				verts.push_back(Vertex{ v2, v2, color1, tex2 });
-				verts.push_back(Vertex{ v3, v3, color1, tex3 });
+				verts.push_back(Vertex{ v1, glm::normalize(v1 / radi) / radi, color1, tex1 });
+				verts.push_back(Vertex{ v2, glm::normalize(v2 / radi) / radi, color1, tex2 });
+				verts.push_back(Vertex{ v3, glm::normalize(v3 / radi) / radi, color1, tex3 });
 
-				verts.push_back(Vertex{ v4, v4, color2, tex4 });
-				verts.push_back(Vertex{ v5, v5, color2, tex5 });
-				verts.push_back(Vertex{ v6, v6, color2, tex6 });
+				verts.push_back(Vertex{ v4, glm::normalize(v4 / radi) / radi, color2, tex4 });
+				verts.push_back(Vertex{ v5, glm::normalize(v5 / radi) / radi, color2, tex5 });
+				verts.push_back(Vertex{ v6, glm::normalize(v6 / radi) / radi, color2, tex6 });
 			}
 			// Finally, setting the values of the Indices. I have it in such a way,
 			// that indices[n] = n; for all n; >= 0, < indices.size().
@@ -267,6 +269,10 @@ void Sphere::setVerticesVector() {
 		}
 	}
 
+}
+
+void Sphere::setRadi(glm::vec3 _radi) {
+	radi = _radi;
 }
 
 // Destructor of Sphere class.
