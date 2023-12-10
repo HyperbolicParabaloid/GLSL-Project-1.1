@@ -57,19 +57,31 @@ public:
 	void toggleNormalArrows();
 	void setNewPos(glm::vec3 _objPos);
 
-	bool isTouching(Object* obj);
-
+	std::vector <Triangle> triangles;
 	std::vector <Vertex> vertices;
 	std::vector <GLuint> indices;
 
 	GLuint triangleType = GL_TRIANGLES;
-	bool doPhysics = false;
-	bool isSolid = false;
 	glm::vec4 color;
 	float objScale;
 	float objRadius = 1.f;
 	glm::mat4 model;
 	glm::vec3 objPos;
+
+	// Physics elements
+	float mass = -1.f;
+	float velovity = 0.f;
+	float acceleration = 0.f;
+	float rotationalVelovity = 0.f;
+
+	bool isTouching(Object* obj);
+	bool isTouching(Triangle* tri);
+	glm::vec3 getIntersection(Object* obj);
+
+	bool doPhysics = false;
+	bool isSolid = false;
+
+	bool isWireframe = false;
 };
 
 #endif

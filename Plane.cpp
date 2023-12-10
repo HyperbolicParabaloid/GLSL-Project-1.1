@@ -86,6 +86,10 @@ void Plane::genOctahedron() {
 			}
 		}
 	}
+	// Make this dependant on physics being enabled potentially.
+	if (true)
+		for (int ii = 0; ii < indices.size(); ii+=3)
+			triangles.push_back(Triangle{ &verts[indices[ii + 0]], &verts[indices[ii + 1]] , &verts[indices[ii + 2]], &model });
 }
 
 // Destructor of Sphere class.

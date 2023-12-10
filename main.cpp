@@ -589,7 +589,7 @@ int main()
 
 	// Setting up matrices for both the light and pyramid models.
 	glm::vec4 lightColor = glm::vec4(.8f, .8f, 1.f, 1.f);
-	glm::vec3 lightPos = glm::vec3(1.5f, 1.5f, 0.5f);
+	glm::vec3 lightPos = glm::vec3(1.5f, 5.5f, 0.5f);
 	glm::mat4 lightModel = glm::mat4(1.f);
 	lightModel = glm::translate(lightModel, lightPos);
 
@@ -637,7 +637,7 @@ int main()
 	int planeLevel = 4;
 	float planeaScale = 25.f;
 	std::vector <Plane*> planeList;
-	glm::vec3 planeaPos = glm::vec3(0.f, 0.f, 0.0f);
+	glm::vec3 planeaPos = glm::vec3(0.f, -1.5f, 0.0f);
 	Plane planea(window, planeaPos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
 	//planea.rotate(45, glm::vec3(0.f, 0.f, 1.f));
 	//planea.rotate(90, glm::vec3(1.f, 0.f, 0.f));
@@ -671,7 +671,9 @@ int main()
 	*/
 	planeList.push_back(&planea);
 	
+	float startPlaneTime = glfwGetTime();
 	int start = -8, end = 8;
+	std::cout << "Making " << start << " -> " << end << " planes(" << end + 1 << "x" << end + 1 <<") took ";
 	float offset = (planeaScale * 2);
 	for (int vv = end; vv >= start; vv--) {
 		for (int uu = start; uu <= end; uu++) {
@@ -681,6 +683,7 @@ int main()
 			}
 		}
 	}
+	std::cout << glfwGetTime() - startPlaneTime << " seconds\n";
 	
 	float cube1y = -1.5 + sqrt(3);
 	glm::vec3 cube1Pos = glm::vec3(-2.5f, cube1y, -2.5f);
@@ -733,23 +736,23 @@ int main()
 	HashTable hashTable(hashTableSize);
 	int hashCount = 0;
 	//std::cout << "hashTableSize = " << hashTableSize << "\n";
-	for (const Vertex& v : planea.vertices) {
-		int index = hashTable.isInTable(v.pos);
-		hashCount++;
-		if (index == -1){//}&& hashCount % 2 == 0) {
-			//std::cout << "index = " << index << "\n";
-			hashTable.addItem(v.pos);
-			glm::vec3 treePos = glm::vec3(v.pos.x * planeaScale, v.pos.y * planeaScale , v.pos.z * planeaScale) + planeaPos;
-			treeList.push_back(new Tree(window, treePos, 0.4f, tree1ConeLevel, tree1SphereLevel, 1.0f, tree1PointPos, true, cone1ShaftColor, tex, &camera));
-			//coneList.push_back(new Cone(window, treePos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
-		}
-		//std::cout << "Not in table, index = " << index << "\n";
-	}
+	//for (const Vertex& v : planea.vertices) {
+	//	int index = hashTable.isInTable(v.pos);
+	//	hashCount++;
+	//	if (index == -1){//}&& hashCount % 2 == 0) {
+	//		//std::cout << "index = " << index << "\n";
+	//		hashTable.addItem(v.pos);
+	//		glm::vec3 treePos = glm::vec3(v.pos.x * planeaScale, v.pos.y * planeaScale , v.pos.z * planeaScale) + planeaPos;
+	//		treeList.push_back(new Tree(window, treePos, 0.4f, tree1ConeLevel, tree1SphereLevel, 1.0f, tree1PointPos, true, cone1ShaftColor, tex, &camera));
+	//		//coneList.push_back(new Cone(window, treePos, 1.f, coneLevel, 1.0f, 0.0f, cone1Tip, true, cone1ShaftColor, cone1ConeColor, empty, &camera));
+	//	}
+	//	//std::cout << "Not in table, index = " << index << "\n";
+	//}
 	objectList.push_back(&tree1);
 	objectList.push_back(&sphere1);
-	objectList.push_back(&cube1);
-	objectList.push_back(&cube2);
-	objectList.push_back(&cube3);
+	//objectList.push_back(&cube1);
+	//objectList.push_back(&cube2);
+	//objectList.push_back(&cube3);
 
 	float camSpeed = 10.f;
 	camera.set_camera_speed(camSpeed);
@@ -791,9 +794,29 @@ int main()
 
 
 	for (int pp = 0; pp < planeList.size(); pp++) {
-		if (planeList[pp]->isTouching(&sphere1))std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
+		if (planeList[pp]->isTouching(&sphere1)) {
+			std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n"; {
+				glm::vec3 newSpherePos = planeList[pp]->objPos;
+				glm::vec3 newSphereRadi = glm::vec3(planeList[pp]->objRadius * planeList[pp]->objScale);
+				glm::vec4 color = planeList[pp]->color;
+
+				objectList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, 1.f, 6, true, color, empty, &camera });
+				objectList.back()->isWireframe = true;
+				for (Triangle tri : planeList[pp]->triangles)
+					if (sphere1.isTouching(&tri)) {
+						std::cout << "Touching triangle centered at (" << tri.center.x << ", " << tri.center.y << ", " << tri.center.z << ")\n";
+						glm::vec3 newSpherePos = tri.center;
+						glm::vec3 newSphereRadi = glm::vec3(tri.radius);
+						glm::vec4 color = tri.v1->color;
+
+						objectList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, .1f, 6, true, color, empty, &camera });
+						objectList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, 1.f, 6, true, color, empty, &camera });
+						objectList.back()->isWireframe = true;
+					}
+			}
+		}
 		//else									std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is NOT touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
-		if (sphere1.isTouching(planeList[pp]))	std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
+		//if (sphere1.isTouching(planeList[pp]))	std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
 		//else									std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is NOT touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
 	}
 	

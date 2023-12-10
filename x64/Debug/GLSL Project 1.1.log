@@ -7,11 +7,12 @@ C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(11,19): warn
           ]
 C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(247,14): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
 C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(603,33): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(685,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(732,20): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(785,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(812,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(819,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(674,23): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(688,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(735,20): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(788,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(835,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(842,15): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(601,8): warning C4101: 'frac': unreferenced local variable
 C:\Users\riley\source\repos\GLSL Project Working Directory\main.cpp(601,14): warning C4101: 'whole': unreferenced local variable
   GLSL Project 1.1.vcxproj -> C:\Users\riley\source\repos\GLSL Project Working Directory\x64\Debug\GLSL Project 1.1.exe

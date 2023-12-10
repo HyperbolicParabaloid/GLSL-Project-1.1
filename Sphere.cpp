@@ -260,6 +260,10 @@ void Sphere::setVerticesVector() {
 				verts.push_back(Vertex{ v5, glm::normalize(v5 / radi) / radi, color2, tex5 });
 				verts.push_back(Vertex{ v6, glm::normalize(v6 / radi) / radi, color2, tex6 });
 			}
+			triangles.push_back(Triangle{ &verts[indCount + 0], &verts[indCount + 1] , &verts[indCount + 2], &model });
+			triangles.push_back(Triangle{ &verts[indCount + 3], &verts[indCount + 4] , &verts[indCount + 5], &model });
+
+
 			// Finally, setting the values of the Indices. I have it in such a way,
 			// that indices[n] = n; for all n; >= 0, < indices.size().
 			for (int ii = 0; ii < 6; ii++) {

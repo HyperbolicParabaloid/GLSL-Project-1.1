@@ -14,14 +14,6 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	textures = _textures;
 }
 
-bool Object::isTouching(Object* obj) {
-	float lenA = objScale * objRadius;
-	float lenB = obj->objScale * obj->objRadius;
-	if (glm::length(obj->objPos - objPos) <= lenA + lenB)
-		return true;
-	return false;
-}
-
 void Object::setNewPos(glm::vec3 _objPos) {
 	objPos = _objPos;
 	model = glm::translate(glm::mat4(1.f), objPos);
@@ -38,6 +30,11 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 	// Activating the shader program and binding the VAO so OpenGL knows what we're trying to do.
 	shaderProgram->Activate();
 	VAO.Bind();
+
+	if (isWireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// Assigning all relevant info to the shader.
 	glUniform3f(glGetUniformLocation(shaderProgram->ID, "camPos"), camera->cameraPos.x, camera->cameraPos.y, camera->cameraPos.z);
@@ -312,4 +309,36 @@ void Object::hotRealoadShader() {
 
 void Object::toggleNormalArrows() {
 	doNormalArrows = !doNormalArrows;
+}
+
+// Physics interactions.
+
+// Returns true if the bounding spheres of two objects overlap. This does not nessicarily mean that
+// the two meshes actually touch. That's a much more expensive computation handled in getIntersection.
+bool Object::isTouching(Object* obj) {
+	float lenA = objScale * objRadius;
+	float lenB = obj->objScale * obj->objRadius;
+	if (glm::length(obj->objPos - objPos) <= lenA + lenB)
+		return true;
+	return false;
+}
+bool Object::isTouching(Triangle* tri) {
+	tri->genCircle();
+	float lenA = objScale * objRadius;
+	float lenB = tri->radius;
+	if (glm::length(tri->center - objPos) <= lenA + lenB)
+		return true;
+	return false;
+}
+
+// Finds the exact spot (if it exits) on the current object's mesh where the given object's mesh is touching
+// it. From this we can use their relative kinematic values to determine each ones new values based on this
+// collision.
+glm::vec3 Object::getIntersection(Object* obj) {
+	// So in general, we need to ask every triangle on each object if they're colliding with each other.
+	// This will be pretty obviously slow as death. Though it won't change from being O(n^2), adding a 
+	// heuristic to guess at which triangles would be best to search first would be smart. 
+
+
+	return glm::vec3(0.f);
 }
