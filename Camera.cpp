@@ -177,7 +177,7 @@ void Camera::track_movement() {
 // Flies the camera to a specified location and faces the camera to new newly specified direction
 bool Camera::fly_to(glm::vec3 _newPos, glm::vec3 _newForward, bool lockCursorMovement) {
 
-	bool mouseIsDone = setMousePos(_newForward, lockCursorMovement);
+	bool mouseIsDone = setMousePos(_newForward, lockCursorMovement, false);
 
 	// Making sure framerate is constant among all framerates.
 	// NOTE: if we don't have delta time updated in view or something of that nature, we'll get
@@ -258,7 +258,7 @@ bool Camera::fly_to(glm::vec3 _newPos) {
 }
 
 // Turns the camera to aim at the specified vector
-bool Camera::setMousePos(glm::vec3 _newForward, bool lockCursorMovement) {
+bool Camera::setMousePos(glm::vec3 _newForward, bool lockCursorMovement, bool _snap) {
 	// This values controls at what point the cameraForward vector will snap onto the target,
 	// without it the function will run essentially forever getting infinitely closer but never
 	// reaching it due to decaying size of the deltaForward and floating point errors.
@@ -272,6 +272,10 @@ bool Camera::setMousePos(glm::vec3 _newForward, bool lockCursorMovement) {
 
 	// Getting new delta of the position.
 	glm::vec3 deltaForward = (_newForward - cameraForward) * speed;
+	if (_snap) {
+		cameraForward = _newForward;
+		return true;
+	}
 
 	// Setting new cameraForward position for:
 	// For x

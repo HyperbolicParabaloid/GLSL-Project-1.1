@@ -697,7 +697,7 @@ int main()
 	glm::vec3 cube3Pos = glm::vec3(0.0f, 2.f, -2.5f);
 	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), empty, &camera);
 
-	int level = 4;
+	int level = 6;
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 1.5f, 0.0f);
 	glm::vec3 sphere1Radi = glm::vec3(1.0f, 1.0f, 1.0f);
 	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.f, level, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
@@ -793,33 +793,37 @@ int main()
 	
 
 
-	for (int pp = 0; pp < planeList.size(); pp++) {
-		if (planeList[pp]->isTouching(&sphere1)) {
-			std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n"; {
-				glm::vec3 newSpherePos = planeList[pp]->objPos;
-				glm::vec3 newSphereRadi = glm::vec3(planeList[pp]->objRadius * planeList[pp]->objScale);
-				glm::vec4 color = planeList[pp]->color;
+	//startPlaneTime = glfwGetTime();
+	//for (int pp = 0; pp < planeList.size(); pp++) {
+	//	if (planeList[pp]->isTouching(&sphere1)) {
+	//		//std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
+	//		glm::vec3 newSpherePos = planeList[pp]->objPos;
+	//		glm::vec3 newSphereRadi = glm::vec3(planeList[pp]->objRadius * planeList[pp]->objScale);
+	//		glm::vec4 color = planeList[pp]->color;
+	//
+	//		objectList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, 1.f, level, true, color, empty, &camera });
+	//		objectList.back()->isWireframe = true;
+	//		for (Triangle tri : planeList[pp]->triangles) {
+	//			if (sphere1.isTouching(&tri)) {
+	//				//std::cout << "Touching triangle centered at (" << tri.center.x << ", " << tri.center.y << ", " << tri.center.z << ")\n";
+	//				glm::vec3 newSpherePos = tri.center;
+	//				glm::vec3 newSphereRadi = glm::vec3(tri.radius);
+	//				glm::vec4 color = tri.v1->color;
+	//
+	//				objectList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, .1f, level, true, color, empty, &camera });
+	//				objectList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, 1.f, level, true, color, empty, &camera });
+	//				objectList.back()->isWireframe = true;
+	//			}
+	//		}
+	//	}
+	//	//else									std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is NOT touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
+	//	//if (sphere1.isTouching(planeList[pp]))	std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
+	//	//else									std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is NOT touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
+	//}
+	//std::cout << "Searching through the planes took " << glfwGetTime() - startPlaneTime << " seconds\n";
 
-				objectList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, 1.f, 6, true, color, empty, &camera });
-				objectList.back()->isWireframe = true;
-				for (Triangle tri : planeList[pp]->triangles)
-					if (sphere1.isTouching(&tri)) {
-						std::cout << "Touching triangle centered at (" << tri.center.x << ", " << tri.center.y << ", " << tri.center.z << ")\n";
-						glm::vec3 newSpherePos = tri.center;
-						glm::vec3 newSphereRadi = glm::vec3(tri.radius);
-						glm::vec4 color = tri.v1->color;
+	bool trackSphere = false;
 
-						objectList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, .1f, 6, true, color, empty, &camera });
-						objectList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, 1.f, 6, true, color, empty, &camera });
-						objectList.back()->isWireframe = true;
-					}
-			}
-		}
-		//else									std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is NOT touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
-		//if (sphere1.isTouching(planeList[pp]))	std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
-		//else									std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is NOT touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
-	}
-	
 	while (!glfwWindowShouldClose(window))
 	{
 		frames++;
@@ -850,8 +854,43 @@ int main()
 		//cone1.setTopRadius(newTopRadius);
 		//cone1.setBottomRadius(newTopRadius);
 
+		//camera.setMousePos(sphere1.objPos - camera.cameraPos, true, true);
 
-		//camera.cameraPos.y = (noise((p.xz + startPos.xz) + scaledTime) * 2.f) + (noise(((p.xz + startPos.xz) + scaledTime) * 1.2) * 1 / 2) + (noise(((p.xz + startPos.xz) + scaledTime) * 0.8) * 1 / 4) * 2 - 1;
+
+		startPlaneTime = glfwGetTime();
+		for (int pp = 0; pp < planeList.size(); pp++) {
+			if (planeList[pp]->isTouching(&sphere1)) {
+				//std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
+				glm::vec3 newSpherePos = planeList[pp]->objPos;
+				glm::vec3 newSphereRadi = glm::vec3(planeList[pp]->objRadius * planeList[pp]->objScale);
+				glm::vec4 color = planeList[pp]->color;
+
+				//objectList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, 1.f, 2, true, color, empty, &camera });
+				//objectList.back()->isWireframe = true;
+				Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
+				newSphere.isWireframe = true;
+				newSphere.draw(lightPos, lightColor);
+				for (Triangle tri : planeList[pp]->triangles) {
+					if (sphere1.isTouching(&tri)) {
+						//std::cout << "Touching triangle centered at (" << tri.center.x << ", " << tri.center.y << ", " << tri.center.z << ")\n";
+						glm::vec3 newSpherePos = tri.center;
+						glm::vec3 newSphereRadi = glm::vec3(tri.radius);
+						glm::vec4 color = tri.v1->color;
+
+						Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
+						newSphere.isWireframe = true;
+						newSphere.draw(lightPos, lightColor);
+					}
+				}
+			}
+			//else									std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is NOT touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
+			//if (sphere1.isTouching(planeList[pp]))	std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
+			//else									std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is NOT touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
+		}
+		//std::cout << "Searching through the planes took " << glfwGetTime() - startPlaneTime << " seconds\n";
+
+		if (!shouldFly && trackSphere)
+			camera.setMousePos(sphere1.objPos - camera.cameraPos, true, true);
 
 		
 		if (setCamera != 0) {
@@ -871,25 +910,29 @@ int main()
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
 			tree1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
-			sphere1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
+			sphere1.setNewPos(sphere1.objPos + glm::vec3(-0.1f, 0.f, 0.f));
+			//sphere1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
 			//planeaPos.x -= 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_UP)) {
 			tree1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
-			sphere1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
+			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.f, -0.1f));
+			//sphere1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
 			//planeaPos.y += 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_DOWN)) {
 			tree1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
-			sphere1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
+			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.f, 0.1f));
+			//sphere1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
 			//planeaPos.y -= 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_RIGHT)) {
 			tree1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
-			sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
+			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.1f, 0.f, 0.f));
+			//sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 			//planeaPos.x += 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
@@ -1004,7 +1047,8 @@ int main()
 			std::cout << "\nLevel: " << level << "\n";
 			lockoutTimer = crntTime + 0.2;
 			std::cout << "Flyin' in\n";
-			shouldFly = true;
+			trackSphere = !trackSphere;
+			shouldFly = trackSphere;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_I) && lockoutTimer <= crntTime) {
 			std::cout << "\nMessing with Vertex: " << level << "\n";
@@ -1025,7 +1069,7 @@ int main()
 		if (shouldFly) {
 			camera.set_camera_speed(2.f);
 			camSpeed = 10.f;
-			if (camera.fly_to(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 0.125f, -1.f), true)) {
+			if (camera.fly_to(sphere1.objPos + glm::vec3(0.f, 0.f, 3.f), sphere1.objPos - camera.cameraPos, true)) {
 				shouldFly = false;
 				camera.set_camera_speed(camSpeed);
 			}

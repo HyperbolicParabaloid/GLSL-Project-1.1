@@ -55,9 +55,10 @@ public:
 	void track_movement();	// Tracks movements of player
 	glm::mat4 get_view();	// Returns the view matrix
 
+	bool lookAtObj(glm::vec3 _objPos);
 	bool fly_to(glm::vec3 newPos, glm::vec3 newForward, bool lockCursorMovement);	// Specifying a position, forward and option to lock camera
 	bool fly_to(glm::vec3 newPos);	// Specifying a position
-	bool setMousePos(glm::vec3 _newForward, bool lockCursorMovement);	// forward and option to lock camera
+	bool setMousePos(glm::vec3 _newForward, bool _lockCursorMovement, bool _snap);	// forward and option to lock camera
 
 	void camMatrixForShader(Shader& _newShader, const char* uniformName);	// Sets the view matrix for the camera whatever shader program and uniform name are provided
 	//void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
