@@ -29,9 +29,9 @@ struct Triangle {
 		radius = std::max({ glm::length(vec_1 - center), glm::length(vec_2 - center), glm::length(vec_3 - center) });
 	}
 	// Pointers to the stored vertices.
-	Vertex* v1;	
-	Vertex* v2; 
-	Vertex* v3; 
+	Vertex* v1;
+	Vertex* v2;
+	Vertex* v3;
 
 	// World space coordiantes of the vertices.
 	glm::vec3 vec_1;

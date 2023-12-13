@@ -80,15 +80,17 @@ Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, glm::vec3 _radi, float _o
 // class for drawing.
 void Sphere::genTriangles() {
 	genOctahedron();
-	setVBOandEBO(verts, indices, "Sphere");
+	//setVBOandEBO(verts, indices, "Sphere");
+	setVBOandEBO("Sphere");
 }
 
 void Sphere::genOctahedron() {
 	// Whenever we generate a new set a vertices and indices, we want to wipe the old ones.
 	// In the future it'd be better to just add in the new vertices and update indices instead
 	// of clearing both indices and verts and starting over but it's fine for now.
-	verts.clear();
+	vertices.clear();
 	indices.clear();
+	triangles.clear();
 
 	if (level < 1)
 		level = 1;
@@ -243,25 +245,25 @@ void Sphere::setVerticesVector() {
 				glm::vec3 n1 = glm::normalize(glm::cross(v3 - v2, v1 - v2));
 				glm::vec3 n2 = glm::normalize(glm::cross(v6 - v5, v4 - v5));
 
-				verts.push_back(Vertex{ v1, n1, color1, tex1 });
-				verts.push_back(Vertex{ v2, n1, color1, tex2 });
-				verts.push_back(Vertex{ v3, n1, color1, tex3 });
+				vertices.push_back(Vertex{ v1, n1, color1, tex1 });
+				vertices.push_back(Vertex{ v2, n1, color1, tex2 });
+				vertices.push_back(Vertex{ v3, n1, color1, tex3 });
 
-				verts.push_back(Vertex{ v4, n2, color2, tex4 });
-				verts.push_back(Vertex{ v5, n2, color2, tex5 });
-				verts.push_back(Vertex{ v6, n2, color2, tex6 });
+				vertices.push_back(Vertex{ v4, n2, color2, tex4 });
+				vertices.push_back(Vertex{ v5, n2, color2, tex5 });
+				vertices.push_back(Vertex{ v6, n2, color2, tex6 });
 			}
 			else {
-				verts.push_back(Vertex{ v1, glm::normalize(v1 / radi) / radi, color1, tex1 });
-				verts.push_back(Vertex{ v2, glm::normalize(v2 / radi) / radi, color1, tex2 });
-				verts.push_back(Vertex{ v3, glm::normalize(v3 / radi) / radi, color1, tex3 });
+				vertices.push_back(Vertex{ v1, glm::normalize(v1 / radi) / radi, color1, tex1 });
+				vertices.push_back(Vertex{ v2, glm::normalize(v2 / radi) / radi, color1, tex2 });
+				vertices.push_back(Vertex{ v3, glm::normalize(v3 / radi) / radi, color1, tex3 });
 
-				verts.push_back(Vertex{ v4, glm::normalize(v4 / radi) / radi, color2, tex4 });
-				verts.push_back(Vertex{ v5, glm::normalize(v5 / radi) / radi, color2, tex5 });
-				verts.push_back(Vertex{ v6, glm::normalize(v6 / radi) / radi, color2, tex6 });
+				vertices.push_back(Vertex{ v4, glm::normalize(v4 / radi) / radi, color2, tex4 });
+				vertices.push_back(Vertex{ v5, glm::normalize(v5 / radi) / radi, color2, tex5 });
+				vertices.push_back(Vertex{ v6, glm::normalize(v6 / radi) / radi, color2, tex6 });
 			}
-			triangles.push_back(Triangle{ &verts[indCount + 0], &verts[indCount + 1] , &verts[indCount + 2], &model });
-			triangles.push_back(Triangle{ &verts[indCount + 3], &verts[indCount + 4] , &verts[indCount + 5], &model });
+			triangles.push_back(Triangle{ &vertices[indCount + 0], &vertices[indCount + 1] , &vertices[indCount + 2], &model });
+			triangles.push_back(Triangle{ &vertices[indCount + 3], &vertices[indCount + 4] , &vertices[indCount + 5], &model });
 
 
 			// Finally, setting the values of the Indices. I have it in such a way,

@@ -70,12 +70,15 @@ public:
 
 	// Physics elements
 	float mass = -1.f;
-	float velovity = 0.f;
+	float velocity = 0.f;
 	float acceleration = 0.f;
-	float rotationalVelovity = 0.f;
+	float rotationalVelocity = 0.f;
 
 	bool isTouching(Object* obj);
 	bool isTouching(Triangle* tri);
+	bool isTouching(Triangle* tri, int index);
+	bool triangleIntersection(Triangle* tri, int index);
+	bool triangleIntersection(Triangle* tri);
 	glm::vec3 getIntersection(Object* obj);
 
 	bool doPhysics = false;

@@ -15,15 +15,17 @@ Plane::Plane(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level
 void Plane::genTriangles() {
 	//triangleType = GL_TRIANGLE_STRIP;
 	genOctahedron();
-	setVBOandEBO(verts, indices, "Plane");
+	//setVBOandEBO(verts, indices, "Plane");
+	setVBOandEBO("Plane");
 }
 
 void Plane::genOctahedron() {
 	// Whenever we generate a new set a vertices and indices, we want to wipe the old ones.
 	// In the future it'd be better to just add in the new vertices and update indices instead
 	// of clearing both indices and verts and starting over but it's fine for now.
-	verts.clear();
+	vertices.clear();
 	indices.clear();
+	triangles.clear();
 
 	if (level < 1)
 		level = 1;
@@ -67,9 +69,9 @@ void Plane::genOctahedron() {
 				clr = glm::vec4(r1, r2, r3, 1.f);
 			}
 			vert = glm::vec3(x, y, z);
-			norm = glm::vec3(0.f, -1.f, 0.f);
+			norm = glm::vec3(0.f, 1.f, 0.f);	// should be glm::vec3(0.f, -1.f, 0.f); !!!!!!!!!!!
 
-			verts.push_back(Vertex{ vert, norm, clr, tex });
+			vertices.push_back(Vertex{ vert, norm, clr, tex });
 			if (uu + 1 < vertsPerSide && vv + 1 < vertsPerSide) {
 				int i0 = vertsPerSide * vv + uu;
 				int i1 = vertsPerSide * vv + (uu + 1);
@@ -89,7 +91,7 @@ void Plane::genOctahedron() {
 	// Make this dependant on physics being enabled potentially.
 	if (true)
 		for (int ii = 0; ii < indices.size(); ii+=3)
-			triangles.push_back(Triangle{ &verts[indices[ii + 0]], &verts[indices[ii + 1]] , &verts[indices[ii + 2]], &model });
+			triangles.push_back(Triangle{ &vertices[indices[ii + 0]], &vertices[indices[ii + 1]] , &vertices[indices[ii + 2]], &model });
 }
 
 // Destructor of Sphere class.

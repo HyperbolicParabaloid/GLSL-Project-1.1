@@ -15,8 +15,8 @@ private:
 	void genTriangles();
 	int numVertsPerSide(int _level);
 
-	std::vector <Vertex> verts;		// Vertex vector that gets sent to Object class to put information into the GPU.
-	std::vector <GLuint> indices;	// GLuint vector that gets sent to Object class to put indices into the GPU.
+	//std::vector <Vertex> verts;		// Vertex vector that gets sent to Object class to put information into the GPU.
+	//std::vector <GLuint> indices;	// GLuint vector that gets sent to Object class to put indices into the GPU.
 
 	int level;
 
