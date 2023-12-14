@@ -700,7 +700,8 @@ int main()
 	int level = 4;
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 1.5f, 0.0f);
 	glm::vec3 sphere1Radi = glm::vec3(1.0f, 1.0f, 1.0f);
-	Sphere sphere1(window, sphere1Pos, sphere1Radi, 4.f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
+	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
+	sphere1.isSolid = true;
 	sphere1.setLevel(level);
 
 	//glm::vec3 test1 = glm::vec3(1.f, 1.f, 0.f);
@@ -887,25 +888,66 @@ int main()
 				newSphere.draw(lightPos, lightColor);
 				for (Triangle tri : planeList[pp]->triangles) {
 					if (sphere1.isTouching(&tri)) {
+						//newSphere.isWireframe = true;
+						//newSphere.draw(lightPos, lightColor);
+						//glm::vec3 newSpherePos = tri.center;
+						//glm::vec3 newSphereRadi = glm::vec3(tri.radius);
+						//glm::vec4 color = tri.v1->color;
+						//
+						//Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
+						//newSphere.isWireframe = true;
+						//newSphere.draw(lightPos, lightColor);
 						for (int tt = 0; tt < sphere1.triangles.size(); tt++) {
 							tri.genCircle();
-							if (sphere1.isTouching(&tri, tt)) {
+
+							glm::vec3 p1 = glm::vec3(-10000.f), p2 = glm::vec3(-10000.f), p3 = glm::vec3(-10000.f);
+
+
+							if (sphere1.isTouching(&tri, tt, &p1, &p2, &p3)) {
 								//std::cout << "Touching triangle centered at (" << tri.center.x << ", " << tri.center.y << ", " << tri.center.z << ")\n";
 								//glm::vec3 newSpherePos = tri.center;
 								//glm::vec3 newSphereRadi = glm::vec3(tri.radius);
 								//glm::vec4 color = tri.v1->color;
 								//Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
+								if (p1.x > -10000.f) {
+									//std::cout << "p1 = (" << p1.x << ", " << p1.y << ", " << p1.z << ")\n";
 
+									newSphere.isWireframe = true;
+									newSphere.draw(lightPos, lightColor);
+									glm::vec3 newSpherePos = p1;// sphere1.triangles[tt].center;
+									glm::vec3 newSphereRadi = glm::vec3(sphere1.triangles[tt].radius) / 5.f;
+									glm::vec4 color = sphere1.triangles[tt].v1->color;
 
-								newSphere.isWireframe = true;
-								newSphere.draw(lightPos, lightColor);
-								glm::vec3 newSpherePos = sphere1.triangles[tt].center;
-								glm::vec3 newSphereRadi = glm::vec3(sphere1.triangles[tt].radius);
-								glm::vec4 color = sphere1.triangles[tt].v1->color;
+									Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
+									newSphere.isWireframe = true;
+									newSphere.draw(lightPos, lightColor);
+								}
+								if (p2.x > -10000.f) {
+									//std::cout << "p2 = (" << p2.x << ", " << p2.y << ", " << p2.z << ")\n";
+								
+									newSphere.isWireframe = true;
+									newSphere.draw(lightPos, lightColor);
+									glm::vec3 newSpherePos = p2;// sphere1.triangles[tt].center;
+									glm::vec3 newSphereRadi = glm::vec3(sphere1.triangles[tt].radius) / 5.f;
+									glm::vec4 color = sphere1.triangles[tt].v1->color;
+								
+									Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
+									newSphere.isWireframe = true;
+									newSphere.draw(lightPos, lightColor);
+								}
+								if (p3.x > -10000.f) {
+									//std::cout << "p3 = (" << p3.x << ", " << p3.y << ", " << p3.z << ")\n";
 
-								Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
-								newSphere.isWireframe = true;
-								newSphere.draw(lightPos, lightColor);
+									newSphere.isWireframe = true;
+									newSphere.draw(lightPos, lightColor);
+									glm::vec3 newSpherePos = p3;// sphere1.triangles[tt].center;
+									glm::vec3 newSphereRadi = glm::vec3(sphere1.triangles[tt].radius) / 5.f;
+									glm::vec4 color = sphere1.triangles[tt].v1->color;
+
+									Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
+									newSphere.isWireframe = true;
+									newSphere.draw(lightPos, lightColor);
+								}
 							}
 						}
 					}
@@ -938,42 +980,42 @@ int main()
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
 			tree1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
-			sphere1.setNewPos(sphere1.objPos + glm::vec3(-0.05f, 0.f, 0.f));
+			sphere1.setNewPos(sphere1.objPos + glm::vec3(-0.01f, 0.f, 0.f));
 			//sphere1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
 			//planeaPos.x -= 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_UP)) {
 			tree1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
-			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.f, -0.05f));
+			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.f, -0.01f));
 			//sphere1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
 			//planeaPos.y += 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_DOWN)) {
 			tree1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
-			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.f, 0.05f));
+			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.f, 0.01f));
 			//sphere1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
 			//planeaPos.y -= 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_RIGHT)) {
 			tree1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
-			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.05f, 0.f, 0.f));
+			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.01f, 0.f, 0.f));
 			//sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 			//planeaPos.x += 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Z)) {
 			tree1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
-			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, -0.05f, 0.f));
+			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, -0.01f, 0.f));
 			//sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 			//planeaPos.x += 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_X)) {
 			tree1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
-			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.05f, 0.f));
+			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.01f, 0.f));
 			//sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 			//planeaPos.x += 0.01f;
 			//planea.setNewPos(planeaPos);
