@@ -395,9 +395,9 @@ bool Object::triangleIntersection(Triangle* tri, int index) {
 		// ridiculous set of calculations as is.
 		glm::vec3 pointOnPlane = triangles[index].center + triNorm * t;
 
-		glm::vec3 edge13_norm = glm::cross(triNorm, tri->vec_1 - tri->vec_3);
-		glm::vec3 edge21_norm = glm::cross(triNorm, tri->vec_2 - tri->vec_1);
-		glm::vec3 edge32_norm = glm::cross(triNorm, tri->vec_3 - tri->vec_2);
+		glm::vec3 edge13_norm = glm::normalize(glm::cross(triNorm, tri->vec_1 - tri->vec_3));
+		glm::vec3 edge21_norm = glm::normalize(glm::cross(triNorm, tri->vec_2 - tri->vec_1));
+		glm::vec3 edge32_norm = glm::normalize(glm::cross(triNorm, tri->vec_3 - tri->vec_2));
 
 		glm::vec3 pntOnPln_to_e13 = tri->vec_1 - pointOnPlane;
 		glm::vec3 pntOnPln_to_e21 = tri->vec_2 - pointOnPlane;
@@ -417,6 +417,10 @@ bool Object::triangleIntersection(Triangle* tri, int index) {
 
 		// From here: we have to decide "do the actual triangles themselves touch?" (which is a little more intense than the sphere -> triangle).
 		if (((t_e_13 <= 0.f && t_e_21 <= 0.f && t_e_32 <= 0.f) || ((abs(t_e_13) >= 0.f && abs(t_e_13) <= leftOverRadius) || abs(t_e_21) >= 0.f && abs(t_e_21) <= leftOverRadius || abs(t_e_32) >= 0.f && abs(t_e_32) <= leftOverRadius))) {
+			//std::cout << "\tpointOnPlane = (" << pointOnPlane.x << ", " << pointOnPlane.y << ", " << pointOnPlane.z << ")\n";
+			//return false;
+			
+			
 			// So 4 distinct cases we care about:
 			//	#1:	Co-planar triangles:	They are in the same plane, flat, one on top of the other. We either deal with it or don't. Hard to say.
 			//								On one hand: imagine a falling plane or something. On the other: we would def deal with that a different 
@@ -424,13 +428,116 @@ bool Object::triangleIntersection(Triangle* tri, int index) {
 			//	
 			//	#2:	Parallel triangles:		They are on two parallel planes facing each other. They won't interact, so we can discard this.
 			// 
-			//	#3:	One edge through:		Here, one triangle is piercing the other but only on one of it's edges. This is the first non-trivial
+			//	#3:	One edge(s) through:	Here, one triangle is piercing the other but only on one of it's edges. This is the first non-trivial
 			//								case.
-			//
-			return true;
+			// 
+			//	#4: Two edge(s) through:	Here, one triangle is piercing the other but now two edges of one triangle pass between two edges of
+			//								the other triangle. This is a slightly more interesting case to deal with, and is obviously non-trivial.
+			// 
+			// In both non-trivial cases, we need to check where exactly the intersections between the triangles lie, so we can respond with the
+			// appropriate forces in each direction.
+
+			glm::vec3 objTriNorm = glm::cross(triangles[index].vec_1 - triangles[index].vec_3, triangles[index].vec_2 - triangles[index].vec_3);
+			float dotBetweenTriangleNorms = dot(objTriNorm, -triNorm);
+
+			// Co-planar or just parallel. For now, we can disregard this.
+			if (abs(dotBetweenTriangleNorms) < 0.000001f) {
+				return false;
+			}
+			else {
+				//return true;
+				
+#if 1
+				glm::vec3 objTri_e_13 = triangles[index].vec_1 - triangles[index].vec_3;
+				glm::vec3 objTri_e_21 = triangles[index].vec_2 - triangles[index].vec_1;
+				glm::vec3 objTri_e_32 = triangles[index].vec_3 - triangles[index].vec_2;
+
+				glm::vec3 objTri_to_plane_11 = tri->vec_1 - triangles[index].vec_1;
+				glm::vec3 objTri_to_plane_22 = tri->vec_2 - triangles[index].vec_2;
+				glm::vec3 objTri_to_plane_33 = tri->vec_3 - triangles[index].vec_3;
+
+
+				float denom_e_13 = glm::dot(glm::normalize(objTri_e_13), triNorm);
+				float denom_e_21 = glm::dot(glm::normalize(objTri_e_21), triNorm);
+				float denom_e_32 = glm::dot(glm::normalize(objTri_e_32), triNorm);
+
+				//if (denom_e_13 > 0.0000001f) {
+
+				// THIS WORKS!
+				//float t1 = (dot(tri->vec_1 - triangles[index].vec_1, triNorm) / denom_e_13) * (denom_e_13 > 0.00000000001f) - float(!(denom_e_13 > 0.00000000001f));
+				//float t2 = (dot(tri->vec_2 - triangles[index].vec_2, triNorm) / denom_e_21) * (denom_e_21 > 0.00000000001f) - float(!(denom_e_21 > 0.00000000001f));
+				//float t3 = (dot(tri->vec_3 - triangles[index].vec_3, triNorm) / denom_e_32) * (denom_e_32 > 0.00000000001f) - float(!(denom_e_32 > 0.00000000001f));
+				//std::cout << "t1 = " << t1 << "\tt2 = " << t2 << "\tt3 = " << t3 << "\n";
+
+				//std::cout << "tri->vec_1 = (" << tri->vec_1.x << ", " << tri->vec_1.y << ", " << tri->vec_1.z << ")\n";
+				//std::cout << "tri->vec_2 = (" << tri->vec_2.x << ", " << tri->vec_2.y << ", " << tri->vec_2.z << ")\n";
+				//std::cout << "tri->vec_3 = (" << tri->vec_3.x << ", " << tri->vec_3.y << ", " << tri->vec_3.z << ")\n";
+
+				int passedBaryTests = 0;
+				if (denom_e_13 > 0.00000000001f) {
+					float t1 = (dot(tri->vec_1 - triangles[index].vec_1, triNorm) / denom_e_13);
+					if (t1 >= 0.f){//&& t1 <= glm::length(objTri_e_13)) {
+						glm::vec3 pointOnPlane = triangles[index].vec_1 + (glm::normalize(objTri_e_13) * t1);
+						passedBaryTests += (barycentricInterpolation(tri, pointOnPlane));
+						//std::cout << "t1 = " << t1 << "\tpointOnPlane = (" << pointOnPlane.x << ", " << pointOnPlane.y << ", " << pointOnPlane.z << ")\n";
+					}
+				}
+
+				if (denom_e_21 > 0.00000000001f) {
+					float t2 = (dot(tri->vec_2 - triangles[index].vec_2, triNorm) / denom_e_21);
+					if (t2 >= 0.f){// && t2 <= glm::length(objTri_e_21)) {
+						glm::vec3 pointOnPlane = triangles[index].vec_2 + (glm::normalize(objTri_e_21) * t2);
+						passedBaryTests += (barycentricInterpolation(tri, pointOnPlane));
+						//std::cout << "t2 = " << t2 << "\tpointOnPlane = (" << pointOnPlane.x << ", " << pointOnPlane.y << ", " << pointOnPlane.z << ")\n";
+					}
+				}
+				
+				if (denom_e_32 > 0.00000000001f) {
+					float t3 = (dot(tri->vec_3 - triangles[index].vec_3, triNorm) / denom_e_32);
+					if (t3 >= 0.f) {// && t3 <= glm::length(objTri_e_32)) {
+						glm::vec3 pointOnPlane = triangles[index].vec_3 + (glm::normalize(objTri_e_32) * t3);
+						passedBaryTests += (barycentricInterpolation(tri, pointOnPlane));
+						//std::cout << "t3 = " << t3 << "\tpointOnPlane = (" << pointOnPlane.x << ", " << pointOnPlane.y << ", " << pointOnPlane.z << ")\n";
+					}
+				}
+				//std::cout << "passedBaryTests = " << passedBaryTests << "\n\n";
+				return (passedBaryTests > 0);
+#endif
+			}
 		}
 	}
 	return false;
+}
+
+bool Object::barycentricInterpolation(Triangle* tri, glm::vec3 p) {
+
+	//float areaABC = length(glm::cross(tri->vec_2 - tri->vec_1, tri->vec_3 - tri->vec_1)) / 2.f;
+	//float alpha	= glm::length(glm::cross(tri->vec_2 - p, tri->vec_3 - p)) / areaABC;
+	//float beta	= glm::length(glm::cross(tri->vec_3 - p, tri->vec_1 - p)) / areaABC;
+	//float gama = 1 - alpha - beta;
+	//return ((gama + alpha + beta == 1.f)
+	//		&& (0.f <= alpha && alpha <= 1.f)
+	//		&& (0.f <= beta && beta <= 1.f)
+	//		&& (0.f <= gama && gama <= 1.f));
+	// Compute vectors        
+	glm::vec3 v0 = tri->vec_3 - tri->vec_1;
+	glm::vec3 v1 = tri->vec_2 - tri->vec_1;
+	glm::vec3 v2 = p - tri->vec_1;
+
+	// Compute dot products
+	float dot00 = dot(v0, v0);
+	float dot01 = dot(v0, v1);
+	float dot02 = dot(v0, v2);
+	float dot11 = dot(v1, v1);
+	float dot12 = dot(v1, v2);
+
+	// Compute barycentric coordinates
+	float invDenom = 1.f / (dot00 * dot11 - dot01 * dot01);
+	float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+	float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+	// Check if point is in triangle
+	return (u >= 0.f) && (v >= 0.f) && (u + v < 1.f);
 }
 
 // Determine if a given triangle intersects with any of the triangles on the Object.

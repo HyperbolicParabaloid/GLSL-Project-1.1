@@ -154,5 +154,5 @@ void main()
 	vec4 sptLgt = spotLight();
 	//FragColor = mix(mix(drtLgt, pntLgt, pntLgt), sptLgt, sptLgt);
 	//FragColor = mix(drtLgt, pntLgt, pntLgt);
-	FragColor = pntLgt;
+	FragColor = drtLgt;
 }

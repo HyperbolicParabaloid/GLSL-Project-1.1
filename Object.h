@@ -77,6 +77,7 @@ public:
 	bool isTouching(Object* obj);
 	bool isTouching(Triangle* tri);
 	bool isTouching(Triangle* tri, int index);
+	bool barycentricInterpolation(Triangle* tri, glm::vec3 p);
 	bool triangleIntersection(Triangle* tri, int index);
 	bool triangleIntersection(Triangle* tri);
 	glm::vec3 getIntersection(Object* obj);
