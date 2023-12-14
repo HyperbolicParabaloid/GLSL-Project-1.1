@@ -336,17 +336,17 @@ bool Object::isTouching(Triangle* tri) {
 }
 
 
-bool Object::isTouching(Triangle* tri, int index, glm::vec3 *_p1, glm::vec3 *_p2, glm::vec3 *_p3) {
+bool Object::isTouching(Triangle* tri, int index, glm::vec3* _p11, glm::vec3* _p12, glm::vec3* _p13, glm::vec3* _p21, glm::vec3* _p22, glm::vec3* _p23) {
 	tri->genCircle();
 	float lenA = objScale * objRadius;
 	float lenB = tri->radius;
 	if (glm::length(tri->center - objPos) <= lenA + lenB)
-		return triangleIntersection(tri, index, _p1, _p2, _p3);
+		return triangleIntersection(tri, index, _p11, _p12, _p13, _p21, _p22, _p23);
 	return false;
 }
 
 
-bool Object::triangleIntersection(Triangle* tri, int index, glm::vec3 *_p1, glm::vec3 *_p2, glm::vec3 *_p3) {
+bool Object::triangleIntersection(Triangle* tri, int index, glm::vec3* _p11, glm::vec3* _p12, glm::vec3* _p13, glm::vec3* _p21, glm::vec3* _p22, glm::vec3* _p23) {
 	if (!isSolid)
 		return false;
 
@@ -448,57 +448,207 @@ bool Object::triangleIntersection(Triangle* tri, int index, glm::vec3 *_p1, glm:
 				return false;
 			}
 			else {
-				
-#if 1
-				glm::vec3 objTri_e_13 = triangles[index].vec_1 - triangles[index].vec_3;
-				glm::vec3 objTri_e_21 = triangles[index].vec_2 - triangles[index].vec_1;
-				glm::vec3 objTri_e_32 = triangles[index].vec_3 - triangles[index].vec_2;
+				glm::vec3 objTri_e_13 = triangles[index].vec_1 - triangles[index].vec_3; glm::vec3 tri_e_13 = tri->vec_1 - tri->vec_3;
+				glm::vec3 objTri_e_21 = triangles[index].vec_2 - triangles[index].vec_1; glm::vec3 tri_e_21 = tri->vec_2 - tri->vec_1;
+				glm::vec3 objTri_e_32 = triangles[index].vec_3 - triangles[index].vec_2; glm::vec3 tri_e_32 = tri->vec_3 - tri->vec_2;
 
-				float denom_e_13 = glm::dot(glm::normalize(objTri_e_13), triNorm);
-				float denom_e_21 = glm::dot(glm::normalize(objTri_e_21), triNorm);
-				float denom_e_32 = glm::dot(glm::normalize(objTri_e_32), triNorm);
+				float denom_objTri_13 = glm::dot(glm::normalize(objTri_e_13), triNorm); float denom_tri_13 = glm::dot(glm::normalize(tri_e_13), objTriNorm);
+				float denom_objTri_21 = glm::dot(glm::normalize(objTri_e_21), triNorm);	float denom_tri_21 = glm::dot(glm::normalize(tri_e_21), objTriNorm);
+				float denom_objTri_32 = glm::dot(glm::normalize(objTri_e_32), triNorm);	float denom_tri_32 = glm::dot(glm::normalize(tri_e_32), objTriNorm);
 
 				// THIS WORKS!
 				int passedBaryTests = 0;
-				if (denom_e_13 > 0.00000000001f) {
-					float t1 = -(dot(tri->vec_1 - triangles[index].vec_1, triNorm) / denom_e_13);
+
+#if 0
+				if (!pointProjection(tri, tri->vec_1, triNorm, triangles[index].vec_1, objTri_e_13, _p11))
+					passedBaryTests += pointProjection(tri, tri->vec_1, -triNorm, triangles[index].vec_1, objTri_e_13, _p11);
+				else
+					passedBaryTests++;
+				
+				if (!pointProjection(tri, tri->vec_2, triNorm, triangles[index].vec_2, objTri_e_21, _p12))
+					passedBaryTests += pointProjection(tri, tri->vec_2, -triNorm, triangles[index].vec_2, objTri_e_21, _p12);
+				else
+					passedBaryTests++;
+				
+				if (!pointProjection(tri, tri->vec_3, triNorm, triangles[index].vec_3, objTri_e_32, _p13))
+					passedBaryTests += pointProjection(tri, tri->vec_3, -triNorm, triangles[index].vec_3, objTri_e_32, _p13);
+				else
+					passedBaryTests++;
+				
+				
+				if (!pointProjection(&triangles[index], triangles[index].vec_1, objTriNorm, tri->vec_1, tri_e_13, _p21))
+					passedBaryTests += pointProjection(&triangles[index], triangles[index].vec_1, -objTriNorm, tri->vec_1, tri_e_13, _p21);
+				else
+					passedBaryTests++;
+				
+				if (!pointProjection(&triangles[index], triangles[index].vec_2, objTriNorm, tri->vec_2, tri_e_21, _p22))
+					passedBaryTests += pointProjection(&triangles[index], triangles[index].vec_2, -objTriNorm, tri->vec_2, tri_e_21, _p22);
+				else
+					passedBaryTests++;
+				
+				if (!pointProjection(&triangles[index], triangles[index].vec_3, objTriNorm, tri->vec_3, tri_e_32, _p23))
+					passedBaryTests += pointProjection(&triangles[index], triangles[index].vec_3, -objTriNorm, tri->vec_3, tri_e_32, _p23);
+				else
+					passedBaryTests++;
+				return (passedBaryTests > 0);
+#endif
+#if 1
+				//
+				//		--------------------------------
+				//			Object piercing tri test
+				//		--------------------------------
+				//
+				*_p11 = pointProjection(tri, tri->vec_1, triNorm, triangles[index].vec_1, objTri_e_13);
+				if (_p11->x < -100000.f)
+					*_p11 = pointProjection(tri, tri->vec_1, -triNorm, triangles[index].vec_1, objTri_e_13);
+				passedBaryTests += (_p11->x >= -100000.f);
+
+				*_p12 = pointProjection(tri, tri->vec_2, triNorm, triangles[index].vec_2, objTri_e_21);
+				if (_p12->x < -100000.f)
+					*_p12 = pointProjection(tri, tri->vec_2, -triNorm, triangles[index].vec_2, objTri_e_21);
+				passedBaryTests += (_p12->x >= -100000.f);
+
+				*_p13 = pointProjection(tri, tri->vec_3, triNorm, triangles[index].vec_3, objTri_e_32);
+				if (_p13->x < -100000.f)
+					*_p13 = pointProjection(tri, tri->vec_3, -triNorm, triangles[index].vec_3, objTri_e_32);
+				passedBaryTests += (_p13->x >= -100000.f);
+				
+				//
+				//		--------------------------------
+				//			Tri piercing object test
+				//		--------------------------------
+				//
+				*_p21 = pointProjection(&triangles[index], triangles[index].vec_1, objTriNorm, tri->vec_1, tri_e_13);
+				if (_p21->x < -100000.f) 
+					*_p21 = pointProjection(&triangles[index], triangles[index].vec_1, -objTriNorm, tri->vec_1, tri_e_13);
+				passedBaryTests += (_p21->x >= -100000.f);
+
+				*_p22 = pointProjection(&triangles[index], triangles[index].vec_2, objTriNorm, tri->vec_2, tri_e_21);
+				if (_p22->x < -100000.f)
+					*_p22 = pointProjection(&triangles[index], triangles[index].vec_2, -objTriNorm, tri->vec_2, tri_e_21);
+				passedBaryTests += (_p22->x >= -100000.f);
+
+				*_p23 = pointProjection(&triangles[index], triangles[index].vec_3, objTriNorm, tri->vec_3, tri_e_32);
+				if (_p23->x < -100000.f)
+					*_p23 = pointProjection(&triangles[index], triangles[index].vec_3, -objTriNorm, tri->vec_3, tri_e_32);
+				passedBaryTests += (_p23->x >= -100000.f);
+
+				return (passedBaryTests > 0);
+#endif
+
+#if 0
+				// First lines
+				if (denom_objTri_13 > 0.00000000001f) {
+					float t1 = -(dot(tri->vec_1 - triangles[index].vec_1, triNorm) / denom_objTri_13);
+
 					if (t1 >= 0.f && t1 <= abs(glm::length(objTri_e_13))) {
 						glm::vec3 pointOnTri = triangles[index].vec_1 - (glm::normalize(objTri_e_13) * t1);
 						passedBaryTests += (barycentricInterpolation(tri, pointOnTri));
 						if (barycentricInterpolation(tri, pointOnTri)) {
-							*_p1 = pointOnTri;
+							*_p11 = pointOnTri;
 						}
 						//std::cout << "t1 = " << t1 << "\tpointOnPlane = (" << pointOnPlane.x << ", " << pointOnPlane.y << ", " << pointOnPlane.z << ")\n";
 					}
 				}
+				if (denom_tri_13 > 0.00000000001f) {
+					float t1 = -(dot(triangles[index].vec_1 - tri->vec_1, objTriNorm) / denom_tri_13);
+				
+					if (t1 >= 0.f && t1 <= abs(glm::length(tri_e_13))) {
+						glm::vec3 pointOnTri = tri->vec_1 - (glm::normalize(tri_e_13) * t1);
+						passedBaryTests += (barycentricInterpolation(&triangles[index], pointOnTri));
+						if (barycentricInterpolation(&triangles[index], pointOnTri)) {
+							*_p21 = pointOnTri;
+						}
+					}
+				}
 
-				if (denom_e_21 > 0.00000000001f) {
-					float t2 = -(dot(tri->vec_2 - triangles[index].vec_2, triNorm) / denom_e_21);
+
+				// 2nd Lines
+				if (denom_objTri_21 > 0.00000000001f) {
+					float t2 = -(dot(tri->vec_2 - triangles[index].vec_2, triNorm) / denom_objTri_21);
+
 					if (t2 >= 0.f && t2 <= abs(glm::length(objTri_e_21))) {
 						glm::vec3 pointOnTri = triangles[index].vec_2 - (glm::normalize(objTri_e_21) * t2);
 						passedBaryTests += (barycentricInterpolation(tri, pointOnTri));
 						if (barycentricInterpolation(tri, pointOnTri)) {
-							*_p2 = pointOnTri;
+							*_p12 = pointOnTri;
 						}
-						//std::cout << "t2 = " << t2 << "\tpointOnPlane = (" << pointOnPlane.x << ", " << pointOnPlane.y << ", " << pointOnPlane.z << ")\n";
 					}
 				}
+				if (denom_tri_21 > 0.00000000001f) {
+					float t2 = -(dot(triangles[index].vec_2 - tri->vec_2, objTriNorm) / denom_tri_21);
 				
-				if (denom_e_32 > 0.00000000001f) {
-					float t3 = -(dot(tri->vec_3 - triangles[index].vec_3, triNorm) / denom_e_32);
+					if (t2 >= 0.f && t2 <= abs(glm::length(tri_e_21))) {
+						glm::vec3 pointOnTri = tri->vec_2 - (glm::normalize(tri_e_21) * t2);
+						passedBaryTests += (barycentricInterpolation(&triangles[index], pointOnTri));
+						if (barycentricInterpolation(&triangles[index], pointOnTri)) {
+							*_p22 = pointOnTri;
+						}
+					}
+				}
+
+
+
+
+				
+				if (denom_objTri_32 > 0.00000000001f) {
+					float t3 = -(dot(tri->vec_3 - triangles[index].vec_3, triNorm) / denom_objTri_32);
+
 					if (t3 >= 0.f && t3 <= abs(glm::length(objTri_e_32))) {
 						glm::vec3 pointOnTri = triangles[index].vec_3 - (glm::normalize(objTri_e_32) * t3);
 						passedBaryTests += (barycentricInterpolation(tri, pointOnTri));
 						if (barycentricInterpolation(tri, pointOnTri)) {
-							*_p3 = pointOnTri;
+							*_p13 = pointOnTri;
 						}
-						//std::cout << "t3 = " << t3 << "\tpointOnPlane = (" << pointOnPlane.x << ", " << pointOnPlane.y << ", " << pointOnPlane.z << ")\n";
 					}
 				}
-				//std::cout << "passedBaryTests = " << passedBaryTests << "\n\n";
-				//return true;
+				if (denom_tri_32 > 0.00000000001f) {
+					float t3 = -(dot(triangles[index].vec_3 - tri->vec_3, objTriNorm) / denom_tri_32);
+				
+					if (t3 >= 0.f && t3 <= abs(glm::length(tri_e_32))) {
+						glm::vec3 pointOnTri = tri->vec_3 - (glm::normalize(tri_e_32) * t3);
+						passedBaryTests += (barycentricInterpolation(&triangles[index], pointOnTri));
+						if (barycentricInterpolation(&triangles[index], pointOnTri)) {
+							*_p23 = pointOnTri;
+						}
+					}
+				}
+				
+
+
 				return (passedBaryTests > 0);
 #endif
+			}
+		}
+	}
+	return false;
+}
+
+glm::vec3 Object::pointProjection(Triangle* triangle, glm::vec3 planePoint0, glm::vec3 planeNormal, glm::vec3 rayStart, glm::vec3 rayDirection) {
+	float denom = glm::dot(glm::normalize(rayDirection), planeNormal);
+
+	if (denom > 0.00000000001f) {
+		float t = -(dot(planePoint0 - rayStart, planeNormal) / denom);
+		if (t >= 0.f && t <= abs(glm::length(rayDirection))) {
+			glm::vec3 pointOnTri = rayStart - (glm::normalize(rayDirection) * t);
+			if (barycentricInterpolation(triangle, pointOnTri)) {
+				return pointOnTri;
+			}
+		}
+	}
+	return glm::vec3(-1000000.f);
+}
+
+bool Object::pointProjection(Triangle* triangle, glm::vec3 planePoint0, glm::vec3 planeNormal, glm::vec3 rayStart, glm::vec3 rayDirection, glm::vec3* _p) {
+	float denom = glm::dot(glm::normalize(rayDirection), planeNormal);
+	
+	if (denom > 0.00000000001f) {
+		float t = -(dot(planePoint0 - rayStart, planeNormal) / denom);
+		if (t >= 0.f && t <= abs(glm::length(rayDirection))) {
+			glm::vec3 pointOnTri = rayStart - (glm::normalize(rayDirection) * t);
+			if (barycentricInterpolation(triangle, pointOnTri)) {
+				*_p = pointOnTri;
+				return true;
 			}
 		}
 	}
@@ -525,7 +675,7 @@ bool Object::barycentricInterpolation(Triangle* tri, glm::vec3 p) {
 	float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
 	// Check if point is in triangle
-	return ((u >= -0.0001f) && (v >= -0.0001f) && (u + v <= 1.0001f));
+	return ((u >= -0.01f) && (v >= -0.01f) && (u + v <= 1.01f));
 }
 
 // Determine if a given triangle intersects with any of the triangles on the Object.
