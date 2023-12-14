@@ -700,7 +700,7 @@ int main()
 	int level = 4;
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 1.5f, 0.0f);
 	glm::vec3 sphere1Radi = glm::vec3(1.0f, 1.0f, 1.0f);
-	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
+	Sphere sphere1(window, sphere1Pos, sphere1Radi, 4.f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 	sphere1.setLevel(level);
 
 	//glm::vec3 test1 = glm::vec3(1.f, 1.f, 0.f);

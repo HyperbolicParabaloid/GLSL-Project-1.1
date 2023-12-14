@@ -478,7 +478,7 @@ bool Object::triangleIntersection(Triangle* tri, int index) {
 					float t1 = -(dot(tri->vec_1 - triangles[index].vec_1, triNorm) / denom_e_13);
 					//if (t1 >= 0.f){//&& t1 <= glm::length(objTri_e_13)) {
 					if (t1 >= 0.f && t1 <= glm::length(objTri_e_13)) {
-						glm::vec3 pointOnPlane = triangles[index].vec_1 + (glm::normalize(objTri_e_13) * t1);
+						glm::vec3 pointOnPlane = triangles[index].vec_1 - (glm::normalize(objTri_e_13) * t1);
 						passedBaryTests += (barycentricInterpolation(tri, pointOnPlane));
 						//std::cout << "t1 = " << t1 << "\tpointOnPlane = (" << pointOnPlane.x << ", " << pointOnPlane.y << ", " << pointOnPlane.z << ")\n";
 					}
@@ -488,7 +488,7 @@ bool Object::triangleIntersection(Triangle* tri, int index) {
 					float t2 = -(dot(tri->vec_2 - triangles[index].vec_2, triNorm) / denom_e_21);
 					//if (t2 >= 0.f){// && t2 <= glm::length(objTri_e_21)) {
 					if (t2 >= 0.f && t2 <= glm::length(objTri_e_21)) {
-						glm::vec3 pointOnPlane = triangles[index].vec_2 + (glm::normalize(objTri_e_21) * t2);
+						glm::vec3 pointOnPlane = triangles[index].vec_2 - (glm::normalize(objTri_e_21) * t2);
 						passedBaryTests += (barycentricInterpolation(tri, pointOnPlane));
 						//std::cout << "t2 = " << t2 << "\tpointOnPlane = (" << pointOnPlane.x << ", " << pointOnPlane.y << ", " << pointOnPlane.z << ")\n";
 					}
@@ -498,7 +498,7 @@ bool Object::triangleIntersection(Triangle* tri, int index) {
 					float t3 = -(dot(tri->vec_3 - triangles[index].vec_3, triNorm) / denom_e_32);
 					//if (t3 >= 0.f) {// && t3 <= glm::length(objTri_e_32)) {
 					if (t3 >= 0.f && t3 <= glm::length(objTri_e_32)) {
-						glm::vec3 pointOnPlane = triangles[index].vec_3 + (glm::normalize(objTri_e_32) * t3);
+						glm::vec3 pointOnPlane = triangles[index].vec_3 - (glm::normalize(objTri_e_32) * t3);
 						passedBaryTests += (barycentricInterpolation(tri, pointOnPlane));
 						//std::cout << "t3 = " << t3 << "\tpointOnPlane = (" << pointOnPlane.x << ", " << pointOnPlane.y << ", " << pointOnPlane.z << ")\n";
 					}
@@ -512,6 +512,7 @@ bool Object::triangleIntersection(Triangle* tri, int index) {
 	return false;
 }
 
+// Problem is probably this tbh.
 bool Object::barycentricInterpolation(Triangle* tri, glm::vec3 p) {
 
 	//float areaABC = length(glm::cross(tri->vec_2 - tri->vec_1, tri->vec_3 - tri->vec_1)) / 2.f;
