@@ -125,7 +125,7 @@ void main()
 {
 	crntPos = aPos;
 	float oldY = vec3(model * vec4(crntPos, 1.f)).y;	// In case this vert shouldn't have noise applied to it.
-	crntPos.y = applyNoise(crntPos);
+	//crntPos.y = applyNoise(crntPos);
 
 	crntPos = vec3(model * vec4(crntPos, 1.f));
 	//if ((crntPos.x <= 0.f && crntPos.x >= -20.f) && (crntPos.z >= 0.f && crntPos.z <= 70.f)){// && crntPos.z <= 0.f && crntPos.z >= -20.f) {

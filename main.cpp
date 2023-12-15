@@ -635,13 +635,14 @@ int main()
 	std::vector <Texture> empty;
 
 	int planeLevel = 4;
-	float planeaScale = 25.f;
+	float planeaScale = 50.f;
 	std::vector <Plane*> planeList;
 	glm::vec3 planeaPos = glm::vec3(0.f, -1.5f, 0.0f);
 	Plane planea(window, planeaPos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
 	//planea.rotate(45, glm::vec3(0.f, 0.f, 1.f));
 	//planea.rotate(90, glm::vec3(1.f, 0.f, 0.f));
 	planea.doRandomColors(true);
+	//planea.rotate(45, glm::vec3(0.f, 0.f, 1.f));
 	planea.setLevel(planeLevel);
 
 	/*
@@ -697,11 +698,12 @@ int main()
 	glm::vec3 cube3Pos = glm::vec3(0.0f, 2.f, -2.5f);
 	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), empty, &camera);
 
-	int level = 3;
+	int level = 2;
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 1.5f, 0.0f);
 	glm::vec3 sphere1Radi = glm::vec3(1.0f, 1.0f, 1.0f);
-	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
+	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.0f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 	sphere1.isSolid = true;
+	sphere1.rotate(45, glm::vec3(0.f, 0.f, 1.f));
 	sphere1.setLevel(level);
 
 	//glm::vec3 test1 = glm::vec3(1.f, 1.f, 0.f);
@@ -898,7 +900,7 @@ int main()
 						//newSphere.isWireframe = true;
 						//newSphere.draw(lightPos, lightColor);
 						for (int tt = 0; tt < sphere1.triangles.size(); tt++) {
-							tri.genCircle();
+							
 
 							glm::vec3 p11 = glm::vec3(-10000.f), p12 = glm::vec3(-10000.f), p13 = glm::vec3(-10000.f);
 							glm::vec3 p21 = glm::vec3(-10000.f), p22 = glm::vec3(-10000.f), p23 = glm::vec3(-10000.f);
@@ -1051,18 +1053,13 @@ int main()
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Z)) {
-			tree1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, -0.01f, 0.f));
-			//sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
-			//planeaPos.x += 0.01f;
-			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_X)) {
-			tree1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.01f, 0.f));
-			//sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
-			//planeaPos.x += 0.01f;
-			//planea.setNewPos(planeaPos);
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_B)) {
+			sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_MINUS) && lockoutTimer <= crntTime) {
 			//planeLevel--;

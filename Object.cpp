@@ -16,8 +16,10 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 
 void Object::setNewPos(glm::vec3 _objPos) {
 	objPos = _objPos;
-	model = glm::translate(glm::mat4(1.f), objPos);
-	model = glm::scale(model, glm::vec3(objScale));
+	glm::mat4 newModel = glm::translate(glm::mat4(1.f), objPos);
+	newModel = glm::scale(newModel, glm::vec3(objScale));
+	glm::mat3 rotationMatrix = (1.0f / objScale) * glm::mat3(model);
+	model = newModel * glm::mat4(rotationMatrix);
 }
 
 // Rotates the object about a given axis by a set angle in degrees.
@@ -352,6 +354,7 @@ bool Object::triangleIntersection(Triangle* tri, int index, glm::vec3* _p11, glm
 
 	// genCircle makes sure all the triangles are up to date with the objects current model matrix.
 	triangles[index].genCircle();
+	tri->genCircle();
 
 	// denom will always be -1.f because we want the shortest path to the plane.
 	//float denom = -1.f;
@@ -444,7 +447,7 @@ bool Object::triangleIntersection(Triangle* tri, int index, glm::vec3* _p11, glm
 			float dotBetweenTriangleNorms = dot(objTriNorm, -triNorm);
 
 			// Co-planar or just parallel. For now, we can disregard this.
-			if (abs(dotBetweenTriangleNorms) < 0.000001f) {
+			if (dotBetweenTriangleNorms < 0.0f) {
 				return false;
 			}
 			else {
@@ -512,6 +515,9 @@ bool Object::triangleIntersection(Triangle* tri, int index, glm::vec3* _p11, glm
 				if (_p13->x < -100000.f)
 					*_p13 = pointProjection(tri, tri->vec_3, -triNorm, triangles[index].vec_3, objTri_e_32);
 				passedBaryTests += (_p13->x >= -100000.f);
+
+				if (passedBaryTests > 1)
+					return true;
 				
 				//
 				//		--------------------------------
