@@ -699,7 +699,7 @@ int main()
 	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), empty, &camera);
 
 	int level = 2;
-	glm::vec3 sphere1Pos = glm::vec3(0.0f, 1.5f, 0.0f);
+	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 sphere1Radi = glm::vec3(1.0f, 1.0f, 1.0f);
 	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.0f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 	sphere1.isSolid = true;
@@ -777,10 +777,11 @@ int main()
 
 	int startingSphereIndex = objectList.size();
 	for (const Vertex &vv : sphere1.vertices) {
-		glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.f, 0.0f);
-		glm::vec3 sphere1Radi = glm::vec3(1.0f, 1.0f, 1.0f);
-		objectList.push_back(new Sphere(window, sphere1Pos, sphere1Radi, 0.1f, level, false, glm::vec4(.8f, .2f, .2f, 1.f), empty, &camera));
-		objectList.push_back(new Sphere(window, sphere1Pos, sphere1Radi, 0.1f, level, false, glm::vec4(.8f, .2f, .2f, 1.f), empty, &camera));
+		glm::vec3 sphereNewPos1 = vv.pos * (2.f / (10.0f / float(objectList.size())));
+		glm::vec3 sphereNewPos2 = vv.pos * (3.f / (10.0f / float(objectList.size())));
+		glm::vec3 sphereNewRadi = glm::vec3(1.0f, 1.0f, 1.0f);
+		objectList.push_back(new Sphere(window, sphereNewPos1, sphereNewRadi, 0.1f, 4, false, glm::vec4(.8f, .2f, .2f, 1.f), empty, &camera));
+		objectList.push_back(new Sphere(window, sphereNewPos2, sphereNewRadi, 0.1f, 4, false, glm::vec4(.8f, .2f, .2f, 1.f), empty, &camera));
 	}
 
 	float camSpeed = 10.f;
@@ -856,6 +857,7 @@ int main()
 		//camera.setMousePos(sphere1.objPos - camera.cameraPos, true, true);
 
 
+
 		startPlaneTime = glfwGetTime();
 		for (int pp = 0; pp < planeList.size(); pp++) {
 			if (planeList[pp]->isTouching(&sphere1)) {
@@ -867,6 +869,14 @@ int main()
 				Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
 				newSphere.isWireframe = true;
 				newSphere.draw(lightPos, lightColor);
+
+
+				glm::vec3 standardPos = glm::vec3(0.f);
+				for (int ss = startingSphereIndex; ss < objectList.size(); ss++) {
+					objectList[ss]->setNewPos(standardPos);
+				}
+
+
 				for (Triangle tri : planeList[pp]->triangles) {
 					if (sphere1.isTouching(&tri)) {
 						//newSphere.isWireframe = true;
@@ -878,106 +888,132 @@ int main()
 						//Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
 						//newSphere.isWireframe = true;
 						//newSphere.draw(lightPos, lightColor);
+
+						int sphereIndex = startingSphereIndex;
 						for (int tt = 0; tt < sphere1.triangles.size(); tt++) {
 							
 
 							glm::vec3 p11 = glm::vec3(-10000.f), p12 = glm::vec3(-10000.f), p13 = glm::vec3(-10000.f);
 							glm::vec3 p21 = glm::vec3(-10000.f), p22 = glm::vec3(-10000.f), p23 = glm::vec3(-10000.f);
 
-							int sphereIndex = startingSphereIndex;
 							if (sphere1.isTouching(&tri, tt, &p11, &p12, &p13, &p21, &p22, &p23)) {
-
-
 								//std::cout << "Touching triangle centered at (" << tri.center.x << ", " << tri.center.y << ", " << tri.center.z << ")\n";
 								//glm::vec3 newSpherePos = tri.center;
 								//glm::vec3 newSphereRadi = glm::vec3(tri.radius);
 								//glm::vec4 color = tri.v1->color;
 								//Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
-
-
+								//newSphere.isWireframe = true;
+								//newSphere.draw(lightPos, lightColor);
+#if 1
 								if (p11.x > -10000.f) {
 									//std::cout << "p1 = (" << p1.x << ", " << p1.y << ", " << p1.z << ")\n";
-								
+
+
 									newSphere.isWireframe = true;
 									newSphere.draw(lightPos, lightColor);
 									glm::vec3 newSpherePos = p11;// sphere1.triangles[tt].center;
 									glm::vec3 newSphereRadi = glm::vec3(sphere1.triangles[tt].radius) / 5.f;
 									glm::vec4 color = sphere1.triangles[tt].v1->color;
-								
+
+
 									Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
 									newSphere.isWireframe = true;
 									newSphere.draw(lightPos, lightColor);
 								}
 								if (p21.x > -10000.f) {
 									//std::cout << "p1 = (" << p1.x << ", " << p1.y << ", " << p1.z << ")\n";
-								
+
+
 									newSphere.isWireframe = true;
 									newSphere.draw(lightPos, lightColor);
 									glm::vec3 newSpherePos = p21;// sphere1.triangles[tt].center;
 									glm::vec3 newSphereRadi = glm::vec3(sphere1.triangles[tt].radius) / 5.f;
 									glm::vec4 color = sphere1.triangles[tt].v1->color;
-								
+
+
 									Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
 									newSphere.isWireframe = true;
 									newSphere.draw(lightPos, lightColor);
 								}
-								
-								
+
+
 								if (p12.x > -10000.f) {
 									//std::cout << "p2 = (" << p2.x << ", " << p2.y << ", " << p2.z << ")\n";
-								
-									newSphere.isWireframe = true;
-									newSphere.draw(lightPos, lightColor);
-									glm::vec3 newSpherePos = p12;// sphere1.triangles[tt].center;
-									glm::vec3 newSphereRadi = glm::vec3(sphere1.triangles[tt].radius) / 5.f;
-									glm::vec4 color = sphere1.triangles[tt].v1->color;
-								
-									Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
-									newSphere.isWireframe = true;
-									newSphere.draw(lightPos, lightColor);
+
 								}
 								if (p22.x > -10000.f) {
 									//std::cout << "p2 = (" << p2.x << ", " << p2.y << ", " << p2.z << ")\n";
-								
+
+
 									newSphere.isWireframe = true;
 									newSphere.draw(lightPos, lightColor);
 									glm::vec3 newSpherePos = p22;// sphere1.triangles[tt].center;
 									glm::vec3 newSphereRadi = glm::vec3(sphere1.triangles[tt].radius) / 5.f;
 									glm::vec4 color = sphere1.triangles[tt].v1->color;
-								
+
+
 									Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
 									newSphere.isWireframe = true;
 									newSphere.draw(lightPos, lightColor);
 								}
-								
-								
+
+
+
+
 								if (p13.x > -10000.f) {
 									//std::cout << "p3 = (" << p3.x << ", " << p3.y << ", " << p3.z << ")\n";
-								
+
+
 									newSphere.isWireframe = true;
 									newSphere.draw(lightPos, lightColor);
 									glm::vec3 newSpherePos = p13;// sphere1.triangles[tt].center;
 									glm::vec3 newSphereRadi = glm::vec3(sphere1.triangles[tt].radius) / 5.f;
 									glm::vec4 color = sphere1.triangles[tt].v1->color;
-								
+
+
 									Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
 									newSphere.isWireframe = true;
 									newSphere.draw(lightPos, lightColor);
 								}
 								if (p23.x > -10000.f) {
 									//std::cout << "p3 = (" << p3.x << ", " << p3.y << ", " << p3.z << ")\n";
-								
+
+
 									newSphere.isWireframe = true;
 									newSphere.draw(lightPos, lightColor);
 									glm::vec3 newSpherePos = p23;// sphere1.triangles[tt].center;
 									glm::vec3 newSphereRadi = glm::vec3(sphere1.triangles[tt].radius) / 5.f;
 									glm::vec4 color = sphere1.triangles[tt].v1->color;
-								
+
+
 									Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
 									newSphere.isWireframe = true;
 									newSphere.draw(lightPos, lightColor);
 								}
+#endif
+#if 0
+								objectList[sphereIndex]->setNewPos(p11);
+								objectList[sphereIndex]->isWireframe = true;
+								
+								objectList[sphereIndex + 1]->setNewPos(p21);
+								objectList[sphereIndex + 1]->isWireframe = true;
+								
+								objectList[sphereIndex + 2]->setNewPos(p12);
+								objectList[sphereIndex + 2]->isWireframe = true;
+								
+								objectList[sphereIndex + 3]->setNewPos(p22);
+								objectList[sphereIndex + 3]->isWireframe = true;
+								
+								objectList[sphereIndex + 4]->setNewPos(p13);
+								objectList[sphereIndex + 4]->isWireframe = true;
+								
+								objectList[sphereIndex + 5]->setNewPos(p23);
+								objectList[sphereIndex + 5]->isWireframe = true;
+#endif
+								
 							}
+							
+							sphereIndex += 6;
 						}
 					}
 				}
@@ -1190,6 +1226,8 @@ int main()
 			//
 			//cone1.doRandomColors(randomColor);
 			//cone1.setLevel(coneLevel);
+			sphere1.setNewPos(glm::vec3(0.f));
+
 			tree1.doRandomColors(randomColor);
 			tree1.setConeLevel(tree1ConeLevel);
 

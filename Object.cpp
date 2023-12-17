@@ -514,15 +514,15 @@ bool Object::triangleIntersection(Triangle* tri, int index, glm::vec3* _p11, glm
 glm::vec3 Object::pointProjection(Triangle* triangle, glm::vec3 planePoint0, glm::vec3 planeNormal, glm::vec3 rayStart, glm::vec3 rayDirection) {
 	float denom = glm::dot(glm::normalize(rayDirection), planeNormal);
 
-	if (denom > 0.00000000001f) {
+	//if (denom > 0.00000000001f) {
 		float t = -(dot(planePoint0 - rayStart, planeNormal) / denom);
-		if (t >= -0.01f && t <= glm::length(rayDirection)) {
+		if (t >= 0.0f && t <= glm::length(rayDirection)) {
 			glm::vec3 pointOnTri = rayStart - (glm::normalize(rayDirection) * t);
 			if (barycentricInterpolation(triangle, pointOnTri)) {
 				return pointOnTri;
 			}
 		}
-	}
+	//}
 	return glm::vec3(-1000000.f);
 }
 
@@ -562,7 +562,7 @@ bool Object::barycentricInterpolation(Triangle* tri, glm::vec3 p) {
 	float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
 
 	// Check if point is in triangle
-	return ((u >= -0.01f) && (v >= -0.01f) && (u + v <= 1.01f));
+	return ((u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.01f));
 }
 
 // Determine if a given triangle intersects with any of the triangles on the Object.
