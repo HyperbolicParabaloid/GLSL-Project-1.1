@@ -239,18 +239,11 @@ GLuint sqrIndices_2[] = {
 	22, 23, 20
 };
 
-int viewWidth = 1600, viewHeight = 1600;
+int viewWidth = 800, viewHeight = 800;
 int setCamera = 0;
 
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
-	setCamera = yoffset;
-	std::cout << "LEMON = (" << xoffset << ", " << yoffset << ")\n";
-}
 
-
-
-#if 0
+#if 1
 int main()
 {
 	// Initialize GLFW
@@ -328,7 +321,7 @@ int main()
 	glm::mat4 view = glm::mat4(1.f);
 
 	Camera camera(window, glm::vec2(viewWidth, viewHeight), glm::vec3(0.f, 0.5f, 2.f), glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 1.f, 0.f));
-	camera.set_projection(glm::radians(60.f), (float)(viewWidth / viewHeight), 0.1f, 100.f);
+	camera.set_projection(glm::radians(60.f), viewWidth, (float)(viewWidth / viewHeight), 0.1f, 100.f);
 
 	double lockoutTimer = 0;
 	bool shouldRotate = false, shouldFly = false, capturingMotion = false;
@@ -363,8 +356,10 @@ int main()
 	glm::vec3 cube3Pos = glm::vec3(0.0f, 2.f, -2.5f);
 	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), empty, &camera);
 
+	int level = 2;
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
-	Sphere sphere1(window, sphere1Pos, .5f, 2, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
+	glm::vec3 sphere1Radi = glm::vec3(1.f, 0.1f, 1.0f);
+	Sphere sphere1(window, sphere1Pos, sphere1Radi, 10.0f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 
 	std::vector <Object*> objectList;
 
@@ -397,6 +392,7 @@ int main()
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "useTex"), 1);
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "useTexSpec"), 1);
 
+	
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -409,8 +405,8 @@ int main()
 		double crntTime = glfwGetTime();
 		if (crntTime - prevTime >= 1 / 60)
 		{
-			rotation = 0.1f;
-			prevTime = crntTime;
+			//rotation = 0.1f;
+			//prevTime = crntTime;
 		}
 
 		// Rotating the view about the x and y axis, and loads of other neat things.
@@ -442,7 +438,7 @@ int main()
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_EQUAL) && lockoutTimer <= crntTime) {
 			level++;
 			std::cout << "\nLevel: " << level << "\n";
-			//sphere1.setLevel(level);
+			sphere1.setLevel(level);
 			plane1.setLevel(level);
 			lockoutTimer = crntTime + 0.2;
 		}
@@ -490,7 +486,19 @@ int main()
 		}
 
 		// Toggling the tracking of user movement
-		camera.track_movement();
+		glm::vec3 newSphere1Pos = camera.track_movement();
+		glm::vec3 cameraPos = camera.cameraPos;
+
+		if (int(crntTime * 4) != int(prevTime * 4)) {
+			//std::cout << "cameraPos = (" << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << ")" << std::endl;
+			std::cout << "newSphere1Pos = (" << newSphere1Pos.x << ", " << newSphere1Pos.y << ", " << newSphere1Pos.z << ")" << std::endl;
+			std::cout << std::endl;
+			prevTime = crntTime;
+		}
+
+		sphere1.setNewPos(newSphere1Pos);
+
+		//sphere1.setNewPos(newSphere1Pos);
 		//plane1.moveFirstVertex();
 
 		// Setting view matrix with camera class
@@ -530,7 +538,7 @@ int main()
 }
 #endif
 
-#if 1
+#if 0
 int main()
 {
 

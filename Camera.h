@@ -23,6 +23,10 @@ private:
 	glm::mat4 view;
 	glm::mat4 projection;
 
+	int width;
+	float aspectRatio;
+	float FOV;
+
 	// For constructing view;
 	glm::vec3 cameraUp;
 	glm::vec2 screenDimensions;
@@ -43,16 +47,18 @@ private:
 public:
 	glm::vec3 cameraForward;
 	glm::vec3 cameraPos;
+	glm::vec3 getLookDirection();// Gets ray poiting out from mouse
+
 	Camera(GLFWwindow* window, glm::vec2 screenDimensions, glm::vec3 _cameraPos, glm::vec3 _cameraForward, glm::vec3 _cameraUp);	// Constructor
 
-	void set_projection(float angle, float aspectRatio, float nearClip, float farClip);
+	void set_projection(float angle, float width, float aspectRatio, float nearClip, float farClip);
 
 	void motion_enabled(bool state);	// For toggling the motion capture
 	void set_camera_speed(float _cameraSpeed);	// For setting the WASD movement sensitivity
 	void set_camera_sensitivity(float _cameraSense);	// For setting the mouse movement sensitivity
 	void set_fly_speed_scaler(float _flySpeedScaler);	// For setting the motion scaler for the camera's motion/turning speed
 
-	void track_movement();	// Tracks movements of player
+	glm::vec3 track_movement();	// Tracks movements of player
 	glm::mat4 get_view();	// Returns the view matrix
 
 	bool lookAtObj(glm::vec3 _objPos);

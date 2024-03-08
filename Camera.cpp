@@ -30,8 +30,12 @@ Camera::Camera(GLFWwindow* _window, glm::vec2 _screenDimensions, glm::vec3 _came
 	//glfwSetScrollCallback(window, scroll_callback);
 }
 
-void Camera::set_projection(float angle, float aspectRatio, float nearClip, float farClip) {
-	projection = glm::perspective(angle, aspectRatio, nearClip, farClip);
+void Camera::set_projection(float _angle, float _width, float _aspectRatio, float _nearClip, float _farClip) {
+	FOV = glm::degrees(_angle);
+	width = _width;
+	aspectRatio = _aspectRatio;
+
+	projection = glm::perspective(_angle, _aspectRatio, _nearClip, _farClip);
 }
 
 // This function takes mouse inputs and converts it into camera rotation.
@@ -91,6 +95,44 @@ void Camera::mouse_callback()
 	cameraForward = direction;
 
 }
+
+
+// Return yee-old vector of mouse pos as a ray in 3D space.
+glm::vec3 Camera::getLookDirection() {
+	// 2D position of the mousse on the screen.
+	double xpos, ypos;
+	glfwGetCursorPos(window, &xpos, &ypos);
+
+	double halfWidth  = width / 2;
+	double yawExtent = FOV / 2;
+
+	double halfHeight = halfWidth * aspectRatio;
+	double pitchExtent = (FOV * aspectRatio) / 2;
+
+	//float _yaw		=  glm::clamp((xpos - halfWidth) / halfWidth * yawExtent, -yawExtent, yawExtent);
+	//float _pitch	=  -glm::clamp((ypos - halfHeight) / halfHeight * pitchExtent, -pitchExtent, pitchExtent);
+	float _yaw = (xpos - halfWidth) / halfWidth * yawExtent;
+	float _pitch = -((ypos - halfHeight) / halfHeight * pitchExtent);
+
+	//glm::mat4 rotationMat = glm::mat4(1.f);
+	//rotationMat = glm::rotate(rotationMat, glm::radians(_yaw), glm::vec3(0.f, 1.f, 0.f));
+	//rotationMat = glm::rotate(rotationMat, glm::radians(_pitch), glm::vec3(1.f, 0.f, 0.f));
+	//glm::vec4 cam = glm::vec4(cameraForward, 1.f);
+	//glm::vec3 direction = glm::vec3(cam * rotationMat);
+
+	//std::cout << "Screen Coords = (" << _yaw << ", " << _pitch << ")\n";
+
+	_pitch += glm::degrees(asin(cameraForward.y));
+	_yaw += glm::degrees(atan2(cameraForward.z, cameraForward.x));
+
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(_yaw)) * cos(glm::radians(_pitch));
+	direction.y = sin(glm::radians(_pitch));
+	direction.z = sin(glm::radians(_yaw)) * cos(glm::radians(_pitch));
+	
+	return direction;
+}
+
 
 // Processes the WASAD movement inputs in a sort of flying-motion based on the cameraForward vector.
 void Camera::processInput()
@@ -167,10 +209,29 @@ void Camera::set_camera_sensitivity(float _cameraSense) {
 }
 
 // Tracks movements of player
-void Camera::track_movement() {
+glm::vec3 Camera::track_movement() {
 	if (motionEnabled) {
 		mouse_callback();
+		//glm::vec3 d = cameraForward;
+		//std::cout << "camDir = (" << d.x << ", " << d.y << ", " << d.z << ")" << std::endl;
 		processInput();
+
+		glm::vec3 d = cameraForward;
+		float scalerValue = -cameraPos.y / d.y;
+		scalerValue = glm::clamp(scalerValue, -1000.f, 1000.f);
+		glm::vec3 newObjPos = cameraPos + d * scalerValue;
+		return newObjPos;
+	}
+	else {
+		//glm::vec3 d = getLookDirection();
+		//
+		glm::vec3 d  = getLookDirection();
+
+		float scalerValue = -cameraPos.y / d.y;
+		scalerValue = glm::clamp(scalerValue, -1000.f, 1000.f);
+		glm::vec3 newObjPos = cameraPos + d * scalerValue;
+
+		return newObjPos;
 	}
 }
 
@@ -263,7 +324,6 @@ bool Camera::setMousePos(glm::vec3 _newForward, bool lockCursorMovement, bool _s
 	// without it the function will run essentially forever getting infinitely closer but never
 	// reaching it due to decaying size of the deltaForward and floating point errors.
 	float snapInPlaceDistance = 0.01f;
-
 	// Normalizing the _newForward vector to make sure the delta's work out.
 	_newForward = glm::normalize(_newForward);
 
