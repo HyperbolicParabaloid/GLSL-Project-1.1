@@ -32,8 +32,8 @@ vec4 pointLight() {
 	// We need the distance from the light to our current pos. Ez.
 	vec3 lightVec = lightPos - crntPos;
 	float dist = length(lightVec);
-	float a = 0.02;	// Quadratic term:	controls how fast the light dies out
-	float b = 0.01f;	// Linear term:		controls how far the light reaches
+	float a = 0.002;	// Quadratic term:	controls how fast the light dies out
+	float b = 0.0001f;	// Linear term:		controls how far the light reaches
 	float intensity = 1.0f / (a * dist * dist + b * dist + 1.0f);
 
 	// ambient lighting

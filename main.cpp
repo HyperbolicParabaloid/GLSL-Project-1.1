@@ -639,6 +639,9 @@ int main()
 	std::vector <Plane*> planeList;
 	glm::vec3 planeaPos = glm::vec3(0.f, -1.5f, 0.0f);
 	Plane planea(window, planeaPos, planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
+	Plane planeb(window, glm::vec3(23.f, -1.5f, 0.0f), planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
+	Plane planec(window, glm::vec3(-10.f, -1.5f, 0.f), planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
+	Plane planed(window, glm::vec3(0.f, 26.5f, 0.0f), planeaScale, planeLevel, true, glm::vec4(0.f, .2f, .8f, 1.f), empty, &camera);
 	//planea.rotate(45, glm::vec3(0.f, 0.f, 1.f));
 	//planea.rotate(90, glm::vec3(1.f, 0.f, 0.f));
 	planea.doRandomColors(true);
@@ -670,20 +673,20 @@ int main()
 	//glm::vec3 plane9Pos = glm::vec3(planeaScale * 2, -1.5f, planeaScale * 2);
 	//Plane plane9(window, plane9Pos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera);
 	*/
-	planeList.push_back(&planea);
+
 	
 	float startPlaneTime = glfwGetTime();
-	//int start = -8, end = 8;
-	//std::cout << "Making " << start << " -> " << end << " planes(" << end + 1 << "x" << end + 1 <<") took ";
-	//float offset = (planeaScale * 2);
-	//for (int vv = end; vv >= start; vv--) {
-	//	for (int uu = start; uu <= end; uu++) {
-	//		if (uu != vv || vv != 0) {
-	//			glm::vec3 newPlanePos = glm::vec3(offset * vv, -1.5f, offset * uu);
-	//			planeList.push_back(new Plane(window, newPlanePos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera));
-	//		}
-	//	}
-	//}
+	int start = -2, end = 2;
+	std::cout << "Making " << start << " -> " << end << " planes(" << end + 1 << "x" << end + 1 <<") took ";
+	float offset = (planeaScale * 2);
+	for (int vv = end; vv >= start; vv--) {
+		for (int uu = start; uu <= end; uu++) {
+			if (uu != vv || vv != 0) {
+				glm::vec3 newPlanePos = glm::vec3(offset * vv, -1.5f, offset * uu);
+				planeList.push_back(new Plane(window, newPlanePos, planeaScale, planeLevel, true, glm::vec4(1.f, .2f, .8f, 1.f), tex, &camera));
+			}
+		}
+	}
 	std::cout << glfwGetTime() - startPlaneTime << " seconds\n";
 	
 	float cube1y = -1.5 + sqrt(3);
@@ -699,7 +702,7 @@ int main()
 	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), empty, &camera);
 
 	int level = 2;
-	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 sphere1Pos = glm::vec3(0.0f, 5.0f, -10.0f);
 	glm::vec3 sphere1Radi = glm::vec3(1.0f, 1.0f, 1.0f);
 	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.0f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 	sphere1.isSolid = true;
@@ -710,9 +713,13 @@ int main()
 	//glm::vec3 test2 = glm::vec3(0.f, 1.f, 1.f);
 	//glm::vec3 test3 = glm::vec3(0.f, 0.f, 1.f);
 	//
-	//glm::vec3 testResult = glm::cross(test1 - test3, test2 - test3);
-	//std::cout << "testResult = (" << testResult.x << ", " << testResult.y << ", " << testResult.z << ")\n";
-	//std::cout << "dot(n, -n) = " << glm::dot(testResult, -testResult) << "\n";
+	//glm::vec3 test_13_23 = glm::cross(test1 - test3, test2 - test3);
+	//std::cout << "test_13_23 = (" << test_13_23.x << ", " << test_13_23.y << ", " << test_13_23.z << ")\n";
+	//std::cout << "dot(n, -n) = " << glm::dot(test_13_23, -test_13_23) << "\n";
+	//
+	//glm::vec3 test_23_13 = glm::cross(test2 - test3, test1 - test3);
+	//std::cout << "test_23_13 = (" << test_23_13.x << ", " << test_23_13.y << ", " << test_23_13.z << ")\n";
+	//std::cout << "dot(n, -n) = " << glm::dot(test_23_13, -test_23_13) << "\n";
 	//
 	//glm::vec3 testCircleCenter = glm::vec3(0.f, 2.f, 10.f);
 	//float t = glm::dot(test3 - testCircleCenter, testResult) / glm::dot(testResult, -testResult);
@@ -768,7 +775,7 @@ int main()
 	//	}
 	//	//std::cout << "Not in table, index = " << index << "\n";
 	//}
-	objectList.push_back(&tree1);
+	//objectList.push_back(&tree1);
 	objectList.push_back(&sphere1);
 	//objectList.push_back(&cube1);
 	//objectList.push_back(&cube2);
@@ -776,13 +783,21 @@ int main()
 
 
 	int startingSphereIndex = objectList.size();
-	for (const Vertex &vv : sphere1.vertices) {
-		glm::vec3 sphereNewPos1 = vv.pos * (2.f / (10.0f / float(objectList.size())));
-		glm::vec3 sphereNewPos2 = vv.pos * (3.f / (10.0f / float(objectList.size())));
-		glm::vec3 sphereNewRadi = glm::vec3(1.0f, 1.0f, 1.0f);
-		objectList.push_back(new Sphere(window, sphereNewPos1, sphereNewRadi, 0.1f, 4, false, glm::vec4(.8f, .2f, .2f, 1.f), empty, &camera));
-		objectList.push_back(new Sphere(window, sphereNewPos2, sphereNewRadi, 0.1f, 4, false, glm::vec4(.8f, .2f, .2f, 1.f), empty, &camera));
-	}
+	//for (const Vertex &vv : sphere1.vertices) {
+	//	glm::vec3 sphereNewPos1 = vv.pos + (vv.norm * 5.f) + glm::vec3(0.f, 5.f, 0.f);//(1.f / (1000.0f / float(objectList.size())));
+	//	//glm::vec3 sphereNewPos2 = vv.pos + (vv.norm * 5.f) + glm::vec3(0.f, 5.f, 0.f);//(10.f / (1000.0f / float(objectList.size())));
+	//	glm::vec3 sphereNewRadi = glm::vec3(1.0f, 1.0f, 1.0f);
+	//	objectList.push_back(new Sphere(window, sphereNewPos1, sphereNewRadi, 0.1f, 4, false, glm::vec4(.8f, .2f, .2f, 1.f), empty, &camera));
+	//	//objectList.push_back(new Sphere(window, sphereNewPos2, sphereNewRadi, 0.1f, 4, false, glm::vec4(.8f, .2f, .2f, 1.f), empty, &camera));
+	//}
+
+	//for (int vv = 0; vv < sphere1.vertices.size() / (1 + (level - 2) * 2); vv++) {
+	//	glm::vec3 sphereNewPos1 = sphere1.vertices[vv].pos + (sphere1.vertices[vv].norm * 5.f) + glm::vec3(0.f, 5.f, 0.f);//(1.f / (1000.0f / float(objectList.size())));
+	//	glm::vec3 sphereNewPos2 = sphere1.vertices[vv].pos + (sphere1.vertices[vv].norm * 10.f) + glm::vec3(0.f, 5.f, 0.f);//(1.f / (1000.0f / float(objectList.size())));
+	//	glm::vec3 sphereNewRadi = glm::vec3(1.0f, 1.0f, 1.0f);
+	//	objectList.push_back(new Sphere(window, sphereNewPos1, sphereNewRadi, 0.1f, 4, false, glm::vec4(.8f, .2f, .2f, 1.f), empty, &camera));
+	//	objectList.push_back(new Sphere(window, sphereNewPos2, sphereNewRadi, 0.1f, 4, false, glm::vec4(.8f, .2f, .2f, 1.f), empty, &camera));
+	//}
 
 	float camSpeed = 10.f;
 	camera.set_camera_speed(camSpeed);
@@ -800,11 +815,37 @@ int main()
 	objectModel = glm::translate(objectModel, objectPos);
 
 
+	glm::vec3 x_axis = glm::vec3(1.f, 0.f, 0.f);
+	glm::vec3 y_axis = glm::vec3(0.f, 1.f, 0.f);
+	glm::vec3 z_axis = glm::vec3(0.f, 0.f, 1.f);
+
+	glm::vec3 x_cross_y = glm::cross(x_axis, y_axis);
+	glm::vec3 y_cross_x = glm::cross(y_axis, x_axis);
+
+	std::cout << "x_cross_y = (" << x_cross_y.x << ", " << x_cross_y.y << ", " << x_cross_y.z << ")\n";
+	std::cout << "x_cross_y = (" << y_cross_x.x << ", " << y_cross_x.y << ", " << y_cross_x.z << ")\n";
+
+	planeList.push_back(&planea);
+
+	planeList.push_back(&planeb);
+	planeb.rotate(45, glm::vec3(0.f, 0.f, 1.f));
+	planeb.setLevel(planeLevel);
+	
+	planeList.push_back(&planec);
+	planec.rotate(-45, glm::vec3(0.f, 0.f, 1.f));
+	planec.setLevel(planeLevel);
+	
+	planeList.push_back(&planed);
+	planed.rotate(180, glm::vec3(0.f, 0.f, 1.f));
+	planed.setLevel(planeLevel);
+
+
+
+
 
 	float planeScale1 = 5.f;
 
 	float topRadius = 0.f;
-
 
 
 	shaderProgram.Activate();
@@ -821,6 +862,9 @@ int main()
 	glfwSetScrollCallback(window, scroll_callback);	
 
 	bool trackSphere = false;
+
+	glm::vec3 pushingForce = glm::vec3(-10.f, 0.0f, 0.0f);
+	//sphere1.applyForce(Force(sphere1.objPos - pushingForce, glm::vec3(-200.f, 0.0f, 0.0f)));
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -857,7 +901,9 @@ int main()
 		//camera.setMousePos(sphere1.objPos - camera.cameraPos, true, true);
 
 
+		sphere1.applyForce(Force(sphere1.objPos + glm::vec3(0.f, 1.f, 0.f), glm::vec3(0.0f, -9.81f, 0.0f)));
 
+#if 1
 		startPlaneTime = glfwGetTime();
 		for (int pp = 0; pp < planeList.size(); pp++) {
 			if (planeList[pp]->isTouching(&sphere1)) {
@@ -877,6 +923,11 @@ int main()
 				}
 
 
+				int sphereIndex = startingSphereIndex;
+				glm::vec3 finalAveragePoint = glm::vec3(0.f);
+				glm::vec3 finalPlaneNorm = glm::vec3(0.f);
+
+
 				for (Triangle tri : planeList[pp]->triangles) {
 					if (sphere1.isTouching(&tri)) {
 						//newSphere.isWireframe = true;
@@ -889,14 +940,15 @@ int main()
 						//newSphere.isWireframe = true;
 						//newSphere.draw(lightPos, lightColor);
 
-						int sphereIndex = startingSphereIndex;
+						//int sphereIndex = startingSphereIndex;
 						for (int tt = 0; tt < sphere1.triangles.size(); tt++) {
 							
 
 							glm::vec3 p11 = glm::vec3(-10000.f), p12 = glm::vec3(-10000.f), p13 = glm::vec3(-10000.f);
 							glm::vec3 p21 = glm::vec3(-10000.f), p22 = glm::vec3(-10000.f), p23 = glm::vec3(-10000.f);
+							sphere1.isTouching(&tri, tt, &p11, &p12, &p13, &p21, &p22, &p23);
 
-							if (sphere1.isTouching(&tri, tt, &p11, &p12, &p13, &p21, &p22, &p23)) {
+							//if (sphere1.isTouching(&tri, tt, &p11, &p12, &p13, &p21, &p22, &p23)) {
 								//std::cout << "Touching triangle centered at (" << tri.center.x << ", " << tri.center.y << ", " << tri.center.z << ")\n";
 								//glm::vec3 newSpherePos = tri.center;
 								//glm::vec3 newSphereRadi = glm::vec3(tri.radius);
@@ -904,7 +956,7 @@ int main()
 								//Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
 								//newSphere.isWireframe = true;
 								//newSphere.draw(lightPos, lightColor);
-#if 1
+#if 0
 								if (p11.x > -10000.f) {
 									//std::cout << "p1 = (" << p1.x << ", " << p1.y << ", " << p1.z << ")\n";
 
@@ -991,127 +1043,111 @@ int main()
 									newSphere.draw(lightPos, lightColor);
 								}
 #endif
-#if 0
-								objectList[sphereIndex]->setNewPos(p11);
-								objectList[sphereIndex]->isWireframe = true;
-								
-								objectList[sphereIndex + 1]->setNewPos(p21);
-								objectList[sphereIndex + 1]->isWireframe = true;
-								
-								objectList[sphereIndex + 2]->setNewPos(p12);
-								objectList[sphereIndex + 2]->isWireframe = true;
-								
-								objectList[sphereIndex + 3]->setNewPos(p22);
-								objectList[sphereIndex + 3]->isWireframe = true;
-								
-								objectList[sphereIndex + 4]->setNewPos(p13);
-								objectList[sphereIndex + 4]->isWireframe = true;
-								
-								objectList[sphereIndex + 5]->setNewPos(p23);
-								objectList[sphereIndex + 5]->isWireframe = true;
+#if 1
+
+								if (p11.x > -10000.f) {
+									finalAveragePoint += p11;
+									finalPlaneNorm += glm::normalize(glm::cross(tri.vec_1 - tri.vec_2, tri.vec_3 - tri.vec_2));
+									//objectList[sphereIndex]->setNewPos(p11);
+									//objectList[sphereIndex]->isWireframe = true;
+									sphereIndex += 1;
+								}
+								if (p21.x > -10000.f) {
+									finalAveragePoint += p21;
+									finalPlaneNorm += glm::normalize(glm::cross(tri.vec_1 - tri.vec_2, tri.vec_3 - tri.vec_2));
+									//objectList[sphereIndex]->setNewPos(p21);
+									//objectList[sphereIndex]->isWireframe = true;
+									sphereIndex += 1;
+								}
+
+
+								if (p12.x > -10000.f) {
+									finalAveragePoint += p12;
+									finalPlaneNorm += glm::normalize(glm::cross(tri.vec_1 - tri.vec_2, tri.vec_3 - tri.vec_2));
+									//objectList[sphereIndex]->setNewPos(p12);
+									//objectList[sphereIndex]->isWireframe = true;
+									sphereIndex += 1;
+
+								}
+								if (p22.x > -10000.f) {
+									finalAveragePoint += p22;
+									finalPlaneNorm += glm::normalize(glm::cross(tri.vec_1 - tri.vec_2, tri.vec_3 - tri.vec_2));
+									//objectList[sphereIndex]->setNewPos(p22);
+									//objectList[sphereIndex]->isWireframe = true;
+									sphereIndex += 1;
+								}
+
+
+
+
+								if (p13.x > -10000.f) {
+									finalAveragePoint += p13;
+									finalPlaneNorm += glm::normalize(glm::cross(tri.vec_1 - tri.vec_2, tri.vec_3 - tri.vec_2));
+									//objectList[sphereIndex]->setNewPos(p13);
+									//objectList[sphereIndex]->isWireframe = true;
+									sphereIndex += 1;									
+								}
+								if (p23.x > -10000.f) {
+									finalAveragePoint += p23;
+									finalPlaneNorm += glm::normalize(glm::cross(tri.vec_1 - tri.vec_2, tri.vec_3 - tri.vec_2));
+									//objectList[sphereIndex]->setNewPos(p23);
+									//objectList[sphereIndex]->isWireframe = true;
+									sphereIndex += 1;
+								}
 #endif
-								
-							}
-							
-							sphereIndex += 6;
+							//}
 						}
 					}
 				}
-			}
-			//else									std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is NOT touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
-			//if (sphere1.isTouching(planeList[pp]))	std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
-			//else									std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is NOT touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
-		}
-		//std::cout << "Searching through the planes took " << glfwGetTime() - startPlaneTime << " seconds\n";
-
-
-		/*
-		startPlaneTime = glfwGetTime();
-		for (int pp = 0; pp < planeList.size(); pp++) {
-			if (planeList[pp]->isTouching(&sphere1)) {
-				//std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
-				glm::vec3 newSpherePos = planeList[pp]->objPos;
-				glm::vec3 newSphereRadi = glm::vec3(planeList[pp]->objRadius * planeList[pp]->objScale);
-				glm::vec4 color = planeList[pp]->color;
-
-				Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
 				newSphere.isWireframe = true;
 				newSphere.draw(lightPos, lightColor);
-				for (Triangle tri : planeList[pp]->triangles) {
-					if (sphere1.isTouching(&tri)) {
-						//newSphere.isWireframe = true;
-						//newSphere.draw(lightPos, lightColor);
-						//glm::vec3 newSpherePos = tri.center;
-						//glm::vec3 newSphereRadi = glm::vec3(tri.radius);
-						//glm::vec4 color = tri.v1->color;
-						//
-						//Sphere newSphere(window, newSpherePos, newSphereRadi, 1.f, 3, true, color, empty, &camera);
-						//newSphere.isWireframe = true;
-						//newSphere.draw(lightPos, lightColor);
-						int sphereIndex = startingSphereIndex;
-						//std::cout << "Starting index = " << sphereIndex << "\n";
-						for (int tt = 0; tt < sphere1.triangles.size(); tt++) {
+				glm::vec3 finalSpherePos = finalAveragePoint / float(sphereIndex - startingSphereIndex);// sphere1.triangles[tt].center;
+				finalPlaneNorm /= float(sphereIndex - startingSphereIndex);;
+				glm::vec3 finalSphereRadi = glm::vec3(1.f);
+				glm::vec4 finalSphereColor = glm::vec4(0.0f, 0.2, 1.f, 1.f);
+
+				if (sphereIndex > startingSphereIndex) {
+					//sphere1.applyForce(Force(finalSpherePos, -sphere1.velocity / (1.f / 60.f)));
+
+					//Triangle *t = &planeList[pp]->triangles[0];
+					//t->genCircle();
+					//glm::vec3 finalPlaneNorm = glm::normalize(glm::cross(t->vec_1 - t->vec_2, t->vec_3 - t->vec_2));
 
 
-							glm::vec3 p11 = glm::vec3(-1000000.f), p12 = glm::vec3(-1000000.f), p13 = glm::vec3(-1000000.f);
-							glm::vec3 p21 = glm::vec3(-1000000.f), p22 = glm::vec3(-1000000.f), p23 = glm::vec3(-1000000.f);
-							glm::vec3 standardPos = glm::vec3(0.f);
+					//glm::vec3 planeNorm = transpose(inverse(glm::mat3(planeList[pp]->model))) * planeList[pp]->triangles[0].v1->norm;
+					//std::cout << "planeNorm = (" << finalPlaneNorm.x << ", " << finalPlaneNorm.y << ", " << finalPlaneNorm.z << ")\n";
+					//std::cout << "returnVec = (" << returnVec.x << ", " << returnVec.y << ", " << returnVec.z << ")\n";
+					//glm::vec3 returnVec = sphere1.isPointInsideModel(finalSpherePos);
+					//sphere1.objPos += returnVec;
 
-							//sphere1.isTouching(&tri, tt, &p11, &p12, &p13, &p21, &p22, &p23);
-							if (sphere1.isTouching(&tri, tt, &p11, &p12, &p13, &p21, &p22, &p23)) {
-								objectList[sphereIndex]->setNewPos(p11);
-								sphereIndex += 1;
+					sphere1.reflectAbout(Force(finalSpherePos, finalPlaneNorm));
 
-								objectList[sphereIndex]->setNewPos(p12);
-								sphereIndex += 1;
-
-								objectList[sphereIndex]->setNewPos(p13);
-								sphereIndex += 1;
-
-								objectList[sphereIndex]->setNewPos(p21);
-								sphereIndex += 1;
-
-								objectList[sphereIndex]->setNewPos(p22);
-								sphereIndex += 1;
-
-								objectList[sphereIndex]->setNewPos(p23);
-								sphereIndex += 1;
-							}
-
-							else {
-								objectList[sphereIndex]->setNewPos(standardPos);
-								sphereIndex += 1;
-
-								objectList[sphereIndex]->setNewPos(standardPos);
-								sphereIndex += 1;
-
-								objectList[sphereIndex]->setNewPos(standardPos);
-								sphereIndex += 1;
-
-								objectList[sphereIndex]->setNewPos(standardPos);
-								sphereIndex += 1;
-
-								objectList[sphereIndex]->setNewPos(standardPos);
-								sphereIndex += 1;
-
-								objectList[sphereIndex]->setNewPos(standardPos);
-								sphereIndex += 1;
-							}
-							//std::cout << "sphereIndex = " << sphereIndex << "\n";
-						}
-					}
+					//glm::vec3 dragDir = glm::normalize(glm::cross(glm::cross(-sphere1.velocity, planeNorm), planeNorm));
+					//if (glm::length(dragDir) > 0.001f) {
+					//	std::cout << "doin drag\n";
+					//	sphere1.applyForce(Force(finalSpherePos, -dragDir * 10.f));
+					//}
 				}
+
+
+				Sphere finalSphere(window, finalSpherePos, finalSphereRadi, 0.1f, 3, true, finalSphereColor, empty, &camera);
+				//finalSphere.isWireframe = true;
+				finalSphere.draw(lightPos, lightColor);
+				//std::cout << "sphereIndex = " << sphereIndex << "\n";
 			}
 			//else									std::cout << "plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ") is NOT touching sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ")\n";
 			//if (sphere1.isTouching(planeList[pp]))	std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
 			//else									std::cout << "sphere1 (" << sphere1.objPos.x << ", " << sphere1.objPos.y << ", " << sphere1.objPos.z << ") is NOT touching plane[" << pp << "] (" << planeList[pp]->objPos.x << ", " << planeList[pp]->objPos.y << ", " << planeList[pp]->objPos.z << ")\n\n";
 		}
 		//std::cout << "Searching through the planes took " << glfwGetTime() - startPlaneTime << " seconds\n";
-		*/
+#endif
+		//sphere1.applyForce(Force(glm::vec3(0.f, 10000.f, 0.f), glm::vec3(0.0f, -9.81f, 0.0f)));
+		sphere1.getNextPos();
+
+		//sphere1.applyForce(Force(sphere1.objPos + sphere1.velocity, -sphere1.velocity * .1f));
 
 		if (!shouldFly && trackSphere)
 			camera.setMousePos(sphere1.objPos - camera.cameraPos, true, true);
-
 		
 		if (setCamera != 0) {
 			if (setCamera > 0)
@@ -1130,28 +1166,32 @@ int main()
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
 			tree1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
-			sphere1.setNewPos(sphere1.objPos + glm::vec3(-camSpeed / 100.f, 0.f, 0.f));
+			sphere1.applyForce(Force(sphere1.objPos + glm::vec3(1.f, 0.f, 0.f), glm::vec3(-camSpeed / 100.f, 0.f, 0.f)));
+			//sphere1.setNewPos(sphere1.objPos + glm::vec3(-camSpeed / 100.f, 0.f, 0.f));
 			//sphere1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
 			//planeaPos.x -= 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_UP)) {
 			tree1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
-			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.f, -camSpeed / 100.f));
+			sphere1.applyForce(Force(sphere1.objPos + glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -camSpeed / 100.f)));
+			//sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.f, -camSpeed / 100.f));
 			//sphere1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
 			//planeaPos.y += 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_DOWN)) {
 			tree1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
-			sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.f, camSpeed / 100.f));
+			sphere1.applyForce(Force(sphere1.objPos + glm::vec3(0.f, 0.f, -1.f), glm::vec3(0.f, 0.f, camSpeed / 100.f)));
+			//sphere1.setNewPos(sphere1.objPos + glm::vec3(0.0f, 0.f, camSpeed / 100.f));
 			//sphere1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
 			//planeaPos.y -= 0.01f;
 			//planea.setNewPos(planeaPos);
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_RIGHT)) {
 			tree1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
-			sphere1.setNewPos(sphere1.objPos + glm::vec3(camSpeed / 100.f, 0.f, 0.f));
+			sphere1.applyForce(Force(sphere1.objPos + glm::vec3(-1.f, 0.f, 0.f), glm::vec3(camSpeed / 100.f, 0.f, 0.f)));
+			//sphere1.setNewPos(sphere1.objPos + glm::vec3(camSpeed / 100.f, 0.f, 0.f));
 			//sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
 			//planeaPos.x += 0.01f;
 			//planea.setNewPos(planeaPos);
@@ -1197,9 +1237,10 @@ int main()
 			//	p->setScale(planeScale1);
 			//	p->setLevel(planeLevel);
 			//}
-			tree1SphereLevel--;
-			tree1.setSphereLevel(tree1SphereLevel);
-			lockoutTimer = crntTime + 0.2;
+			//tree1SphereLevel--;
+			//tree1.setSphereLevel(tree1SphereLevel);
+			//lockoutTimer = crntTime + 0.2;
+			planea.rotate(.5f, glm::vec3(0.f, 0.f, 1.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_0) && lockoutTimer <= crntTime) {
 			//std::cout << "\nLevel: " << level << "\n";
@@ -1208,9 +1249,10 @@ int main()
 			//	p->setScale(planeScale1);
 			//	p->setLevel(planeLevel);
 			//}
-			tree1SphereLevel++;
-			tree1.setSphereLevel(tree1SphereLevel);
-			lockoutTimer = crntTime + 0.2;
+			//tree1SphereLevel++;
+			//tree1.setSphereLevel(tree1SphereLevel);
+			//lockoutTimer = crntTime + 0.2;
+			planea.rotate(-.5f, glm::vec3(0.f, 0.f, 1.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_R) && lockoutTimer <= crntTime) {
 			//sphere1.doRandomColors(randomColor);

@@ -61,6 +61,7 @@ void Plane::genOctahedron() {
 			GLfloat x, z, y = 0.f;
 			x = ((uu * 2) - (vertsPerSide - 1)) / (float)(vertsPerSide - 1);	// Goes from -1.f =>  1.f
 			z = ((vertsPerSide - 1) - (vv * 2)) / (float)(vertsPerSide - 1);	// Goes from  1.f => -1.f
+			//y += noise(glm::vec2(x * objScale + objPos.x, z * objScale + objPos.z)) / 10.f;
 
 			if (randomColor) {
 				float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);

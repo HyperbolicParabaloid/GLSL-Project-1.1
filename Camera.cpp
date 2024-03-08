@@ -262,7 +262,7 @@ bool Camera::setMousePos(glm::vec3 _newForward, bool lockCursorMovement, bool _s
 	// This values controls at what point the cameraForward vector will snap onto the target,
 	// without it the function will run essentially forever getting infinitely closer but never
 	// reaching it due to decaying size of the deltaForward and floating point errors.
-	float snapInPlaceDistance = 0.001f;
+	float snapInPlaceDistance = 0.01f;
 
 	// Normalizing the _newForward vector to make sure the delta's work out.
 	_newForward = glm::normalize(_newForward);

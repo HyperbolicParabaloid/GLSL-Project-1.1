@@ -36,6 +36,10 @@ private:
 	bool doNormalArrows;
 	std::string name;
 
+	int samePosCount;
+	std::vector<glm::vec3> velocityHistory;
+	std::vector<glm::vec3> posHistory;
+
 	VAO VAO;
 
 public:
@@ -68,11 +72,14 @@ public:
 	glm::mat4 model;
 	glm::vec3 objPos;
 
+	glm::vec3 pastObjPos;
+
 	// Physics elements
-	float mass = -1.f;
-	float velocity = 0.f;
-	float acceleration = 0.f;
-	float rotationalVelocity = 0.f;
+	float deltaTime;
+	float mass;
+	glm::vec3 velocity;
+	float rotationalVelocity;
+	glm::vec3 rotationalAxis;
 
 	bool isTouching(Object* obj);
 	bool isTouching(Triangle* tri);
@@ -84,6 +91,13 @@ public:
 	
 	bool pointProjection(Triangle* triangle, glm::vec3 planePoint0, glm::vec3 planeNormal, glm::vec3 rayStart, glm::vec3 rayDirection, glm::vec3 *_p);
 	glm::vec3 pointProjection(Triangle* triangle, glm::vec3 planePoint0, glm::vec3 planeNormal, glm::vec3 rayStart, glm::vec3 rayDirection);
+
+	glm::vec3 isPointInsideModel(glm::vec3 p);
+
+	void applyForce(Force f);
+	void reflectAbout(Force f);
+
+	void getNextPos();
 
 	bool doPhysics = false;
 	bool isSolid = false;

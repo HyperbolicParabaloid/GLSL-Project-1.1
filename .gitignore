@@ -8,7 +8,7 @@
 *.com
 *.class
 *.dll
-*.exe
+#*.exe
 *.o
 *.so
 
@@ -24,6 +24,7 @@
 *.rar
 *.tar
 *.zip
+*.db
 
 # Logs and databases #
 ######################
@@ -38,7 +39,5 @@
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
-Thumbs.db
 
-x64
+x64/*

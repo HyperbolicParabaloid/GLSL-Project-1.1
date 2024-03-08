@@ -44,6 +44,15 @@ struct Triangle {
 	float radius;
 };
 
+struct Force {
+	Force(glm::vec3 _pos, glm::vec3 _dir) {
+		pos = _pos;
+		dir = _dir;
+	}
+	glm::vec3 pos;
+	glm::vec3 dir;
+};
+
 class VBO
 {
 public:

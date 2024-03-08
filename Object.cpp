@@ -12,6 +12,15 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	model = glm::scale(model, glm::vec3(objScale));
 	camera = _camera;
 	textures = _textures;
+
+	pastObjPos = glm::vec3(0.f);
+	samePosCount = 0;
+
+	deltaTime = 1.f / 60.f;
+	mass = 10.f;
+	velocity = glm::vec3(0.f);
+	rotationalVelocity = 0.f;
+	rotationalAxis = glm::vec3(0.f);
 }
 
 void Object::setNewPos(glm::vec3 _objPos) {
@@ -565,156 +574,181 @@ bool Object::barycentricInterpolation(Triangle* tri, glm::vec3 p) {
 	return ((u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.01f));
 }
 
-// Determine if a given triangle intersects with any of the triangles on the Object.
-bool Object::triangleIntersection(Triangle* tri) {
-	tri->genCircle();
 
-	// First intersection method: on the same plane
+void Object::applyForce(Force f) {
+	//std::cout << "f.dir = (" << f.dir.x << ", " << f.dir.y << ", " << f.dir.z << ")\n";
+
+	float coefficient_of_friction = 0.8f;
+
+	glm::vec3 forcePos_to_center = objPos - f.pos;
+	float theta_forcePos_to_center_Dot_forceDir = 0.f;
+
+	glm::vec3 forcePos_to_center_X_forceDir = glm::cross(glm::normalize(forcePos_to_center), glm::normalize(f.dir));
+	theta_forcePos_to_center_Dot_forceDir = acos(glm::dot(glm::normalize(forcePos_to_center), glm::normalize(f.dir)));
+
+	velocity += f.dir * deltaTime * cos(theta_forcePos_to_center_Dot_forceDir);// glm::normalize(f.dir)* linearAcceleration* deltaTime;
+	//rotationalVelocity = (glm::length(f.dir) * sin(theta_forcePos_to_center_Dot_forceDir)) / (glm::length(forcePos_to_center));
+	//rotationalAxis = forcePos_to_center_X_forceDir;
+
+	//std::cout << "theta_forcePos_to_center_Dot_forceDir = " << theta_forcePos_to_center_Dot_forceDir << "\n";
+
+	//float linearAcceleration;
+	//float angularAcceleration;
 	//
-	// Let T1, T2 be triangles, and let { v10, v11, v12 }, and { v20, v21, v22 } be their
-	// respective vertices. Finally, let Pi1 and Pi2 be the planes on which T1 and T2 lie
-	// respectively.
-	// 
-	// The equation dot(n2, X) + d2 == 0 determines if a given point, X, is on the plane.
-	// n2 denotes the normal of the plane. The dot product of two vectors gives the cos of
-	// the angle between them.
+	//if (glm::degrees(theta_forcePos_to_center_Dot_forceDir) > 0.f && glm::degrees(theta_forcePos_to_center_Dot_forceDir) < 180.f) {
 	//
-	// Therefore, for any given point, X, if the angle given by dot(n2, X) == d2, d2 being the
-	// computed angle between the normal and a point on the plane (it'll always be 90 degrees btw)
-	// then that point is on the plane as well. Rearranging: we get dot(n2, X) + d2 == 0.
+	//	linearAcceleration = glm::length(f.dir) * cos(theta_forcePos_to_center_Dot_forceDir);
+	//	angularAcceleration = glm::length(f.dir) * sin(theta_forcePos_to_center_Dot_forceDir);
+	//}
+	//else {
+	//	linearAcceleration = glm::length(f.dir);
+	//	angularAcceleration = 0.f;
+	//}
+
+	//std::cout << "forcePos_to_center_X_forceDir = (" << forcePos_to_center_X_forceDir.x << ", " << forcePos_to_center_X_forceDir.y << ", " << forcePos_to_center_X_forceDir.z << ")\n";
+	//std::cout << "linearAcceleration = " << linearAcceleration << "\n";
+	//std::cout << "linearAcceleration * deltaTime = " << linearAcceleration * deltaTime << "\n";
+
+	//std::cout << "\nvelocity = (" << velocity.x << ", " << velocity.y << ", " << velocity.z << ")\n";
+	
+
+	// \/ * cos(theta_forcePos_to_center_Dot_forceDir)
+	//std::cout << "velocity = (" << velocity.x << ", " << velocity.y << ", " << velocity.z << ")\n";
+	//rotationalAxis = forcePos_to_center_X_forceDir;
+	//rotationalVelocity += angularAcceleration * deltaTime * glm::length(forcePos_to_center);
+
+	//std::cout << "forcePos_to_center = (" << forcePos_to_center.x << ", " << forcePos_to_center.y << ", " << forcePos_to_center.z << ")\n";
+	//std::cout << "forcePos_to_center_X_forceDir = (" << forcePos_to_center_X_forceDir.x << ", " << forcePos_to_center_X_forceDir.y << ", " << forcePos_to_center_X_forceDir.z << ")\n";
 	//
-	// Therefore, if dot(n2, Xi) + d2 == 0, for all Xi = { v10, v11, v12 }, the the triangle T1 is
-	// on the same plane as triangle T2.
-	//
-	// If however, all points dot(n2, Xi) + d2 != 0, for all Xi = { v10, v11, v12 }, and the sign of
-	// dot(n2, Xi) + d2 are all the same, then all the points lie on one side of the triangle or the other.
-	// If however, there are at least two with different signs, then the triangle T1 is stabbing through the
-	// plane in some manner.
-	//
-	// Handling the same computation with T2 and Pi1 will let us reject trivial cases early and save
-	// on computation time.
+	//std::cout << "theta_forcePos_to_center_Dot_forceDir = " << theta_forcePos_to_center_Dot_forceDir << "\tsin(theta) = " << sin(glm::radians(theta_forcePos_to_center_Dot_forceDir)) << "\tcos(theta) = " << cos(glm::radians(theta_forcePos_to_center_Dot_forceDir)) << "\n";
+}
 
-	bool anyHits = false;
+void Object::reflectAbout(Force f) {
 
-	float lenA = 0.f;
-	float lenB = tri->radius;
-	for (int tt = 0; tt < triangles.size(); tt++) {
-		triangles[tt].genCircle();
-		lenA = triangles[tt].radius;
-		//glm::length(tri->center - triangles[tt].center) <= lenA + lenB;
-		glm::vec3 triNorm = glm::vec3(0.f, 1.f, 0.f);
-		float p = dot(triangles[tt].center - tri->center, triNorm) / glm::length(triNorm);
-		//std::cout << "p = " << p;
+	float bounciness = 1.2f;
+	float drag = -0.01f;
+	
+	glm::vec3 normal = glm::normalize(f.dir);
+	float angle = acos(glm::dot(normal, normalize(velocity)));
 
-		if (p < lenA && p > -lenA) {
-			glm::vec3 v20 = tri->vec_1;	// Triangle 2's vertices
-			glm::vec3 v21 = tri->vec_2;
-			glm::vec3 v22 = tri->vec_3;
-			glm::vec3 n2 = cross(v21 - v20, v22 - v20);	// Triangle 2's normal
-			float d2 = dot(-n2, v20);	// Triangle 2's cos(angle between -n2 and one of the vertices)
-
-			glm::vec3 v10 = triangles[tt].vec_1;	// Triangle 2's vertices
-			glm::vec3 v11 = triangles[tt].vec_2;
-			glm::vec3 v12 = triangles[tt].vec_3;
-			glm::vec3 n1 = cross(v11 - v10, v12 - v10);	// Triangle 2's normal
-			float d1 = dot(-n1, v10);	// Triangle 2's cos(angle between -n2 and one of the vertices)
-
-			float dot_n2_v10 = dot(n2, v10) + d2, dot_n1_v20 = dot(n1, v20) + d1;	// Calculating the sum of dot(n2/1, v1/2 0->2) + d2/1.
-			float dot_n2_v11 = dot(n2, v11) + d2, dot_n1_v21 = dot(n1, v21) + d1;	// Result will be 0 if the given point is on the plane.
-			float dot_n2_v12 = dot(n2, v12) + d2, dot_n1_v22 = dot(n1, v22) + d1;
-
-			float same_v10_v11 = signbit(dot_n2_v10) == signbit(dot_n2_v11);
-			float same_v12_v10 = signbit(dot_n2_v12) == signbit(dot_n2_v10);
-			float same_v11_v12 = signbit(dot_n2_v11) == signbit(dot_n2_v12);
-
-			float same_v20_v21 = signbit(dot_n1_v20) == signbit(dot_n1_v21);
-			float same_v22_v20 = signbit(dot_n1_v22) == signbit(dot_n1_v20);
-			float same_v21_v22 = signbit(dot_n1_v21) == signbit(dot_n1_v22);
-
-			if ((dot_n2_v10 == 0 && dot_n2_v11 == 0 && dot_n2_v12 == 0) && (dot_n1_v20 == 0 && dot_n1_v21 == 0 && dot_n1_v22 == 0)) {
-				// Both triangles on the same plane
-				std::cout << "Triangle[" << tt << "Same plane\n";
-				anyHits = true;
-			}
-			else if ((int(same_v10_v11) && int(same_v11_v12)) || (int(same_v20_v21) && int(same_v21_v22))) {
-				// T1 is on one side of Pi2.
-				// T2 is on one side of Pi1.
-				std::cout << "Triangle[" << tt << "]Trivial reject\n";
-				//anyHits = false;
-			}
-			else {
-				glm::vec3 t2_same_side_1, t2_same_side_2, t2_opposite_side;
-				glm::vec3 t1_same_side_1, t1_same_side_2, t1_opposite_side;
-
-				t1_same_side_1 = (v10 * same_v10_v11) + (v12 * same_v12_v10) + (v11 * same_v11_v12);
-				t1_same_side_2 = (v11 * same_v10_v11) + (v10 * same_v12_v10) + (v12 * same_v11_v12);
-				t1_opposite_side = (v12 * same_v10_v11) + (v11 * same_v12_v10) + (v10 * same_v11_v12);
-
-				t2_same_side_1 = (v20 * same_v20_v21) + (v22 * same_v22_v20) + (v21 * same_v21_v22);
-				t2_same_side_2 = (v21 * same_v20_v21) + (v20 * same_v22_v20) + (v22 * same_v21_v22);
-				t2_opposite_side = (v22 * same_v20_v21) + (v21 * same_v22_v20) + (v20 * same_v21_v22);
-
-				// Some amount of T1 pierces through Pi2 (for T2 and Pi1 also) with the line representing this cross section being
-				// L = O + tD,	with D = n1 x n2 being the direction of the line and O being some point on the line.
-				// Since the planes overlap, the triangles are guaranteed to both be intersected by the line L.
-				//
-				// Therefore, if we get the intervals of this intersection for both triangles, then the overlap between the two set of
-				// intervals, will represent the overlap of the two triangles.
-
-				// The result of the overlap test does not change if we project onto the
-				// coordinate axis with which it is most closely aligned.Therefore equation can be
-				// simplified:
-
-				glm::vec3 D = cross(n1, n2);	// Defines the line representing the intersection between Pi1 and Pi2.
-				float D_max = std::max({ abs(D.x), abs(D.y), abs(D.z) });
-				int D_max_x = (D_max == abs(D.x)), D_max_y = (D_max == abs(D.y)), D_max_z = (D_max == abs(D.z));
-				float p1_same_1, p1_same_2, p1_opposite, p2_same_1, p2_same_2, p2_opposite;
-
-				// Wrote this with branchless coding techniques to squeeze out some performance.
-				p1_same_1 = (t1_same_side_1.x * D_max_x) + (t1_same_side_1.y * D_max_y) + (t1_same_side_1.z * D_max_z);
-				p1_opposite = (t1_opposite_side.x * D_max_x) + (t1_opposite_side.y * D_max_y) + (t1_opposite_side.z * D_max_z);
-				p1_same_2 = (t1_same_side_2.x * D_max_x) + (t1_same_side_2.y * D_max_y) + (t1_same_side_2.z * D_max_z);
-
-				p2_same_1 = (t2_same_side_1.x * D_max_x) + (t2_same_side_1.y * D_max_y) + (t2_same_side_1.z * D_max_z);
-				p2_opposite = (t2_opposite_side.x * D_max_x) + (t2_opposite_side.y * D_max_y) + (t2_opposite_side.z * D_max_z);
-				p2_same_2 = (t2_same_side_2.x * D_max_x) + (t2_same_side_2.y * D_max_y) + (t2_same_side_2.z * D_max_z);
-
-				float d1_same_1, d1_same_2, d1_opposite;
-				float d2_same_1, d2_same_2, d2_opposite;
-
-				d1_same_1 = (dot_n2_v10 * same_v10_v11) + (dot_n2_v12 * same_v12_v10) + (dot_n2_v11 * same_v11_v12);
-				d1_same_2 = (dot_n2_v11 * same_v10_v11) + (dot_n2_v10 * same_v12_v10) + (dot_n2_v12 * same_v11_v12);
-				d1_opposite = (dot_n2_v12 * same_v10_v11) + (dot_n2_v11 * same_v12_v10) + (dot_n2_v10 * same_v11_v12);
-
-				d2_same_1 = (dot_n1_v20 * same_v20_v21) + (dot_n1_v22 * same_v22_v20) + (dot_n1_v21 * same_v21_v22);
-				d2_same_2 = (dot_n1_v21 * same_v20_v21) + (dot_n1_v20 * same_v22_v20) + (dot_n1_v22 * same_v21_v22);
-				d2_opposite = (dot_n1_v22 * same_v20_v21) + (dot_n1_v21 * same_v22_v20) + (dot_n1_v20 * same_v21_v22);
-
-				float interval_11 = p1_same_1 + ((p1_opposite - p1_same_1) * (d1_same_1 / (d1_same_1 - d1_opposite)));
-				float interval_12 = p1_same_2 + ((p1_opposite - p1_same_2) * (d1_same_2 / (d1_same_2 - d1_opposite)));
-
-				float interval_21 = p2_same_1 + ((p2_opposite - p2_same_1) * (d2_same_1 / (d2_same_1 - d2_opposite)));
-				float interval_22 = p2_same_2 + ((p2_opposite - p2_same_2) * (d2_same_2 / (d2_same_2 - d2_opposite)));
-
-
-				// Gotta now see if intervals overlap.
-				std::cout << "Triangle[" << tt << "] Gotta now see if intervals overlap.\n";
-
-				anyHits = true;
-			}
-		}
+	// Returning out if the angle is less than 90 degrees, because that means we struck the back face of
+	// the mesh, which we don't want to reflect off of.
+	glm::vec3 returnVec = isPointInsideModel(f.pos);
+	objPos += returnVec;
+	if (glm::degrees(angle) < 90.f) {
+		return;
 	}
-	return anyHits;
+
+	glm::vec3 normal_cross_velocity = glm::cross(normal, velocity);
+
+	float theta = acos(glm::dot(normal, -normalize(velocity)));
+	glm::vec3 axis = glm::cross(normal, -normalize(velocity));
+
+	rotationalVelocity = -glm::radians((glm::length(velocity - velocity * normal) / length(objPos - f.pos)) * sin(theta));
+	rotationalAxis = axis;
+
+	glm::mat4 rotationMatrix = glm::mat4(1.f);
+	glm::rotate(rotationMatrix, angle, normal_cross_velocity);
+
+	glm::vec3 reflect = glm::vec3(rotationMatrix * glm::vec4(normal, 1.f)) * glm::length(velocity * normal);// *cos(theta);
+	velocity += (reflect * bounciness) + ((velocity + reflect) * drag);
+
+	// Just to ensure objects don't sink through walls when they get pinched
+
+
+	// NEED TO MAKE WAY BETTER VERSION OF THIS ONE!
+	//if (glm::length(objPos - f.pos) - objRadius < 0.f) {
+	//	objPos -= glm::normalize(objPos - f.pos) * (glm::length(objPos - f.pos) - objRadius);
+	//}
+
+	//glm::vec3 reflect = normal * glm::length(velocity) * 1.8f;
+
+	//std::cout << "reflect = (" << reflect.x << ", " << reflect.y << ", " << reflect.z << ")\n";
+
+
+	//glm::vec3 forwardDir = -glm::normalize(glm::cross(glm::cross(velocity, normal), normal) * velocity) * glm::length(velocity);
+
+	//glm::vec3 conservation_of_energy_constant = 0.5f * mass * (velocity * velocity);
+	//velocity = sqrt((conservation_of_energy_constant * 2.f) / mass);
+
+	//velocity = normal * glm::length(velocity) * 1.5f + velocity;// -velocity * percent_of_velocity_exchange;
+	////applyForce(Force(f.pos, f.dir));
+	//glm::vec3 dragVelocity = (normal * glm::length(velocity) + velocity) * -.01f;
+	//glm::vec3 dragVelocity = glm::vec3(0.f);
+
+	//std::cout << "forwardDir = (" << forwardDir.x << ", " << forwardDir.y << ", " << forwardDir.z << ")\n";
+	//if (glm::length(forwardDir) >= 0.00000001f) 
+	//	velocity += (forwardDir) * 0.01f;
+	////applyForce(Force(f.pos, dragVelocity));
+	//velocity += dragVelocity;
+
+	//float angle = acos(glm::dot(normal , -normalize(velocity)));
+	//float velocity_magnitude = glm::length(velocity);
+	//
+	//glm::vec3 velocity_X_normal = glm::cross(normal, -normalize(velocity));
+
+	//if (abs(glm::degrees(angle)) < 179.9f && abs(glm::degrees(angle)) > 0.1f) {
+	//	//angle *= !(ceil(abs(glm::degrees(angle))) < 179.f && floor(abs(glm::degrees(angle))) > 1.f);
+	//
+	//	glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.f), -angle, velocity_X_normal);
+	//
+	//	glm::vec4 scaled_normal = glm::vec4(normal * velocity_magnitude, 1);
+	//
+	//
+	//	//std::cout << "\nvelocity mag = (" << velocity_magnitude << "\n";
+	//	//std::cout << "Old velocity = (" << velocity.x << ", " << velocity.y << ", " << velocity.z << "), angle = " << glm::degrees(angle) << "\n";
+	//
+	//	velocity = glm::vec3(rotationMatrix * scaled_normal) * percent_of_velocity_exchange;
+	//
+	//	//std::cout << "New velocity = (" << velocity.x << ", " << velocity.y << ", " << velocity.z << "), angle = " << glm::degrees(angle) << "\n";
+	//}
+	//else if (abs(glm::degrees(angle)) == 0.f) {
+	//}
 }
 
-// Finds the exact spot (if it exits) on the current object's mesh where the given object's mesh is touching
-// it. From this we can use their relative kinematic values to determine each ones new values based on this
-// collision.
-glm::vec3 Object::getIntersection(Object* obj) {
-	// So in general, we need to ask every triangle on each object if they're colliding with each other.
-	// This will be pretty obviously slow as death. Though it won't change from being O(n^2), adding a 
-	// heuristic to guess at which triangles would be best to search first would be smart. 
 
+void Object::getNextPos() {
 
-	return glm::vec3(0.f);
+	float terminal_velocity = 100.f;
+	if (glm::length(velocity) > terminal_velocity)
+		velocity = glm::normalize(velocity) * terminal_velocity;
+
+	objPos += velocity * deltaTime;
+
+	glm::mat4 newModel = glm::translate(glm::mat4(1.f), objPos);
+	if (glm::length(rotationalAxis) > 0.f && abs(rotationalVelocity) > 0.f)
+		newModel = glm::rotate(newModel, rotationalVelocity, rotationalAxis);
+
+	glm::mat3 rotationMatrix = (1.0f / objScale) * glm::mat3(model);
+	newModel = newModel * glm::mat4(rotationMatrix);
+
+	model = glm::scale(newModel, glm::vec3(objScale));
 }
+
+
+glm::vec3 Object::isPointInsideModel(glm::vec3 p) {
+
+	float t = 10000.f;
+	glm::vec3 returnVec = glm::vec3(0.f);
+
+	for (Triangle tri : triangles) {
+		tri.genCircle();
+		glm::vec3 triNorm = glm::cross(tri.vec_1 - tri.vec_3, tri.vec_2 - tri.vec_3);
+
+		// Normal of triangle, A.K.A., normal of plane.
+		glm::vec3 triCenter = tri.vec_3 - p;
+
+		// Here, t is the shortest distance from the center of the circle generated by triangles[index].
+		if (-glm::dot(triCenter, -triNorm) < t) {
+			t = -glm::dot(triCenter, -triNorm);
+			returnVec = -triNorm * t;
+		}
+	
+
+		//if (t <= 0.1f)
+		//	returnVec = glm::vec3(0.f);// -triNorm * t;
+	}
+
+	return returnVec;
+}
+
