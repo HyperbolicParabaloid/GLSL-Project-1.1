@@ -76,6 +76,11 @@ void Object::setVBOandEBO(std::string msg) {
 		name = msg;
 		shaderProgram = new Shader("tree.vert", "tree.frag");
 	}
+	else if (msg == "UI") {
+		name = msg;
+		std::cout << "UI ELEMENT\n";
+		shaderProgram = new Shader("ui.vert", "ui.frag");
+	}
 	else
 		shaderProgram = new Shader("object.vert", "object.frag");
 	shaderProgram->Activate();
@@ -165,6 +170,11 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 	else if (msg == "Tree") {
 		name = msg;
 		shaderProgram = new Shader("tree.vert", "tree.frag");
+	}
+	else if (msg == "UI") {
+		name = msg;
+		std::cout << "UI ELEMENT\n";
+		shaderProgram = new Shader("ui.vert", "ui.frag");
 	}
 	else
 		shaderProgram = new Shader("object.vert", "object.frag");

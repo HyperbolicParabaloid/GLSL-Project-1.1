@@ -78,6 +78,9 @@
     <ClCompile Include="Tree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="default.vert">
@@ -117,6 +120,12 @@
       <Filter>Resource Files\shaders</Filter>
     </None>
     <None Include="tree.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="ui.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="ui.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>
@@ -167,6 +176,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Tree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

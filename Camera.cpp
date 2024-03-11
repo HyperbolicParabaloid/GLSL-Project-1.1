@@ -103,34 +103,18 @@ glm::vec3 Camera::getLookDirection() {
 	double xpos, ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
 
-	double halfWidth  = width / 2;
-	double yawExtent = FOV / 2;
+	// make cursor coordinates from -1 -> +1
+	float pt_x = (xpos / width) * 2.f - 1.f;
+	float pt_y = -(ypos / width) * 2.f + 1.f;
 
-	double halfHeight = halfWidth * aspectRatio;
-	double pitchExtent = (FOV * aspectRatio) / 2;
+	float nearClip = 0.1f, w = 1.f;
+	glm::vec4 rasterCoords = glm::vec4(pt_x, pt_y, nearClip, w);
 
-	//float _yaw		=  glm::clamp((xpos - halfWidth) / halfWidth * yawExtent, -yawExtent, yawExtent);
-	//float _pitch	=  -glm::clamp((ypos - halfHeight) / halfHeight * pitchExtent, -pitchExtent, pitchExtent);
-	float _yaw = (xpos - halfWidth) / halfWidth * yawExtent;
-	float _pitch = -((ypos - halfHeight) / halfHeight * pitchExtent);
+	glm::mat4 cam_to_world = inverse(view);
+	glm::mat4 model_to_cam = inverse(glm::translate(glm::mat4(1.f), cameraPos));
+	glm::vec3 f = model_to_cam * cam_to_world * rasterCoords;
 
-	//glm::mat4 rotationMat = glm::mat4(1.f);
-	//rotationMat = glm::rotate(rotationMat, glm::radians(_yaw), glm::vec3(0.f, 1.f, 0.f));
-	//rotationMat = glm::rotate(rotationMat, glm::radians(_pitch), glm::vec3(1.f, 0.f, 0.f));
-	//glm::vec4 cam = glm::vec4(cameraForward, 1.f);
-	//glm::vec3 direction = glm::vec3(cam * rotationMat);
-
-	//std::cout << "Screen Coords = (" << _yaw << ", " << _pitch << ")\n";
-
-	_pitch += glm::degrees(asin(cameraForward.y));
-	_yaw += glm::degrees(atan2(cameraForward.z, cameraForward.x));
-
-	glm::vec3 direction;
-	direction.x = cos(glm::radians(_yaw)) * cos(glm::radians(_pitch));
-	direction.y = sin(glm::radians(_pitch));
-	direction.z = sin(glm::radians(_yaw)) * cos(glm::radians(_pitch));
-	
-	return direction;
+	return f;
 }
 
 
@@ -212,8 +196,6 @@ void Camera::set_camera_sensitivity(float _cameraSense) {
 glm::vec3 Camera::track_movement() {
 	if (motionEnabled) {
 		mouse_callback();
-		//glm::vec3 d = cameraForward;
-		//std::cout << "camDir = (" << d.x << ", " << d.y << ", " << d.z << ")" << std::endl;
 		processInput();
 
 		glm::vec3 d = cameraForward;
@@ -222,17 +204,12 @@ glm::vec3 Camera::track_movement() {
 		glm::vec3 newObjPos = cameraPos + d * scalerValue;
 		return newObjPos;
 	}
-	else {
-		//glm::vec3 d = getLookDirection();
-		//
-		glm::vec3 d  = getLookDirection();
+	glm::vec3 d = getLookDirection();
+	float scalerValue = -cameraPos.y / d.y;
+	scalerValue = glm::clamp(scalerValue, -1000.f, 1000.f);
+	glm::vec3 newObjPos = cameraPos + d * scalerValue;
 
-		float scalerValue = -cameraPos.y / d.y;
-		scalerValue = glm::clamp(scalerValue, -1000.f, 1000.f);
-		glm::vec3 newObjPos = cameraPos + d * scalerValue;
-
-		return newObjPos;
-	}
+	return newObjPos;
 }
 
 // Flies the camera to a specified location and faces the camera to new newly specified direction

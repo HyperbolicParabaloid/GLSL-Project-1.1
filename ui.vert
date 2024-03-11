@@ -123,27 +123,14 @@ vec3 calculateNoiseWave() {
 
 void main()
 {
+	gl_Position = model * vec4(aPos, 1.f);
+
 	crntPos = aPos;
-	float oldY = vec3(model * vec4(crntPos, 1.f)).y;	// In case this vert shouldn't have noise applied to it.
-	//crntPos.y = applyNoise(crntPos);
-
-	crntPos = vec3(model * vec4(crntPos, 1.f));
-	//if ((crntPos.x <= 0.f && crntPos.x >= -20.f) && (crntPos.z >= 0.f && crntPos.z <= 70.f)){// && crntPos.z <= 0.f && crntPos.z >= -20.f) {
-		Normal = transpose(inverse(mat3(model))) * vec3(0.f, 1.f, 0.f);
-		crntPos.y = oldY;
-	//} else {
-	//	Normal = transpose(inverse(mat3(model))) * calculateNoiseWave();
-	//}
-
-	//crntPos = vec3(model * vec4(aPos, 1.f));
-
-	// Outputs the positions/coordinates of all vertices
-	gl_Position = camMatrix * vec4(crntPos, 1.f);
-
-
 	texCoord = aTex;
 	color = aColor;
-	
+
+	//gl_Position = camMatrix * vec4(crntPos, 1.f);
+
 	//color = mix(aColor, vec4(0.f, 0.5, 1.f, 1.f), newY);
 
 	// Assigns the colors from the Vertex Data to "color"

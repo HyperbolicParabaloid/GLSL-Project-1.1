@@ -2,6 +2,7 @@
 #include"Cube.h"
 #include"Sphere.h"
 #include"Plane.h"
+#include"UI.h"
 #include"Cone.h"
 #include"Tree.h"
 #include"HashTable.h"
@@ -361,8 +362,12 @@ int main()
 	glm::vec3 sphere1Radi = glm::vec3(1.f, 0.1f, 1.0f);
 	Sphere sphere1(window, sphere1Pos, sphere1Radi, 10.0f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 
+	UI UI1(window, glm::vec3(0.f), 1.f, 2, true, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+
+
 	std::vector <Object*> objectList;
 
+	objectList.push_back(&UI1);
 	objectList.push_back(&sphere1);
 	objectList.push_back(&cube1);
 	objectList.push_back(&cube2);
@@ -491,12 +496,19 @@ int main()
 
 		if (int(crntTime * 4) != int(prevTime * 4)) {
 			//std::cout << "cameraPos = (" << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << ")" << std::endl;
-			std::cout << "newSphere1Pos = (" << newSphere1Pos.x << ", " << newSphere1Pos.y << ", " << newSphere1Pos.z << ")" << std::endl;
-			std::cout << std::endl;
+			//std::cout << "newSphere1Pos = (" << newSphere1Pos.x << ", " << newSphere1Pos.y << ", " << newSphere1Pos.z << ")" << std::endl;
+			//std::cout << std::endl;
 			prevTime = crntTime;
 		}
 
-		sphere1.setNewPos(newSphere1Pos);
+		//glm::mat4 rotationMat = glm::mat4(1.f);
+		//rotationMat = glm::rotate(rotationMat, glm::radians(10.f), glm::vec3(0.f, 1.f, 0.f));
+		//newSphere1Pos = glm::vec3(rotationMat * glm::vec4(newSphere1Pos, 1.f));
+
+		if (newSphere1Pos.x > -100.f)
+			sphere1.setNewPos(newSphere1Pos);
+		glm::vec3 newObjPos = sphere1.objPos;
+		//std::cout << "newObjPos = (" << newObjPos.x << ", " << newObjPos.y << ", " << newObjPos.z << ")\n";
 
 		//sphere1.setNewPos(newSphere1Pos);
 		//plane1.moveFirstVertex();
