@@ -47,7 +47,6 @@ private:
 public:
 	glm::vec3 cameraForward;
 	glm::vec3 cameraPos;
-	glm::vec3 getLookDirection();// Gets ray poiting out from mouse
 
 	Camera(GLFWwindow* window, glm::vec2 screenDimensions, glm::vec3 _cameraPos, glm::vec3 _cameraForward, glm::vec3 _cameraUp);	// Constructor
 
@@ -57,6 +56,7 @@ public:
 	void set_camera_speed(float _cameraSpeed);	// For setting the WASD movement sensitivity
 	void set_camera_sensitivity(float _cameraSense);	// For setting the mouse movement sensitivity
 	void set_fly_speed_scaler(float _flySpeedScaler);	// For setting the motion scaler for the camera's motion/turning speed
+	glm::vec3 getCursorRay();// Gets ray poiting out from mouse
 
 	glm::vec3 track_movement();	// Tracks movements of player
 	glm::mat4 get_view();	// Returns the view matrix

@@ -317,6 +317,10 @@ int main()
 
 	// Enables the Depth Buffer
 	glEnable(GL_DEPTH_TEST);
+	// Enabling transparency with Alpha value.
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 
 	// Initializing matrices for model, view and projection
 	glm::mat4 view = glm::mat4(1.f);
@@ -359,20 +363,20 @@ int main()
 
 	int level = 2;
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 sphere1Radi = glm::vec3(1.f, 0.1f, 1.0f);
-	Sphere sphere1(window, sphere1Pos, sphere1Radi, 10.0f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
+	glm::vec3 sphere1Radi = glm::vec3(1.f, 1.f, 1.0f);
+	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.0f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 
-	UI UI1(window, glm::vec3(0.f), 1.f, 2, true, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+	UI UI1(window, glm::vec3(1.f, 1.f, 0.f), 0.1f, 2, true, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
 
 
 	std::vector <Object*> objectList;
 
-	objectList.push_back(&UI1);
 	objectList.push_back(&sphere1);
 	objectList.push_back(&cube1);
 	objectList.push_back(&cube2);
 	objectList.push_back(&cube3);
 	objectList.push_back(&plane1);
+	objectList.push_back(&UI1);
 
 
 	camera.set_camera_speed(10);
@@ -414,6 +418,7 @@ int main()
 			//prevTime = crntTime;
 		}
 
+
 		// Rotating the view about the x and y axis, and loads of other neat things.
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_F) && lockoutTimer <= crntTime) {
 			lockoutTimer = crntTime + 0.2;
@@ -422,16 +427,20 @@ int main()
 			std::cout << "Crotation\n";
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
-			sphere1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
+			//sphere1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
+			UI1.setScreenPos(glm::vec2(UI1.objPos) - glm::vec2(0.01f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_UP)) {
-			sphere1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
+			//sphere1.rotate(.5f, glm::vec3(-1.f, 0.f, 0.f));
+			UI1.setScreenPos(glm::vec2(UI1.objPos) - glm::vec2(0.f, -0.01f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_DOWN)) {
-			sphere1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
+			//sphere1.rotate(.5f, glm::vec3(1.f, 0.f, 0.f));
+			UI1.setScreenPos(glm::vec2(UI1.objPos) - glm::vec2(0.f, 0.01f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_RIGHT)) {
-			sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
+			//sphere1.rotate(.5f, glm::vec3(0.f, 1.f, 0.f));
+			UI1.setScreenPos(glm::vec2(UI1.objPos) - glm::vec2(-0.01f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_MINUS) && lockoutTimer <= crntTime) {
 			level--;
@@ -469,9 +478,15 @@ int main()
 			sphere1.smoothSurface(isSmooth);
 			sphere1.setLevel(level);
 
-			plane1.smoothSurface(isSmooth);
-			plane1.setLevel(level);
+			//plane1.smoothSurface(isSmooth);
+			//plane1.setLevel(level);
 			lockoutTimer = crntTime + 0.2;
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_L) && lockoutTimer <= crntTime) {
+			UI1.setScale(UI1.getScale() + glm::vec2(0.001f));
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_K) && lockoutTimer <= crntTime) {
+			UI1.setScale(UI1.getScale() - glm::vec2(0.001f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_T) && lockoutTimer <= crntTime) {
 			std::cout << "\nLevel: " << level << "\n";
@@ -495,23 +510,34 @@ int main()
 		glm::vec3 cameraPos = camera.cameraPos;
 
 		if (int(crntTime * 4) != int(prevTime * 4)) {
-			//std::cout << "cameraPos = (" << cameraPos.x << ", " << cameraPos.y << ", " << cameraPos.z << ")" << std::endl;
 			//std::cout << "newSphere1Pos = (" << newSphere1Pos.x << ", " << newSphere1Pos.y << ", " << newSphere1Pos.z << ")" << std::endl;
 			//std::cout << std::endl;
 			prevTime = crntTime;
 		}
 
-		//glm::mat4 rotationMat = glm::mat4(1.f);
-		//rotationMat = glm::rotate(rotationMat, glm::radians(10.f), glm::vec3(0.f, 1.f, 0.f));
-		//newSphere1Pos = glm::vec3(rotationMat * glm::vec4(newSphere1Pos, 1.f));
 
 		if (newSphere1Pos.x > -100.f)
 			sphere1.setNewPos(newSphere1Pos);
 		glm::vec3 newObjPos = sphere1.objPos;
-		//std::cout << "newObjPos = (" << newObjPos.x << ", " << newObjPos.y << ", " << newObjPos.z << ")\n";
 
-		//sphere1.setNewPos(newSphere1Pos);
-		//plane1.moveFirstVertex();
+
+		// Mouse Buttons
+		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) && lockoutTimer <= crntTime) {
+			std::cout << "Yee-old LEFT click bruv.\n";
+			glm::vec3 cursorRay = camera.getCursorRay();
+			//std::cout << "cursorRay = (" << cursorRay.x << ", " << cursorRay.y << ", " << cursorRay.z << ")" << std::endl;
+			for (auto obj : objectList) {
+				glm::vec3 rayToObjectOutput = obj->rayToObject(cursorRay);
+				std::cout << "rayToObjectOutput = (" << rayToObjectOutput.x << ", " << rayToObjectOutput.y << ", " << rayToObjectOutput.z << ")" << std::endl;
+
+			}
+			lockoutTimer = crntTime + 0.2;
+		}
+		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
+			std::cout << "Yee-old RIGHT click bruv.\n";
+			lockoutTimer = crntTime + 0.2;
+		}
+
 
 		// Setting view matrix with camera class
 		view = camera.get_view();
@@ -519,8 +545,14 @@ int main()
 		//floor.draw(camera, shaderProgram);
 
 		// Drawing all the Objects in the list.
+		
 		for (auto obj : objectList)
 			obj->draw(lightPos, lightColor);
+
+		
+		
+		//UI1.draw(lightPos, lightColor);
+		//glDisable(GL_BLEND);
 
 
 		// Drawing the Light.

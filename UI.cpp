@@ -7,7 +7,13 @@ UI::UI(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, bool
 	randomColor = false;
 	seed = 1;
 	objRadius = sqrt(2);
+	scale = glm::vec2(_objScale);
 	genTriangles();
+}
+
+glm::vec3 UI::rayToObject(glm::vec3 _ray) {
+	//return glm::vec3(FLT_MAX);
+	return glm::vec3(objPos);
 }
 
 // Creates a new set of Vertex's and their associated indices to send to the Object
@@ -59,8 +65,8 @@ void UI::genOctahedron() {
 	indices.push_back(1);
 	indices.push_back(2);
 
-	glm::vec3 scalingVec = glm::vec3(0.1f, 0.1f, 0.f);
-	glm::vec3 screenPos = glm::vec3(1.f, 1.f, 0.f);
+	glm::vec3 scalingVec = glm::vec3(objScale, objScale, 0.f);
+	glm::vec3 screenPos = glm::vec3(objPos.x, objPos.y, 0.f);
 	model = glm::translate(glm::mat4(1.f), screenPos - scalingVec);
 	model = glm::scale(model, scalingVec);
 
@@ -115,6 +121,25 @@ void UI::genOctahedron() {
 
 // Destructor of Sphere class.
 UI::~UI() {
+}
+
+// Sets the screen coordinates of the UI object.
+void UI::setScreenPos(glm::vec2 _screenCoords) {
+	objPos = glm::vec3(_screenCoords, objPos.z);
+	model = glm::translate(glm::mat4(1.f), glm::vec3(_screenCoords - scale, 0.0f));
+	model = glm::scale(model, glm::vec3(scale, 0.f));
+}
+
+// Sets the X and Y scaling factors for the UI objects transformation.
+void UI::setScale(glm::vec2 _scale) {
+	scale = _scale;
+	model = glm::translate(glm::mat4(1.f), objPos - glm::vec3(scale, 0.0f));
+	model = glm::scale(model, glm::vec3(scale, 0.f));
+}
+
+
+glm::vec2 UI::getScale() {
+	return scale;
 }
 
 // Returns the number of Vertices per side of the plane at a given level of Tessellation.

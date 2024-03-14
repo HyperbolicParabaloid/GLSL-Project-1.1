@@ -98,7 +98,7 @@ void Camera::mouse_callback()
 
 
 // Return yee-old vector of mouse pos as a ray in 3D space.
-glm::vec3 Camera::getLookDirection() {
+glm::vec3 Camera::getCursorRay() {
 	// 2D position of the mousse on the screen.
 	double xpos, ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
@@ -204,7 +204,7 @@ glm::vec3 Camera::track_movement() {
 		glm::vec3 newObjPos = cameraPos + d * scalerValue;
 		return newObjPos;
 	}
-	glm::vec3 d = getLookDirection();
+	glm::vec3 d = getCursorRay();
 	float scalerValue = -cameraPos.y / d.y;
 	scalerValue = glm::clamp(scalerValue, -1000.f, 1000.f);
 	glm::vec3 newObjPos = cameraPos + d * scalerValue;

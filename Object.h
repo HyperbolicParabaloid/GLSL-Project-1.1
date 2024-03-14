@@ -81,6 +81,8 @@ public:
 	float rotationalVelocity;
 	glm::vec3 rotationalAxis;
 
+	virtual glm::vec3 rayToObject(glm::vec3 _ray);
+
 	bool isTouching(Object* obj);
 	bool isTouching(Triangle* tri);
 	bool isTouching(Triangle* tri, int index, glm::vec3 *_p11, glm::vec3 *_p12, glm::vec3 *_p13, glm::vec3* _p21, glm::vec3* _p22, glm::vec3* _p23);

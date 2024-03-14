@@ -23,6 +23,8 @@ private:
 	bool isSmooth;
 	bool randomColor;
 
+	glm::vec2 scale;
+
 	int seed;
 public:
 	UI(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
@@ -33,6 +35,10 @@ public:
 	void reseed();
 	void smoothSurface(bool _isSmooth);
 	void setScale(float _scale);
+	void setScreenPos(glm::vec2 _screenCoords);
+	void setScale(glm::vec2 _scale);
+	glm::vec3 rayToObject(glm::vec3 _ray);
+	glm::vec2 getScale();
 };
 
 #endif

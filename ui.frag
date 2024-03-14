@@ -176,10 +176,26 @@ void main()
 	vec4 pntLgt = pointLight();
 	vec4 drtLgt = directionalLight();
 	vec4 sptLgt = spotLight();
+
 	
+	
+	
+	//FragColor = vec4(0.f, 0.f, 0.f, 0.f);
+	//return;
 	FragColor = color;
 
 	vec2 uv = texCoord;
+	float cLength = length(uv);
+	float radiusOuter = 1.0f;
+	float radiusInner = 0.5f;
+	// Pretty self explanitory: if distance > min but < max, draw the color.
+	if ((cLength <= radiusOuter && cLength > radiusInner)) {
+		//vec4 randomColor = vec4(rand(searchPos), rand(searchPos + 1), rand(searchPos + 2), 1);
+		FragColor.w = 1.f;
+	} else {
+		FragColor = vec4(0.f);
+	}
+	return;
 	
 	vec4 noiseColor = FragColor;
 	float n = noise(uv + time);

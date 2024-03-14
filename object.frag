@@ -155,4 +155,5 @@ void main()
 	//FragColor = mix(mix(drtLgt, pntLgt, pntLgt), sptLgt, sptLgt);
 	//FragColor = mix(drtLgt, pntLgt, pntLgt);
 	FragColor = pntLgt;
+	FragColor.w = 1.f;
 }

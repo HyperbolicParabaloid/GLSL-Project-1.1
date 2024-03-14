@@ -23,6 +23,11 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	rotationalAxis = glm::vec3(0.f);
 }
 
+glm::vec3 Object::rayToObject(glm::vec3 _ray) {
+	//return glm::vec3(FLT_MAX);
+	return glm::vec3(0.f);
+}
+
 void Object::setNewPos(glm::vec3 _objPos) {
 	objPos = _objPos;
 	glm::mat4 newModel = glm::translate(glm::mat4(1.f), objPos);
