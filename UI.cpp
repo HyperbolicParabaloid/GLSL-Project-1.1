@@ -48,75 +48,30 @@ void UI::genOctahedron() {
 	glm::vec3 vert;
 	glm::vec3 norm;
 	glm::vec2 tex;
-	glm::vec4 clr;
-	clr = color;
+	glm::vec4 clr = color;
 
 	norm = glm::vec3(0.f, 0.f, -1.f);	// should be glm::vec3(0.f, -1.f, 0.f); !!!!!!!!!!!
-	vertices.push_back(Vertex{ glm::vec3(1.f, 1.f, 0.f), norm, clr, glm::vec2(1.f, 1.f)});
-	vertices.push_back(Vertex{ glm::vec3(-1.f, 1.f, 0.f), norm, clr, glm::vec2(-1.f, 1.f) });
+	vertices.push_back(Vertex{ glm::vec3(-1.f, 1.f, 0.f), norm, clr, glm::vec2(-1.f, 1.f)});
+	vertices.push_back(Vertex{ glm::vec3(1.f, 1.f, 0.f), norm, clr, glm::vec2(1.f, 1.f) });
 	vertices.push_back(Vertex{ glm::vec3(-1.f, -1.f, 0.f), norm, clr, glm::vec2(-1.f, -1.f) });
 	vertices.push_back(Vertex{ glm::vec3(1.f, -1.f, 0.f), norm, clr, glm::vec2(1.f, -1.f) });
 
 	indices.push_back(0);
-	indices.push_back(3);
 	indices.push_back(2);
+	indices.push_back(3);
 
 	indices.push_back(0);
+	indices.push_back(3);
 	indices.push_back(1);
-	indices.push_back(2);
 
 	glm::vec3 scalingVec = glm::vec3(objScale, objScale, 0.f);
 	glm::vec3 screenPos = glm::vec3(objPos.x, objPos.y, 0.f);
 	model = glm::translate(glm::mat4(1.f), screenPos - scalingVec);
 	model = glm::scale(model, scalingVec);
 
-
-	//int count = 0;
-	//for (int vv = 0; vv < vertsPerSide; vv++) {
-	//	for (int uu = 0; uu < vertsPerSide; uu++) {
-	//
-	//		// Can I just make uu and vv go from 0->1, and make that my UV texture coodiantes?
-	//		// If so, I just need a new array to hold them, and assign them along with the preVerts.
-	//		// then, when preVerts get mapped into postVerts inside of the setNorms function, I can
-	//		// do the same thing with the texture coords. Perhaps. We shall see. Tomorrow. When I have coffee.
-	//		//
-	//		// I lied. A little. Should be something like:
-	//		tex = glm::vec2(static_cast<float>(-uu) / (vertsPerSide - 1), static_cast<float>(-vv) / (vertsPerSide - 1)) * objScale;	// (0->1, 0->1)
-	//		GLfloat x, y, z = -0.1f;
-	//		x = ((uu + 2) - (vertsPerSide - 1)) / (float)(vertsPerSide - 1);	// Goes from -1.f =>  1.f
-	//		y = ((vertsPerSide - 1) - (vv)) / (float)(vertsPerSide - 1);	// Goes from  1.f => -1.f
-	//		//y += noise(glm::vec2(x * objScale + objPos.x, z * objScale + objPos.z)) / 10.f;
-	//
-	//		if (randomColor) {
-	//			float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	//			float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	//			float r3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	//			clr = glm::vec4(r1, r2, r3, 1.f);
-	//		}
-	//		vert = glm::vec3(x, y, z);
-	//		norm = glm::vec3(0.f, 0.f, -1.f);	// should be glm::vec3(0.f, -1.f, 0.f); !!!!!!!!!!!
-	//
-	//		vertices.push_back(Vertex{ vert, norm, clr, tex });
-	//		if (uu + 1 < vertsPerSide && vv + 1 < vertsPerSide) {
-	//			int i0 = vertsPerSide * vv + uu;
-	//			int i1 = vertsPerSide * vv + (uu + 1);
-	//			int i2 = vertsPerSide * (vv + 1) + uu;
-	//			int i3 = vertsPerSide * (vv + 1) + (uu + 1);
-	//
-	//			indices.push_back(i2);
-	//			indices.push_back(i1);
-	//			indices.push_back(i0);
-	//
-	//			indices.push_back(i3);
-	//			indices.push_back(i1);
-	//			indices.push_back(i2);
-	//		}
-	//	}
-	//}
-	// Make this dependant on physics being enabled potentially.
-	if (true)
-		for (int ii = 0; ii < indices.size(); ii += 3)
-			triangles.push_back(Triangle{ &vertices[indices[ii + 0]], &vertices[indices[ii + 1]] , &vertices[indices[ii + 2]], &model });
+	//if (true)
+	//	for (int ii = 0; ii < indices.size(); ii += 3)
+	//		triangles.push_back(Triangle{ &vertices[indices[ii + 0]], &vertices[indices[ii + 1]] , &vertices[indices[ii + 2]], &model });
 }
 
 // Destructor of Sphere class.
@@ -140,6 +95,49 @@ void UI::setScale(glm::vec2 _scale) {
 
 glm::vec2 UI::getScale() {
 	return scale;
+}
+
+// Returns whether 2D coordiantes are touching the UI Object.
+bool UI::isTouching(glm::vec2 _cursorPos)
+{
+	// Barycentric test.
+	glm::vec3 p = glm::vec3(_cursorPos, 0.f);
+	for (int i = 0; i < indices.size(); i+=3) {
+		glm::vec3 vec_1 = glm::vec3(model * glm::vec4(vertices[indices[i + 0]].pos, 1.f));
+		glm::vec3 vec_2 = glm::vec3(model * glm::vec4(vertices[indices[i + 1]].pos, 1.f));
+		glm::vec3 vec_3 = glm::vec3(model * glm::vec4(vertices[indices[i + 2]].pos, 1.f));
+
+		// Compute vectors        
+		glm::vec3 v0 = vec_3 - vec_1;
+		glm::vec3 v1 = vec_2 - vec_1;
+		glm::vec3 v2 = p - vec_1;
+
+		// Compute dot products
+		float dot00 = dot(v0, v0);
+		float dot01 = dot(v0, v1);
+		float dot02 = dot(v0, v2);
+		float dot11 = dot(v1, v1);
+		float dot12 = dot(v1, v2);
+
+		// Compute barycentric coordinates
+		float invDenom = 1.f / (dot00 * dot11 - dot01 * dot01);
+		float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+		float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+		// Check if point is in triangle
+		bool result = ((u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.01f));
+
+		//std::cout << "Is point p = (" << p.x << ", " << p.y << ", " << p.z << "), in triangle? [" << result << "]\n" << std::endl;
+		if (result)
+			return result;
+
+	}
+	return false;
+}
+
+void UI::setColor(glm::vec4 _color) {
+	color = _color;
+	genTriangles();
 }
 
 // Returns the number of Vertices per side of the plane at a given level of Tessellation.

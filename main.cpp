@@ -366,18 +366,38 @@ int main()
 	glm::vec3 sphere1Radi = glm::vec3(1.f, 1.f, 1.0f);
 	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.0f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 
-	UI UI1(window, glm::vec3(1.f, 1.f, 0.f), 0.1f, 2, true, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+	glm::vec3 UI1Pos = glm::vec3(1.f, 1.f, 0.f);
+	UI UI1(window, glm::vec3(-0.6f, 0.8f, 0.f), 0.1f, 2, true, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
 
 
 	std::vector <Object*> objectList;
+	std::vector <UI*> UIList;
 
 	objectList.push_back(&sphere1);
 	objectList.push_back(&cube1);
 	objectList.push_back(&cube2);
 	objectList.push_back(&cube3);
 	objectList.push_back(&plane1);
-	objectList.push_back(&UI1);
+	//objectList.push_back(&UI1);
 
+
+	float UI_Scale = 0.1f;
+	bool first = true;
+	for (float y = 1.f - UI_Scale * 2.f; y > -1.f + UI_Scale * 4.f; y -= UI_Scale * 2.f) {
+		for (float x = -1.f + UI_Scale * 4.f; x < 1.f - UI_Scale * 2.f; x += UI_Scale * 2.f) {
+			if (first) {
+				UIList.push_back(&UI1);
+				objectList.push_back(UIList.back());
+				first = false;
+			}
+			else {
+				glm::vec3 UIPos = glm::vec3(x, y, 0.f);
+				UIList.push_back(new UI{ window, UIPos, 0.1f, 2, true, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera });
+				objectList.push_back(UIList.back());
+			}
+		}
+	}
+	
 
 	camera.set_camera_speed(10);
 	level = 2;
@@ -524,17 +544,22 @@ int main()
 		// Mouse Buttons
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) && lockoutTimer <= crntTime) {
 			std::cout << "Yee-old LEFT click bruv.\n";
-			glm::vec3 cursorRay = camera.getCursorRay();
-			//std::cout << "cursorRay = (" << cursorRay.x << ", " << cursorRay.y << ", " << cursorRay.z << ")" << std::endl;
-			for (auto obj : objectList) {
-				glm::vec3 rayToObjectOutput = obj->rayToObject(cursorRay);
-				std::cout << "rayToObjectOutput = (" << rayToObjectOutput.x << ", " << rayToObjectOutput.y << ", " << rayToObjectOutput.z << ")" << std::endl;
-
+			//std::cout << "cursorPos = (" << cursorPos.x << ", " << cursorPos.y << ")" << std::endl;
+			for (auto UI_Obj : UIList) {
+				glm::vec2 cursorPos = camera.getCursorPos();
+				if (UI_Obj->isTouching(cursorPos))
+					UI_Obj->setColor(glm::vec4(0.f, 0.f, 0.f, 1.f));
+				
 			}
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
 			std::cout << "Yee-old RIGHT click bruv.\n";
+			for (auto UI_Obj : UIList) {
+				glm::vec2 cursorPos = camera.getCursorPos();
+				UI_Obj->setColor(glm::vec4((UI_Obj->objPos + 1.f) / 2.f, 1.f));
+
+			}
 			lockoutTimer = crntTime + 0.2;
 		}
 

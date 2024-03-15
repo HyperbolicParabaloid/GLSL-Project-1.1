@@ -97,8 +97,8 @@ void Camera::mouse_callback()
 }
 
 
-// Return yee-old vector of mouse pos as a ray in 3D space.
-glm::vec3 Camera::getCursorRay() {
+glm::vec2 Camera::getCursorPos()
+{
 	// 2D position of the mousse on the screen.
 	double xpos, ypos;
 	glfwGetCursorPos(window, &xpos, &ypos);
@@ -106,9 +106,14 @@ glm::vec3 Camera::getCursorRay() {
 	// make cursor coordinates from -1 -> +1
 	float pt_x = (xpos / width) * 2.f - 1.f;
 	float pt_y = -(ypos / width) * 2.f + 1.f;
+	return glm::vec2(pt_x, pt_y);
+}
 
-	float nearClip = 0.1f, w = 1.f;
-	glm::vec4 rasterCoords = glm::vec4(pt_x, pt_y, nearClip, w);
+// Return yee-old vector of mouse pos as a ray in 3D space.
+glm::vec3 Camera::getCursorRay() {
+	// 2D position of the mousse on the screen.
+		float nearClip = 0.1f, w = 1.f;
+	glm::vec4 rasterCoords = glm::vec4(getCursorPos(), nearClip, w);
 
 	glm::mat4 cam_to_world = inverse(view);
 	glm::mat4 model_to_cam = inverse(glm::translate(glm::mat4(1.f), cameraPos));
