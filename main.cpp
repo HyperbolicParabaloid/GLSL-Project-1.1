@@ -383,6 +383,8 @@ int main()
 
 	float UI_Scale = 0.1f;
 	bool first = true;
+	float colorScaler = 64.f;
+	float colorCount = 1.f;
 	for (float y = 1.f - UI_Scale * 2.f; y > -1.f + UI_Scale * 4.f; y -= UI_Scale * 2.f) {
 		for (float x = -1.f + UI_Scale * 4.f; x < 1.f - UI_Scale * 2.f; x += UI_Scale * 2.f) {
 			if (first) {
@@ -392,8 +394,9 @@ int main()
 			}
 			else {
 				glm::vec3 UIPos = glm::vec3(x, y, 0.f);
-				UIList.push_back(new UI{ window, UIPos, 0.1f, 2, true, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera });
+				UIList.push_back(new UI{ window, UIPos, 0.1f, 2, true, glm::vec4(colorCount / colorScaler, 0.f, .0f, 1.f), empty, &camera });
 				objectList.push_back(UIList.back());
+				colorCount++;
 			}
 		}
 	}
@@ -421,6 +424,29 @@ int main()
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "useTex"), 1);
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "useTexSpec"), 1);
 
+
+	
+	std::fstream myFile;
+	char characterArray[] = {	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
+								'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+							};
+	int characterIndex = 0;
+	myFile.open("C:/Users/riley/source/repos/GLSL Project Working Directory/Character Libray/dictionary_list.txt");// , std::ios::app);
+	int A = int('A');
+
+	std::string dictionary[100];
+	std::string theLine;
+
+	myFile.clear();
+	myFile.seekg(0, std::ios::beg);
+
+
+	while (getline(myFile, theLine)) {
+		std::string subStr = theLine.substr(2, theLine.size() - 1);
+		int index = int(theLine[0]);
+		dictionary[index] = subStr;
+		std::cout << "Added " << subStr << " at [" << index << "]\n";
+	}
 	
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -514,11 +540,7 @@ int main()
 			std::cout << "Flyin' in\n";
 			shouldFly = true;
 		}
-		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_I) && lockoutTimer <= crntTime) {
-			std::cout << "\nMessing with Vertex: " << level << "\n";
-			lockoutTimer = crntTime + 0.2;
-			plane1.moveFirstVertex();
-		}
+		
 		if (shouldFly) {
 			if (camera.fly_to(glm::vec3(0.f, 0.f, 3.f), glm::vec3(0.f, 0.125f, -1.f), true)) {
 				shouldFly = false;
@@ -543,24 +565,78 @@ int main()
 
 		// Mouse Buttons
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) && lockoutTimer <= crntTime) {
-			std::cout << "Yee-old LEFT click bruv.\n";
+			//std::cout << "Yee-old LEFT click bruv.\n";
 			//std::cout << "cursorPos = (" << cursorPos.x << ", " << cursorPos.y << ")" << std::endl;
 			for (auto UI_Obj : UIList) {
 				glm::vec2 cursorPos = camera.getCursorPos();
 				if (UI_Obj->isTouching(cursorPos))
 					UI_Obj->setColor(glm::vec4(0.f, 0.f, 0.f, 1.f));
-				
 			}
-			lockoutTimer = crntTime + 0.2;
+			lockoutTimer = crntTime + 0.02;
 		}
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
-			std::cout << "Yee-old RIGHT click bruv.\n";
+			//std::cout << "Yee-old RIGHT click bruv.\n";
 			for (auto UI_Obj : UIList) {
 				glm::vec2 cursorPos = camera.getCursorPos();
 				UI_Obj->setColor(glm::vec4((UI_Obj->objPos + 1.f) / 2.f, 1.f));
-
 			}
 			lockoutTimer = crntTime + 0.2;
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_I) && lockoutTimer <= crntTime) {
+			//std::cout << "Writing to file.\n";
+			//myFile.clear();
+			//myFile.seekg(0, std::ios::end);
+			//
+			//
+			//myFile << characterArray[characterIndex % (sizeof(characterArray) / sizeof(characterArray[0]))] << "_";
+			//for (auto UI_Obj : UIList) {
+			//	if (UI_Obj->color == glm::vec4(0.f, 0.f, 0.f, 1.f))
+			//		myFile << 1;
+			//	else
+			//		myFile << 0;
+			//}
+			//myFile << '\n';
+			//characterIndex++;
+
+			std::string line;
+			getline(std::cin, line);
+			std::cout << dictionary[int(line[0])] << "\n";
+
+			int codeIndex = 0;
+
+			std::string code = dictionary[int(line[0])];
+
+			std::cout << "length = " << line.size() << "\n";
+			for (auto UI_Obj : UIList) {
+				if (code[codeIndex] == '1')
+					UI_Obj->setColor(glm::vec4(0.f, 0.f, 0.f, 1.f));
+				else
+					UI_Obj->setColor(glm::vec4((UI_Obj->objPos + 1.f) / 2.f, 1.f));
+				codeIndex++;
+			}
+
+
+			lockoutTimer = crntTime + 0.5;
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Z) && lockoutTimer <= crntTime) {
+			std::cout << "Reading from file.\n";
+			std::string line;
+
+			myFile.clear();
+			myFile.seekg(0, std::ios::beg);
+
+			while (getline(myFile, line))
+			{
+				std::cout << line << "\n";
+			}
+			
+
+			lockoutTimer = crntTime + 0.2;
+		}
+		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_X) && lockoutTimer <= crntTime) {
+			std::cout << "Decremented counter\n";
+			characterIndex--;
+			lockoutTimer = crntTime + 0.5;
 		}
 
 
@@ -593,6 +669,7 @@ int main()
 		// Take care of all GLFW events
 		glfwPollEvents();
 	}
+	myFile.close();
 
 	lightShader.Delete();
 	// Delete window before ending the program

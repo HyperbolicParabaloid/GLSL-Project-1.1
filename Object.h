@@ -4,6 +4,7 @@
 #define PI 3.1415926538
 
 #include <iostream>
+#include <fstream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <ctime>

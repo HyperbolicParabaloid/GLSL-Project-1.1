@@ -83,7 +83,6 @@ void Object::setVBOandEBO(std::string msg) {
 	}
 	else if (msg == "UI") {
 		name = msg;
-		std::cout << "UI ELEMENT\n";
 		shaderProgram = new Shader("ui.vert", "ui.frag");
 	}
 	else
@@ -361,7 +360,6 @@ bool Object::isTouching(Triangle* tri) {
 	return false;
 }
 
-
 bool Object::isTouching(Triangle* tri, int index, glm::vec3* _p11, glm::vec3* _p12, glm::vec3* _p13, glm::vec3* _p21, glm::vec3* _p22, glm::vec3* _p23) {
 	tri->genCircle();
 	float lenA = objScale * objRadius;
@@ -370,7 +368,6 @@ bool Object::isTouching(Triangle* tri, int index, glm::vec3* _p11, glm::vec3* _p
 		return triangleIntersection(tri, index, _p11, _p12, _p13, _p21, _p22, _p23);
 	return false;
 }
-
 
 bool Object::triangleIntersection(Triangle* tri, int index, glm::vec3* _p11, glm::vec3* _p12, glm::vec3* _p13, glm::vec3* _p21, glm::vec3* _p22, glm::vec3* _p23) {
 	if (!isSolid)
