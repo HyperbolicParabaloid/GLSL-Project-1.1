@@ -1,4 +1,4 @@
-#version 330 core
+#version 400 core
 
 // Outputs colors in RGBA
 out vec4 FragColor;
@@ -23,6 +23,7 @@ uniform vec3 lightPos;
 uniform vec3 camPos;
 // For time
 uniform float time;
+uniform uvec2 pixels;
 
 // Point light, illuminates the enviorment like a candle. There's a "point"
 // of light from which the intensity fades with the inverse square of the
@@ -173,19 +174,70 @@ float noise(vec2 n) {
 // Doing Phong shading
 void main()
 {
-	vec4 pntLgt = pointLight();
-	vec4 drtLgt = directionalLight();
-	vec4 sptLgt = spotLight();
+	//vec4 pntLgt = pointLight();
+	//vec4 drtLgt = directionalLight();
+	//vec4 sptLgt = spotLight();
+	ivec2 cPos = ivec2(int(crntPos.x), int(crntPos.y)); // Might need to be changed back to vec2 instead of ivec2
+	vec2 uv = ((vec2(crntPos) + 1.f) / 2.f) * 8.f;
+	ivec2 coord = ivec2((((crntPos.x + 1.f) / 2.f) * 8), (((-crntPos.y + 1.f) / 2.f) * 8));
 
-	
-	
-	
-	//FragColor = vec4(0.f, 0.f, 0.f, 0.f);
-	//return;
-	FragColor = color;
+
+	uint num = pixels.x;//uint(texCoord.x);
+	int bit = 0;
+	int fragNum = int(coord.y * 8 + coord.x);
+
+	if (fragNum >= 32)
+		num = pixels.y;//uint(texCoord.y);
+
+	bit = int(bitfieldExtract(num, fragNum % 32, 1));
+
+
+	// Adding Letters
+	if (bit == 1)
+		FragColor = color;
+	else
+		FragColor = vec4(0.f);
+
+
+	//Adds in the cell boarders so you can see what you're doing a little better.
+	if (fract(uv.x) > 0.9 || fract(uv.x) < 0.1)
+		FragColor = vec4(1);
+	else if (fract(uv.y) > 0.9 || fract(uv.y) < 0.1)
+		FragColor = vec4(1);
 	return;
 
-	vec2 uv = texCoord;
+
+
+
+
+
+
+
+
+
+
+	//// Adding Letters
+	//int bit = pixels[int(coord.y * 8 + coord.x)];
+	//
+	//if (bit == 0)
+	//	FragColor = glm::vec4(0.f);
+	//else
+	//	FragColor = color;
+	//
+	////Adds in the cell boarders so you can see what you're doing a little better.
+	//if (fract(uv.x) > 0.9 || fract(uv.x) < 0.1)
+	//	FragColor = vec4(1);
+	//else if (fract(uv.y) > 0.9 || fract(uv.y) < 0.1)
+	//	FragColor = vec4(1);
+
+	return;
+
+
+	
+
+
+
+
 	float cLength = length(uv);
 	float radiusOuter = 1.0f;
 	float radiusInner = 0.5f;
@@ -196,8 +248,11 @@ void main()
 	} else {
 		FragColor = vec4(0.f);
 	}
-	return;
 	
+
+
+
+
 	vec4 noiseColor = FragColor;
 	float n = noise(uv + time);
 	//float n = noise(uv);
@@ -213,7 +268,6 @@ void main()
 	//else
 		FragColor = mix(noiseColor, vec4(1), n / 2);
 
-	vec2 cPos = vec2(int(uv.x), int(uv.y));
 	
 	// The offset the loop will search around it's current cell block.
 	// A.K.A., a search distance of 1 would mean the loop would look at

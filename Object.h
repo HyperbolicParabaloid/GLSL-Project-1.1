@@ -41,9 +41,12 @@ private:
 	std::vector<glm::vec3> velocityHistory;
 	std::vector<glm::vec3> posHistory;
 
-	VAO VAO;
 
 public:
+
+	glm::uvec2 pixels;
+
+	VAO VAO;
 	Shader* shaderProgram;
 	Camera* camera;
 	Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 color, std::vector <Texture>& _textures, Camera* _camera);
@@ -64,6 +67,7 @@ public:
 
 	std::vector <Triangle> triangles;
 	std::vector <Vertex> vertices;
+	std::vector <VertexUI> verticesUI;
 	std::vector <GLuint> indices;
 
 	GLuint triangleType = GL_TRIANGLES;

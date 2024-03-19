@@ -1,4 +1,4 @@
-#version 330 core
+#version 400 core
 
 // Positions/Coordinates
 layout (location = 0) in vec3 aPos;
@@ -126,8 +126,8 @@ void main()
 	gl_Position = model * vec4(aPos, 1.f);
 
 	crntPos = aPos;
-	texCoord = aTex;
 	color = aColor;
+	texCoord = aTex;
 
 	//gl_Position = camMatrix * vec4(crntPos, 1.f);
 

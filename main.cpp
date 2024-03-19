@@ -320,7 +320,7 @@ int main()
 	// Enabling transparency with Alpha value.
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 
 	// Initializing matrices for model, view and projection
 	glm::mat4 view = glm::mat4(1.f);
@@ -366,8 +366,71 @@ int main()
 	glm::vec3 sphere1Radi = glm::vec3(1.f, 1.f, 1.0f);
 	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.0f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 
+
+
+
+
+
+	std::fstream myFile;
+	//char characterArray[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+	//							'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+	//};
+	int characterIndex = 0;
+	myFile.open("C:/Users/riley/source/repos/GLSL Project Working Directory/Character Libray/dictionary_list.txt");// , std::ios::app);
+
+	int const dictionaryLength = 100;
+	std::string dictionary[dictionaryLength];
+	std::string theLine;
+
+	glm::uvec2 intDict[100];
+
+	myFile.clear();
+	myFile.seekg(0, std::ios::beg);
+
+	// 48->57 = 0->9;
+	// 65->90 = A->Z;
+	//	   95 = _	;
+	while (getline(myFile, theLine)) {
+		std::string code = theLine.substr(2, theLine.size() - 1);
+		int index = int(theLine[0]);
+		dictionary[index] = code;
+		int bitsX = 0;
+		int bitsY = 0;
+
+		for (int bit = 0; bit < 32; bit++) {
+			if (code[bit] == '0') {
+				bitsX |= 0 << (bit % 32);
+			}
+			else {
+				bitsX |= 1 << (bit % 32);
+			}
+		}
+		for (int bit = 32; bit < 64; bit++) {
+			if (code[bit] == '0') {
+				bitsY |= 0 << (bit % 32);
+			}
+			else {
+				bitsY |= 1 << (bit % 32);
+			}
+		}
+		intDict[index] = glm::uvec2(bitsX, bitsY);
+		std::cout << "Added " << code << " at [" << index << "]\n";
+	}
+
+	// Setting all other values to be spaces.
+	for (int i = 0; i < dictionaryLength; i++) {
+		if (dictionary[i].empty()) {
+			dictionary[i] = dictionary[95];
+			intDict[i] = glm::uvec2(0);
+		}
+	}
+
+
+
+
+
 	glm::vec3 UI1Pos = glm::vec3(1.f, 1.f, 0.f);
-	UI UI1(window, glm::vec3(-0.6f, 0.8f, 0.f), 0.1f, 2, true, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+	UI UI1(window, glm::vec3(-0.6f, 0.8f, 0.f), 0.1f, "H", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
 
 
 	std::vector <Object*> objectList;
@@ -385,22 +448,53 @@ int main()
 	bool first = true;
 	float colorScaler = 64.f;
 	float colorCount = 1.f;
-	for (float y = 1.f - UI_Scale * 2.f; y > -1.f + UI_Scale * 4.f; y -= UI_Scale * 2.f) {
-		for (float x = -1.f + UI_Scale * 4.f; x < 1.f - UI_Scale * 2.f; x += UI_Scale * 2.f) {
-			if (first) {
-				UIList.push_back(&UI1);
-				objectList.push_back(UIList.back());
-				first = false;
-			}
-			else {
-				glm::vec3 UIPos = glm::vec3(x, y, 0.f);
-				UIList.push_back(new UI{ window, UIPos, 0.1f, 2, true, glm::vec4(colorCount / colorScaler, 0.f, .0f, 1.f), empty, &camera });
-				objectList.push_back(UIList.back());
-				colorCount++;
-			}
-		}
-	}
-	
+
+	UIList.push_back(&UI1);
+	objectList.push_back(UIList.back());
+
+
+	glm::vec2 texCoord = glm::vec2(-1.f, 1.f);
+	glm::ivec2 coord = glm::ivec2(floor((texCoord.x + 1.f) / 2.f) * 7, floor((-texCoord.y + 1.f) / 2.f) * 7);
+	int fragNum = int(coord.y * 8 + coord.x) % 32;
+	std::cout << "(" << coord.x << ", " << coord.y << ") fragNum = " << fragNum << "\n";
+
+	texCoord = glm::vec2(1.f, 1.f);
+	coord = glm::ivec2(floor((texCoord.x + 1.f) / 2.f) * 7, floor((-texCoord.y + 1.f) / 2.f) * 7);
+	fragNum = int(coord.y * 8 + coord.x) % 32;
+	std::cout << "(" << coord.x << ", " << coord.y << ") fragNum = " << fragNum << "\n";
+
+	texCoord = glm::vec2(-1.f, -1.f);
+	coord = glm::ivec2(floor((texCoord.x + 1.f) / 2.f) * 7, floor((-texCoord.y + 1.f) / 2.f) * 7);
+	fragNum = int(coord.y * 8 + coord.x) % 32;
+	std::cout << "(" << coord.x << ", " << coord.y << ") fragNum = " << fragNum << "\n";
+
+	texCoord = glm::vec2(1.f, -1.f);
+	coord = glm::ivec2(floor((texCoord.x + 1.f) / 2.f) * 7, floor((-texCoord.y + 1.f) / 2.f) * 7);
+	fragNum = int(coord.y * 8 + coord.x) % 32;
+	std::cout << "(" << coord.x << ", " << coord.y << ") fragNum = " << fragNum << "\n";
+
+	std::cout << "\n";
+
+
+
+
+
+	//for (float y = 1.f - UI_Scale * 2.f; y > -1.f + UI_Scale * 4.f; y -= UI_Scale * 2.f) {
+	//	for (float x = -1.f + UI_Scale * 4.f; x < 1.f - UI_Scale * 2.f; x += UI_Scale * 2.f) {
+	//		if (first) {
+	//			UIList.push_back(&UI1);
+	//			objectList.push_back(UIList.back());
+	//			first = false;
+	//		}
+	//		else {
+	//			glm::vec3 UIPos = glm::vec3(x, y, 0.f);
+	//			UIList.push_back(new UI{ window, UIPos, 0.1f, 2, true, glm::vec4(colorCount / colorScaler, 0.f, .0f, 1.f), empty, &camera });
+	//			objectList.push_back(UIList.back());
+	//			colorCount++;
+	//		}
+	//	}
+	//}
+
 
 	camera.set_camera_speed(10);
 	level = 2;
@@ -425,28 +519,7 @@ int main()
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "useTexSpec"), 1);
 
 
-	
-	std::fstream myFile;
-	char characterArray[] = {	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
-								'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
-							};
-	int characterIndex = 0;
-	myFile.open("C:/Users/riley/source/repos/GLSL Project Working Directory/Character Libray/dictionary_list.txt");// , std::ios::app);
-	int A = int('A');
 
-	std::string dictionary[100];
-	std::string theLine;
-
-	myFile.clear();
-	myFile.seekg(0, std::ios::beg);
-
-
-	while (getline(myFile, theLine)) {
-		std::string subStr = theLine.substr(2, theLine.size() - 1);
-		int index = int(theLine[0]);
-		dictionary[index] = subStr;
-		std::cout << "Added " << subStr << " at [" << index << "]\n";
-	}
 	
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -569,16 +642,16 @@ int main()
 			//std::cout << "cursorPos = (" << cursorPos.x << ", " << cursorPos.y << ")" << std::endl;
 			for (auto UI_Obj : UIList) {
 				glm::vec2 cursorPos = camera.getCursorPos();
-				if (UI_Obj->isTouching(cursorPos))
-					UI_Obj->setColor(glm::vec4(0.f, 0.f, 0.f, 1.f));
+				if (UI_Obj->isTouching(cursorPos)) {}
+					//UI_Obj->setColor(glm::vec4(0.f, 0.f, 0.f, 1.f));
 			}
 			lockoutTimer = crntTime + 0.02;
 		}
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
-			//std::cout << "Yee-old RIGHT click bruv.\n";
+			
 			for (auto UI_Obj : UIList) {
-				glm::vec2 cursorPos = camera.getCursorPos();
-				UI_Obj->setColor(glm::vec4((UI_Obj->objPos + 1.f) / 2.f, 1.f));
+				UI_Obj->writeLetter(dictionary[0]);
+				//UI_Obj->setColor(glm::vec4((UI_Obj->objPos + 1.f) / 2.f, 1.f));
 			}
 			lockoutTimer = crntTime + 0.2;
 		}
@@ -600,20 +673,16 @@ int main()
 
 			std::string line;
 			getline(std::cin, line);
-			std::cout << dictionary[int(line[0])] << "\n";
 
-			int codeIndex = 0;
+			int UIIndex = 0;
+			for (char c : line) {
+				glm::uvec2 code = intDict[int(c) % dictionaryLength];
 
-			std::string code = dictionary[int(line[0])];
-
-			std::cout << "length = " << line.size() << "\n";
-			for (auto UI_Obj : UIList) {
-				if (code[codeIndex] == '1')
-					UI_Obj->setColor(glm::vec4(0.f, 0.f, 0.f, 1.f));
-				else
-					UI_Obj->setColor(glm::vec4((UI_Obj->objPos + 1.f) / 2.f, 1.f));
-				codeIndex++;
+				UIList[UIIndex]->writeLetter(code);
+				UIIndex++;
 			}
+
+
 
 
 			lockoutTimer = crntTime + 0.5;
@@ -649,7 +718,6 @@ int main()
 		
 		for (auto obj : objectList)
 			obj->draw(lightPos, lightColor);
-
 		
 		
 		//UI1.draw(lightPos, lightColor);

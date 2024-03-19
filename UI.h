@@ -13,21 +13,21 @@ class UI : public Object
 	//	~Plane();
 private:
 	void genTriangles();
-	int numVertsPerSide(int _level);
 
 	//std::vector <Vertex> verts;		// Vertex vector that gets sent to Object class to put information into the GPU.
 	//std::vector <GLuint> indices;	// GLuint vector that gets sent to Object class to put indices into the GPU.
 
-	int level;
+	glm::uvec2 *dictionary;
 
 	bool isSmooth;
 	bool randomColor;
 
 	glm::vec2 scale;
+	std::string text;
 
 	int seed;
 public:
-	UI(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
+	UI(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, std::string _text, glm::uvec2 (& _dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
 	~UI();
 	void genOctahedron();
 	void setLevel(int _level);
@@ -41,6 +41,9 @@ public:
 	glm::vec2 getScale();
 	bool isTouching(glm::vec2 _cursorPos);
 	void setColor(glm::vec4 _color);
+	
+	void writeLetter(glm::uvec2 _pixels);
+	void writeLetter(std::string code);
 };
 
 #endif
