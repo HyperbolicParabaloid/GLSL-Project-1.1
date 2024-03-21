@@ -35,7 +35,6 @@ private:
 	std::vector <Texture> textures;
 
 	bool doNormalArrows;
-	std::string name;
 
 	int samePosCount;
 	std::vector<glm::vec3> velocityHistory;
@@ -43,6 +42,7 @@ private:
 
 
 public:
+	std::string name;
 
 	glm::uvec2 pixels;
 
@@ -53,7 +53,7 @@ public:
 	~Object();
 	void draw(glm::vec3 _lightPos, glm::vec4 _lightColor);
 	void setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg);
-	void setVBOandEBO(std::string msg);
+	virtual void setVBOandEBO(std::string msg);
 	void rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation);
 	void moveFirstVertex();
 

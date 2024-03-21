@@ -354,13 +354,12 @@ int main()
 	Cube cube1(window, cube1Pos, 1.f, color, empty, &camera);
 	cube1.rotate(45.f, glm::vec3(0.f, 0.f, 1.f));
 	cube1.rotate(45.f, glm::vec3(0.f, 1.f, 0.f));
-
 	glm::vec3 cube2Pos = glm::vec3(2.0f, -.5f, -2.5f);
 	Cube cube2(window, cube2Pos, 1.f, glm::vec4(.2f, .5f, .8f, 1.f), empty, &camera);
-
+	
 	glm::vec3 cube3Pos = glm::vec3(0.0f, 2.f, -2.5f);
 	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), empty, &camera);
-
+	
 	int level = 2;
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 sphere1Radi = glm::vec3(1.f, 1.f, 1.0f);
@@ -441,7 +440,7 @@ int main()
 	objectList.push_back(&cube2);
 	objectList.push_back(&cube3);
 	objectList.push_back(&plane1);
-	//objectList.push_back(&UI1);
+	objectList.push_back(&UI1);
 
 
 	float UI_Scale = 0.1f;
@@ -497,7 +496,7 @@ int main()
 
 
 	camera.set_camera_speed(10);
-	level = 2;
+	
 	bool randomColor = true;
 	bool isSmooth = true;
 
@@ -565,14 +564,14 @@ int main()
 			level--;
 			std::cout << "\nLevel: " << level << "\n";
 			sphere1.setLevel(level);
-			plane1.setLevel(level);
+			//plane1.setLevel(level);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_EQUAL) && lockoutTimer <= crntTime) {
 			level++;
 			std::cout << "\nLevel: " << level << "\n";
 			sphere1.setLevel(level);
-			plane1.setLevel(level);
+			//plane1.setLevel(level);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_R) && lockoutTimer <= crntTime) {

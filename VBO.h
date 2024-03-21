@@ -3,6 +3,8 @@
 
 #include<glad/glad.h>
 #include<glm/glm.hpp>
+#include<stdio.h>
+#include<iostream>
 #include<vector>
 
 // In the future I plan on using these to hold information about each vertex instead of just
@@ -11,7 +13,7 @@ struct Vertex {
 	glm::vec3 pos = glm::vec3(0.f);	glm::vec3 norm;	glm::vec4 color = glm::vec4(0.f);	glm::vec2 texCoord = glm::vec2(0.f);
 };
 struct VertexUI {
-	glm::vec3 pos = glm::vec3(0.f);	glm::vec3 norm;	glm::vec4 color = glm::vec4(0.f);	glm::ivec2 texCoord = glm::ivec2(0);
+	glm::vec3 pos = glm::vec3(0.f);	glm::vec3 norm;	glm::vec4 color = glm::vec4(0.f);	glm::uvec2 texCoord = glm::uvec2(0);
 };
 struct Triangle {
 	Triangle(Vertex* _v1, Vertex* _v2, Vertex* _v3, glm::mat4* _model) {
@@ -64,7 +66,7 @@ public:
 	// Constructor that generates a Vertex Buffer Object and links it to vertices
 	VBO(GLfloat* vertices, GLsizeiptr size);
 	VBO(std::vector<Vertex>& vertices);
-	VBO(std::vector<VertexUI>& vertices);
+	VBO(std::vector<VertexUI>& verticesUI);
 
 	// Binds the VBO
 	void Bind();

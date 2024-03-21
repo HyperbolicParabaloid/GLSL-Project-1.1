@@ -130,66 +130,46 @@ void Object::setVBOandEBO(std::string msg) {
 
 	VAO.Bind();
 	
-	//if (msg == "UI") {
-	//	// Setting VBO and EBO
-	//	// Generates Vertex Buffer Object and links it to vertices
-	//	VBO VBO(verticesUI);
-	//	// Generates Element Buffer Object and links it to indices
-	//	EBO EBO(indices);
-	//
-	//	// Links VBO attributes such as coordinates and colors to VAO
-	//	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(VertexUI), (void*)0);
-	//	VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, sizeof(VertexUI), (void*)(3 * sizeof(float)));
-	//	VAO.LinkAttrib(VBO, 2, 4, GL_FLOAT, sizeof(VertexUI), (void*)(6 * sizeof(float)));
-	//	VAO.LinkAttrib(VBO, 3, 2, GL_INT, sizeof(VertexUI), (void*)(10 * sizeof(int)));
-	//
-	//	// Unbind all to prevent accidentally modifying them
-	//	VAO.Unbind();
-	//	VBO.Unbind();
-	//	EBO.Unbind();
-	//}
-	//else {
-		// Setting VBO and EBO
-		// Generates Vertex Buffer Object and links it to vertices
-		VBO VBO(vertices);
-		// Generates Element Buffer Object and links it to indices
-		EBO EBO(indices);
+	// Setting VBO and EBO
+	// Generates Vertex Buffer Object and links it to vertices
+	VBO VBO(vertices);
+	// Generates Element Buffer Object and links it to indices
+	EBO EBO(indices);
 
 
-		// Links VBO attributes such as coordinates and colors to VAO
-		VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
-		VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
-		VAO.LinkAttrib(VBO, 2, 4, GL_FLOAT, sizeof(Vertex), (void*)(6 * sizeof(float)));
-		VAO.LinkAttrib(VBO, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)(10 * sizeof(float)));
+	// Links VBO attributes such as coordinates and colors to VAO
+	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 2, 4, GL_FLOAT, sizeof(Vertex), (void*)(6 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)(10 * sizeof(float)));
 
-		// Keep track of how many of each type of textures we have
-		unsigned int numDiffuse = 0;
-		unsigned int numSpecular = 0;
+	// Keep track of how many of each type of textures we have
+	unsigned int numDiffuse = 0;
+	unsigned int numSpecular = 0;
 
-		// Assign all the relevant information to the shader.
-		for (unsigned int i = 0; i < textures.size(); i++)
+	// Assign all the relevant information to the shader.
+	for (unsigned int i = 0; i < textures.size(); i++)
+	{
+		std::string num;
+		std::string type = textures[i].type;
+		if (type == "diffuse")
 		{
-			std::string num;
-			std::string type = textures[i].type;
-			if (type == "diffuse")
-			{
-				num = std::to_string(numDiffuse++);
-				glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTex"), 1);
-			}
-			else if (type == "specular")
-			{
-				num = std::to_string(numSpecular++);
-				glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTexSpec"), 1);
-			}
-			textures[i].texUnit(*shaderProgram, (type + num).c_str(), i);
-			textures[i].Bind();
+			num = std::to_string(numDiffuse++);
+			glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTex"), 1);
 		}
+		else if (type == "specular")
+		{
+			num = std::to_string(numSpecular++);
+			glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTexSpec"), 1);
+		}
+		textures[i].texUnit(*shaderProgram, (type + num).c_str(), i);
+		textures[i].Bind();
+	}
 
-		// Unbind all to prevent accidentally modifying them
-		VAO.Unbind();
-		VBO.Unbind();
-		EBO.Unbind();
-	//}
+	// Unbind all to prevent accidentally modifying them
+	VAO.Unbind();
+	VBO.Unbind();
+	EBO.Unbind();
 	
 }
 

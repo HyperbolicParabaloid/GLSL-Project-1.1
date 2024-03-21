@@ -16,6 +16,39 @@ glm::vec3 UI::rayToObject(glm::vec3 _ray) {
 	return glm::vec3(objPos);
 }
 
+void UI::setVBOandEBO(std::string msg) {
+	// Generates Shader object using shaders object.vert and object.frag
+	delete shaderProgram;
+	
+	name = msg;
+	shaderProgram = new Shader("ui.vert", "ui.frag");
+	
+	shaderProgram->Activate();
+
+	VAO.Bind();
+
+	// Setting VBO and EBO
+	// Generates Vertex Buffer Object and links it to vertices
+	VBO VBO(verticesUI);
+	// Generates Element Buffer Object and links it to indices
+	EBO EBO(indices);
+
+
+	
+	// Links VBO attributes such as coordinates and colors to VAO
+	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(VertexUI), (void*)0);
+	VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, sizeof(VertexUI), (void*)(3 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 2, 4, GL_FLOAT, sizeof(VertexUI), (void*)(6 * sizeof(float)));
+	VAO.LinkAttribI(VBO, 3, 2, GL_UNSIGNED_INT, sizeof(VertexUI), (void*)(10 * sizeof(float)));
+
+	
+
+	// Unbind all to prevent accidentally modifying them
+	VAO.Unbind();
+	VBO.Unbind();
+	EBO.Unbind();
+}
+
 // Creates a new set of Vertex's and their associated indices to send to the Object
 // class for drawing.
 void UI::genTriangles() {
@@ -33,21 +66,15 @@ void UI::genOctahedron() {
 	// Runs once for evrey character in the text string.
 	for (char c : text) {
 
-		float temp;
-		glm::vec3 vert;
-		glm::vec3 norm;
+		glm::vec3 norm = glm::vec3(0.f, 0.f, -1.f);	// should be glm::vec3(0.f, -1.f, 0.f); !!!!!!!!!!!
 		glm::vec4 clr = color;
 
 		glm::uvec2 letter = dictionary[int('A') % 100];
-		//std::cout << letter.x << ", " << letter.y << "\n";
-
 		
-
-		norm = glm::vec3(0.f, 0.f, -1.f);	// should be glm::vec3(0.f, -1.f, 0.f); !!!!!!!!!!!
-		vertices.push_back(Vertex{ glm::vec3(-1.f, 1.f, 0.f),	norm, clr, letter });
-		vertices.push_back(Vertex{ glm::vec3(1.f, 1.f, 0.f),	norm, clr, letter });
-		vertices.push_back(Vertex{ glm::vec3(-1.f, -1.f, 0.f),norm, clr, letter });
-		vertices.push_back(Vertex{ glm::vec3(1.f, -1.f, 0.f),	norm, clr, letter });
+		verticesUI.push_back(VertexUI{ glm::vec3(-1.f, 1.f, 0.f),	norm, clr, letter });
+		verticesUI.push_back(VertexUI{ glm::vec3(1.f, 1.f, 0.f),	norm, clr, letter });
+		verticesUI.push_back(VertexUI{ glm::vec3(-1.f, -1.f, 0.f),  norm, clr, letter });
+		verticesUI.push_back(VertexUI{ glm::vec3(1.f, -1.f, 0.f),	norm, clr, letter });
 
 		indices.push_back(0);
 		indices.push_back(2);
@@ -64,6 +91,23 @@ void UI::genOctahedron() {
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+//std::cout << letter.x << ", " << letter.y << "\n";
+//std::cout << "Size of vec2() = " << sizeof(glm::vec2) << "\n";
+//std::cout << "Size of ivec2() = " << sizeof(glm::ivec2) << "\n";
+//std::cout << "Size of uvec2() = " << sizeof(glm::uvec2) << "\n";
+//
+//std::cout << "Size of Vertex = " << sizeof(Vertex) << "\n";
+//std::cout << "Size of VertexUI = " << sizeof(VertexUI) << "\n";
 
 // Destructor of Sphere class.
 UI::~UI() {
@@ -94,9 +138,9 @@ bool UI::isTouching(glm::vec2 _cursorPos)
 	// Barycentric test.
 	glm::vec3 p = glm::vec3(_cursorPos, 0.f);
 	for (int i = 0; i < indices.size(); i+=3) {
-		glm::vec3 vec_1 = glm::vec3(model * glm::vec4(vertices[indices[i + 0]].pos, 1.f));
-		glm::vec3 vec_2 = glm::vec3(model * glm::vec4(vertices[indices[i + 1]].pos, 1.f));
-		glm::vec3 vec_3 = glm::vec3(model * glm::vec4(vertices[indices[i + 2]].pos, 1.f));
+		glm::vec3 vec_1 = glm::vec3(model * glm::vec4(verticesUI[indices[i + 0]].pos, 1.f));
+		glm::vec3 vec_2 = glm::vec3(model * glm::vec4(verticesUI[indices[i + 1]].pos, 1.f));
+		glm::vec3 vec_3 = glm::vec3(model * glm::vec4(verticesUI[indices[i + 2]].pos, 1.f));
 
 		// Compute vectors        
 		glm::vec3 v0 = vec_3 - vec_1;
