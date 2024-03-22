@@ -170,6 +170,36 @@ void UI::setNewNumber(double _num, int _precision) {
 	setNewString(shortString);
 }
 
+// Appends current string with anther string.
+void UI::appendString(std::string _code) {
+	text += _code;
+	setNewString(text);
+}
+
+// Appends current string with float to given precision.
+void UI::appendNumber(double _num, int _precision) {
+	// To get a string with as many whole numbers as required + '.' + n many decimals.
+	std::string longString = std::to_string(_num);
+	std::string shortString;
+
+	int n = _precision;
+	int decimals = longString.length();
+	for (int i = 0; i < longString.length(); i++) {
+		shortString.push_back(longString[i]);
+		if (longString[i] == '.') {
+			decimals = i + n;
+		}
+		if (decimals <= i)
+			break;
+	}
+	text += shortString;
+	setNewString(text);
+}
+
+std::string UI::getString() {
+	return text;
+}
+
 // Creates a new set of Vertex's and their associated indices to send to the Object
 // class for drawing.
 void UI::genTriangles() {
@@ -237,7 +267,7 @@ void UI::genOctahedron() {
 		indices.push_back(indicesCount + 3);
 		indices.push_back(indicesCount + 1);
 
-		// Increment indces counter by 4 to move to next letter square.
+		// Increment indices counter by 4 to move to next letter square.
 		indicesCount += 4;
 	}
 

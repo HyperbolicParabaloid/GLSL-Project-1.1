@@ -388,14 +388,14 @@ int main()
 
 	/*
 	1 2 3 4 5 6 7 8
-	0 0 1 1 1 1 0 0 1
-	0 1 1 1 1 1 1 0 2
-	1 1 0 0 0 1 1 0 3
-	1 1 0 0 0 0 0 0 4
-	1 1 1 0 0 1 1 0 5
-	1 0 1 1 1 1 0 0 6
-	1 1 0 1 1 0 0 0 7
-	0 1 1 0 1 1 0 0 8
+	0 0 0 0 0 0 0 0 1
+	0 0 0 1 1 0 0 0 2
+	0 0 0 1 1 0 0 0 3
+	0 0 0 1 1 0 0 0 4
+	0 0 0 1 1 0 0 0 5
+	0 0 0 0 0 0 0 0 6
+	0 0 0 1 1 0 0 0 7
+	0 0 0 1 1 0 0 0 8
 
 
 	*/
@@ -457,7 +457,7 @@ int main()
 
 
 	glm::vec3 UI1Pos = glm::vec3(1.f, 1.f, 0.f);
-	UI UI1(window, glm::vec3(0.f), 1.f, 0.1f, "123456", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+	UI UI1(window, glm::vec3(0.f), 1.f, 0.1f, "PAIGE :D! ", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
 
 
 	std::vector <Object*> objectList;
@@ -520,7 +520,7 @@ int main()
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "useTexSpec"), 1);
 
 
-
+	std::string text = UI1.getString();
 	
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -535,7 +535,8 @@ int main()
 		if (crntTime - prevTime >= 1 / 60)
 		{
 			
-			UI1.setNewNumber(crntTime, 2);
+			UI1.setNewString(text);
+			UI1.appendNumber(crntTime, 3);
 			//rotation = 0.1f;
 			//prevTime = crntTime;
 		}
@@ -652,8 +653,9 @@ int main()
 		}
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
 			
-			std::string newString = "123456";
-			UI1.setNewString(newString);
+			//std::string newString = "123456";
+			//UI1.setNewString(newString);
+			UI1.appendString("6789");
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_I) && lockoutTimer <= crntTime) {

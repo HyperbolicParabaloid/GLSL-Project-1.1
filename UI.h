@@ -27,6 +27,10 @@ public:
 
 	void setNewString(std::string _code);
 	void setNewNumber(double _num, int _precision);
+	void appendString(std::string _code);
+	void appendNumber(double _num, int _precision);
+
+	std::string getString();
 
 	void setScreenPos(glm::vec2 _screenCoords);
 	void setScale(glm::vec2 _scale);
