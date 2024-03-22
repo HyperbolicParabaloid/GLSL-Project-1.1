@@ -15,27 +15,25 @@ private:
 	bool randomColor;
 
 	glm::vec2 scale;
+	float characterScale;
 	std::string text;
 
 	int seed;
 public:
-	UI(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, std::string _text, glm::uvec2 (& _dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
+	UI(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, float _characterScale, std::string _text, glm::uvec2(&_dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
 	~UI();
 	void genOctahedron();
 	void setVBOandEBO(std::string msg);
-	void doRandomColors(bool _randomColor);
-	void reseed();
-	void smoothSurface(bool _isSmooth);
-	void setScale(float _scale);
+
+	void setNewString(std::string _code);
+	void setNewNumber(double _num, int _precision);
+
 	void setScreenPos(glm::vec2 _screenCoords);
 	void setScale(glm::vec2 _scale);
 	glm::vec3 rayToObject(glm::vec3 _ray);
 	glm::vec2 getScale();
 	bool isTouching(glm::vec2 _cursorPos);
 	void setColor(glm::vec4 _color);
-	
-	void writeLetter(glm::uvec2 _pixels);
-	void writeLetter(std::string code);
 };
 
 #endif

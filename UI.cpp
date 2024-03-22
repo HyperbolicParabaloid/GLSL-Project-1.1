@@ -1,13 +1,14 @@
 #include "UI.h"
 
 // Constructor for Plane.
-UI::UI(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, std::string _text, glm::uvec2 (&_dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
+UI::UI(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, float _characterScale, std::string _text, glm::uvec2 (&_dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
 	text = _text;
 	dictionary = _dictionary;
 	randomColor = false;
 	seed = 1;
-	objRadius = sqrt(2);
+
 	scale = glm::vec2(_objScale);
+	characterScale = _characterScale;
 	genTriangles();
 }
 
@@ -17,7 +18,7 @@ glm::vec3 UI::rayToObject(glm::vec3 _ray) {
 }
 
 void UI::setVBOandEBO(std::string msg) {
-	// Generates Shader object using shaders object.vert and object.frag
+	// Generates Shader object using shaders ui.vert and ui.frag
 	delete shaderProgram;
 	
 	name = msg;
@@ -27,13 +28,12 @@ void UI::setVBOandEBO(std::string msg) {
 
 	VAO.Bind();
 
+
 	// Setting VBO and EBO
 	// Generates Vertex Buffer Object and links it to vertices
 	VBO VBO(verticesUI);
 	// Generates Element Buffer Object and links it to indices
 	EBO EBO(indices);
-
-
 	
 	// Links VBO attributes such as coordinates and colors to VAO
 	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(VertexUI), (void*)0);
@@ -41,12 +41,133 @@ void UI::setVBOandEBO(std::string msg) {
 	VAO.LinkAttrib(VBO, 2, 4, GL_FLOAT, sizeof(VertexUI), (void*)(6 * sizeof(float)));
 	VAO.LinkAttribI(VBO, 3, 2, GL_UNSIGNED_INT, sizeof(VertexUI), (void*)(10 * sizeof(float)));
 
-	
-
 	// Unbind all to prevent accidentally modifying them
 	VAO.Unbind();
 	VBO.Unbind();
 	EBO.Unbind();
+}
+
+// Sets the string to something else.
+// Kind of a ineffcient/busy function. Probably should split it up to make it look a little cleaner.
+void UI::setNewString(std::string _code) {
+	// Setting the textcure coords.
+	glm::vec3 texCoord1 = glm::vec3(-1.f, 1.f, 0.f);
+	glm::vec3 texCoord2 = glm::vec3(1.f, 1.f, 0.f);
+	glm::vec3 texCoord3 = glm::vec3(-1.f, -1.f, 0.f);
+	glm::vec3 texCoord4 = glm::vec3(1.f, -1.f, 0.f);
+
+	// Setting color;
+	glm::vec4 clr = color;
+
+	// Helper variables to track character offsets.
+	float xCount = 0.f, yCount = 0.f;
+	int indicesCount = 0;
+
+	// Getting lengths.
+	int crntTextLength = verticesUI.size() / 4;
+	int newTextLength = _code.length();
+
+	int vertCount = 0;
+	if (crntTextLength > newTextLength) { // If the old string is longer.
+		for (int i = 0; i < crntTextLength; i++) {
+
+			if (i < newTextLength) {
+				char c = _code[i];
+				// Setting the character to be displayed.
+				glm::uvec2 character = dictionary[int(c) % 100];
+				verticesUI[vertCount + 0].letter = character;
+				verticesUI[vertCount + 1].letter = character;
+				verticesUI[vertCount + 2].letter = character;
+				verticesUI[vertCount + 3].letter = character;
+			}
+			else {
+				// Setting the character to be displayed.
+				glm::uvec2 character = dictionary[0];
+				verticesUI[vertCount + 0].letter = character;
+				verticesUI[vertCount + 1].letter = character;
+				verticesUI[vertCount + 2].letter = character;
+				verticesUI[vertCount + 3].letter = character;
+			}
+			vertCount += 4;
+		}
+	} 
+	else { // If the new string is longer.
+		for (int i = 0; i < newTextLength; i++) {
+			char c = _code[i];
+			// Setting character spacings.
+			float xLeft = -1.f + characterScale * 2.f * xCount;
+			float xRight = -1.f + characterScale * 2.f * (xCount + 1.f);
+			float yUp = 1.f - characterScale * 2.f * yCount;
+			float yDown = 1.f - characterScale * 2.f * (yCount + 1.f);
+			// Incrementing xCount.
+			xCount += 1.f;
+
+			// If characters are at the end of the rectangle, move to next line down.
+			if (-1.f + characterScale * 2.f * (xCount + 1.f) > 1.f) {
+				xCount = 0.f;
+				yCount += 1.f;
+			}
+
+
+			// Setting the character to be displayed.
+			glm::uvec2 character = dictionary[int(c) % 100];
+			if (i < crntTextLength) {
+				// Setting the character to be displayed.
+				verticesUI[indicesCount + 0].letter = character;
+				verticesUI[indicesCount + 1].letter = character;
+				verticesUI[indicesCount + 2].letter = character;
+				verticesUI[indicesCount + 3].letter = character;
+			}
+			else {
+				// Setting character positions.
+				glm::vec3 pos1 = glm::vec3(xLeft, yUp, 0.f);
+				glm::vec3 pos2 = glm::vec3(xRight, yUp, 0.f);
+				glm::vec3 pos3 = glm::vec3(xLeft, yDown, 0.f);
+				glm::vec3 pos4 = glm::vec3(xRight, yDown, 0.f);
+
+				// Adding Vertex info to vector.
+				verticesUI.push_back(VertexUI{ pos1, texCoord1, clr, character });
+				verticesUI.push_back(VertexUI{ pos2, texCoord2, clr, character });
+				verticesUI.push_back(VertexUI{ pos3, texCoord3, clr, character });
+				verticesUI.push_back(VertexUI{ pos4, texCoord4, clr, character });
+
+				// Lower left triangle.
+				indices.push_back(indicesCount + 0);
+				indices.push_back(indicesCount + 2);
+				indices.push_back(indicesCount + 3);
+				// Upper right triangle.
+				indices.push_back(indicesCount + 0);
+				indices.push_back(indicesCount + 3);
+				indices.push_back(indicesCount + 1);
+			}
+			// Increment indices counter by 4 to move to next letter square.
+			indicesCount += 4;
+		}
+	}
+
+	// Finally, setting text equal to the new string (_code) and binding the vertexUI to the VAO. 
+	text = _code;
+	setVBOandEBO("UI");
+}
+
+// Basically the same as setNewString, except it works specifically with doubles (or any floating point numbers)
+// to get an exact precision so you only get the characters you want.
+void UI::setNewNumber(double _num, int _precision) {
+	// To get a string with as many whole numbers as required + '.' + n many decimals.
+	std::string longString = std::to_string(_num);
+	std::string shortString;
+
+	int n = _precision;
+	int decimals = longString.length();
+	for (int i = 0; i < longString.length(); i++) {
+		shortString.push_back(longString[i]);
+		if (longString[i] == '.') {
+			decimals = i + n;
+		}
+		if (decimals <= i)
+			break;
+	}
+	setNewString(shortString);
 }
 
 // Creates a new set of Vertex's and their associated indices to send to the Object
@@ -56,74 +177,95 @@ void UI::genTriangles() {
 	setVBOandEBO("UI");
 }
 
+// Generates the basic retangle with added characters.
 void UI::genOctahedron() {
-	// Whenever we generate a new set a vertices and indices, we want to wipe the old ones.
-	// In the future it'd be better to just add in the new vertices and update indices instead
-	// of clearing both indices and verts and starting over but it's fine for now.
+
+	// Clearing verts and inds.
 	verticesUI.clear();
 	indices.clear();
 
-	// Runs once for evrey character in the text string.
+	// Setting the textcure coords.
+	glm::vec3 texCoord1 = glm::vec3(-1.f, 1.f, 0.f);
+	glm::vec3 texCoord2 = glm::vec3(1.f, 1.f, 0.f);
+	glm::vec3 texCoord3 = glm::vec3(-1.f, -1.f, 0.f);
+	glm::vec3 texCoord4 = glm::vec3(1.f, -1.f, 0.f);
+
+	// Setting color;
+	glm::vec4 clr = color;
+
+	// Helper variables to track character offsets.
+	float xCount = 0.f, yCount = 0.f;
+	int indicesCount = 0;
+
+	// Runs once for every character in the text string.
 	for (char c : text) {
+		// Setting character spacings.
+		float xLeft		= -1.f + characterScale * 2.f * xCount;
+		float xRight	= -1.f + characterScale * 2.f * (xCount + 1.f);
+		float yUp		=  1.f - characterScale * 2.f * yCount;
+		float yDown		=  1.f - characterScale * 2.f * (yCount + 1.f);
+		// Incrementing xCount.
+		xCount += 1.f;
 
-		glm::vec3 norm = glm::vec3(0.f, 0.f, -1.f);	// should be glm::vec3(0.f, -1.f, 0.f); !!!!!!!!!!!
-		glm::vec4 clr = color;
+		// If characters are at the end of the rectangle, move to next line down.
+		if (-1.f + characterScale * 2.f * (xCount + 1.f) > 1.f) {
+			xCount = 0.f;
+			yCount += 1.f;
+		}
 
-		glm::uvec2 letter = dictionary[int('A') % 100];
+		// Setting character positions.
+		glm::vec3 pos1 = glm::vec3(xLeft,	yUp,	0.f);
+		glm::vec3 pos2 = glm::vec3(xRight,	yUp,	0.f);
+		glm::vec3 pos3 = glm::vec3(xLeft,	yDown,	0.f);
+		glm::vec3 pos4 = glm::vec3(xRight,	yDown,	0.f);
+
+		// Setting the character to be displayed.
+		glm::uvec2 character = dictionary[int(c) % 100];
 		
-		verticesUI.push_back(VertexUI{ glm::vec3(-1.f, 1.f, 0.f),	norm, clr, letter });
-		verticesUI.push_back(VertexUI{ glm::vec3(1.f, 1.f, 0.f),	norm, clr, letter });
-		verticesUI.push_back(VertexUI{ glm::vec3(-1.f, -1.f, 0.f),  norm, clr, letter });
-		verticesUI.push_back(VertexUI{ glm::vec3(1.f, -1.f, 0.f),	norm, clr, letter });
+		// Adding Vertex info to vector.
+		verticesUI.push_back(VertexUI{ pos1, texCoord1, clr, character });
+		verticesUI.push_back(VertexUI{ pos2, texCoord2, clr, character });
+		verticesUI.push_back(VertexUI{ pos3, texCoord3, clr, character });
+		verticesUI.push_back(VertexUI{ pos4, texCoord4, clr, character });
 
-		indices.push_back(0);
-		indices.push_back(2);
-		indices.push_back(3);
+		// Lower left triangle.
+		indices.push_back(indicesCount + 0);
+		indices.push_back(indicesCount + 2);
+		indices.push_back(indicesCount + 3);
+		// Upper right triangle.
+		indices.push_back(indicesCount + 0);
+		indices.push_back(indicesCount + 3);
+		indices.push_back(indicesCount + 1);
 
-		indices.push_back(0);
-		indices.push_back(3);
-		indices.push_back(1);
-
-		glm::vec3 scalingVec = glm::vec3(objScale, objScale, 0.f);
-		glm::vec3 screenPos = glm::vec3(objPos.x, objPos.y, 0.f);
-		model = glm::translate(glm::mat4(1.f), screenPos - scalingVec);
-		model = glm::scale(model, scalingVec);
+		// Increment indces counter by 4 to move to next letter square.
+		indicesCount += 4;
 	}
 
+	// Setting transformation matrix.
+	glm::vec3 scalingVec = glm::vec3(objScale, objScale, 0.f);
+	glm::vec3 screenPos = glm::vec3(objPos.x, objPos.y, 0.f);
+	//model = glm::translate(glm::mat4(1.f), screenPos - scalingVec);
+	model = glm::translate(glm::mat4(1.f), screenPos);
+	model = glm::scale(model, scalingVec);
 }
 
-
-
-
-
-
-
-
-
-
-//std::cout << letter.x << ", " << letter.y << "\n";
-//std::cout << "Size of vec2() = " << sizeof(glm::vec2) << "\n";
-//std::cout << "Size of ivec2() = " << sizeof(glm::ivec2) << "\n";
-//std::cout << "Size of uvec2() = " << sizeof(glm::uvec2) << "\n";
-//
-//std::cout << "Size of Vertex = " << sizeof(Vertex) << "\n";
-//std::cout << "Size of VertexUI = " << sizeof(VertexUI) << "\n";
-
-// Destructor of Sphere class.
+// Yee old destructor.
 UI::~UI() {
 }
 
 // Sets the screen coordinates of the UI object.
 void UI::setScreenPos(glm::vec2 _screenCoords) {
 	objPos = glm::vec3(_screenCoords, objPos.z);
-	model = glm::translate(glm::mat4(1.f), glm::vec3(_screenCoords - scale, 0.0f));
+	//model = glm::translate(glm::mat4(1.f), glm::vec3(_screenCoords - scale, 0.0f));
+	model = glm::translate(glm::mat4(1.f), glm::vec3(_screenCoords, 0.0f));
 	model = glm::scale(model, glm::vec3(scale, 0.f));
 }
 
 // Sets the X and Y scaling factors for the UI objects transformation.
 void UI::setScale(glm::vec2 _scale) {
 	scale = _scale;
-	model = glm::translate(glm::mat4(1.f), objPos - glm::vec3(scale, 0.0f));
+	//model = glm::translate(glm::mat4(1.f), objPos - glm::vec3(scale, 0.0f));
+	model = glm::translate(glm::mat4(1.f), objPos);
 	model = glm::scale(model, glm::vec3(scale, 0.f));
 }
 
@@ -173,66 +315,4 @@ bool UI::isTouching(glm::vec2 _cursorPos)
 void UI::setColor(glm::vec4 _color) {
 	color = _color;
 	genTriangles();
-}
-
-void UI::writeLetter(glm::uvec2 _pixels) {
-	pixels = _pixels;
-}
-
-// Writes letter on UI object.
-void UI::writeLetter(std::string code) {
-	// Activating the shader program and binding the VAO so OpenGL knows what we're trying to do.
-	int codeIndex = 0;
-	int bitsX = 0;
-	int bitsY = 0;
-
-	for (int bit = 0; bit < 32; bit++) {
-		if (code[codeIndex] == '0') {
-			bitsX |= 0 << (bit % 32);
-			std::cout << 0;
-		}
-		else {
-			bitsX |= 1 << (bit % 32);
-			std::cout << 1;
-		}
-		if ((codeIndex + 1) % 8 == 0)
-			std::cout << "\n";
-		codeIndex++;
-	}
-	for (int bit = 0; bit < 32; bit++) {
-		if (code[codeIndex] == '0') {
-			bitsY |= 0 << (bit % 32);
-			std::cout << 0;
-		}
-		else {
-			bitsY |= 1 << (bit % 32);
-			std::cout << 1;
-		}
-		if ((codeIndex + 1) % 8 == 0)
-			std::cout << "\n";
-		codeIndex++;
-	}
-	pixels = glm::uvec2(bitsX, bitsY);
-
-
-	
-
-}
-
-// Redraws the Sphere where ever triangle has a random color.
-void UI::doRandomColors(bool _randomColor) {
-	randomColor = _randomColor;
-}
-
-void UI::reseed() {
-	seed++;
-}
-
-// Redraws the Sphere where the Vertex normals are used instead of Surface normals of each Triangle.
-void UI::smoothSurface(bool _isSmooth) {
-	isSmooth = _isSmooth;
-}
-
-void UI::setScale(float _scale) {
-	objScale = _scale;
 }

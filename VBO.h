@@ -13,7 +13,7 @@ struct Vertex {
 	glm::vec3 pos = glm::vec3(0.f);	glm::vec3 norm;	glm::vec4 color = glm::vec4(0.f);	glm::vec2 texCoord = glm::vec2(0.f);
 };
 struct VertexUI {
-	glm::vec3 pos = glm::vec3(0.f);	glm::vec3 norm;	glm::vec4 color = glm::vec4(0.f);	glm::uvec2 texCoord = glm::uvec2(0);
+	glm::vec3 pos = glm::vec3(0.f);	glm::vec3 texCoord;	glm::vec4 color = glm::vec4(0.f);	glm::uvec2 letter = glm::uvec2(0);
 };
 struct Triangle {
 	Triangle(Vertex* _v1, Vertex* _v2, Vertex* _v3, glm::mat4* _model) {

@@ -386,7 +386,35 @@ int main()
 	myFile.clear();
 	myFile.seekg(0, std::ios::beg);
 
+	/*
+	1 2 3 4 5 6 7 8
+	0 0 1 1 1 1 0 0 1
+	0 1 1 1 1 1 1 0 2
+	1 1 0 0 0 1 1 0 3
+	1 1 0 0 0 0 0 0 4
+	1 1 1 0 0 1 1 0 5
+	1 0 1 1 1 1 0 0 6
+	1 1 0 1 1 0 0 0 7
+	0 1 1 0 1 1 0 0 8
+
+
+	*/
+	//     34 = "
+	//	   35 = #
+	//     36 = $
+	//     37 = %
+	//     38 = &
+	//     39 = '
+	//	   40 = (
+	//	   41 = )
+	//	   42 = *
+	//     43 = +
+	//     44 = ,
+	//     45 = -
+	//	   46 = .
+	//     47 = /
 	// 48->57 = 0->9;
+	//     61 = =
 	// 65->90 = A->Z;
 	//	   95 = _	;
 	while (getline(myFile, theLine)) {
@@ -413,7 +441,7 @@ int main()
 			}
 		}
 		intDict[index] = glm::uvec2(bitsX, bitsY);
-		std::cout << "Added " << code << " at [" << index << "]\n";
+		//std::cout << "Added " << code << " at [" << index << "]\n";
 	}
 
 	// Setting all other values to be spaces.
@@ -429,7 +457,7 @@ int main()
 
 
 	glm::vec3 UI1Pos = glm::vec3(1.f, 1.f, 0.f);
-	UI UI1(window, glm::vec3(-0.6f, 0.8f, 0.f), 0.1f, "H", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+	UI UI1(window, glm::vec3(0.f), 1.f, 0.1f, "123456", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
 
 
 	std::vector <Object*> objectList;
@@ -450,32 +478,6 @@ int main()
 
 	UIList.push_back(&UI1);
 	objectList.push_back(UIList.back());
-
-
-	glm::vec2 texCoord = glm::vec2(-1.f, 1.f);
-	glm::ivec2 coord = glm::ivec2(floor((texCoord.x + 1.f) / 2.f) * 7, floor((-texCoord.y + 1.f) / 2.f) * 7);
-	int fragNum = int(coord.y * 8 + coord.x) % 32;
-	std::cout << "(" << coord.x << ", " << coord.y << ") fragNum = " << fragNum << "\n";
-
-	texCoord = glm::vec2(1.f, 1.f);
-	coord = glm::ivec2(floor((texCoord.x + 1.f) / 2.f) * 7, floor((-texCoord.y + 1.f) / 2.f) * 7);
-	fragNum = int(coord.y * 8 + coord.x) % 32;
-	std::cout << "(" << coord.x << ", " << coord.y << ") fragNum = " << fragNum << "\n";
-
-	texCoord = glm::vec2(-1.f, -1.f);
-	coord = glm::ivec2(floor((texCoord.x + 1.f) / 2.f) * 7, floor((-texCoord.y + 1.f) / 2.f) * 7);
-	fragNum = int(coord.y * 8 + coord.x) % 32;
-	std::cout << "(" << coord.x << ", " << coord.y << ") fragNum = " << fragNum << "\n";
-
-	texCoord = glm::vec2(1.f, -1.f);
-	coord = glm::ivec2(floor((texCoord.x + 1.f) / 2.f) * 7, floor((-texCoord.y + 1.f) / 2.f) * 7);
-	fragNum = int(coord.y * 8 + coord.x) % 32;
-	std::cout << "(" << coord.x << ", " << coord.y << ") fragNum = " << fragNum << "\n";
-
-	std::cout << "\n";
-
-
-
 
 
 	//for (float y = 1.f - UI_Scale * 2.f; y > -1.f + UI_Scale * 4.f; y -= UI_Scale * 2.f) {
@@ -532,6 +534,8 @@ int main()
 		double crntTime = glfwGetTime();
 		if (crntTime - prevTime >= 1 / 60)
 		{
+			
+			UI1.setNewNumber(crntTime, 2);
 			//rotation = 0.1f;
 			//prevTime = crntTime;
 		}
@@ -648,43 +652,15 @@ int main()
 		}
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
 			
-			for (auto UI_Obj : UIList) {
-				UI_Obj->writeLetter(dictionary[0]);
-				//UI_Obj->setColor(glm::vec4((UI_Obj->objPos + 1.f) / 2.f, 1.f));
-			}
+			std::string newString = "123456";
+			UI1.setNewString(newString);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_I) && lockoutTimer <= crntTime) {
-			//std::cout << "Writing to file.\n";
-			//myFile.clear();
-			//myFile.seekg(0, std::ios::end);
-			//
-			//
-			//myFile << characterArray[characterIndex % (sizeof(characterArray) / sizeof(characterArray[0]))] << "_";
-			//for (auto UI_Obj : UIList) {
-			//	if (UI_Obj->color == glm::vec4(0.f, 0.f, 0.f, 1.f))
-			//		myFile << 1;
-			//	else
-			//		myFile << 0;
-			//}
-			//myFile << '\n';
-			//characterIndex++;
+			std::string m = std::to_string(1234.56789) + "/1-2+3,4=5" + '"' + "#$%&*()";
 
-			std::string line;
-			getline(std::cin, line);
-
-			int UIIndex = 0;
-			for (char c : line) {
-				glm::uvec2 code = intDict[int(c) % dictionaryLength];
-
-				UIList[UIIndex]->writeLetter(code);
-				UIIndex++;
-			}
-
-
-
-
-			lockoutTimer = crntTime + 0.5;
+			UI1.setNewString(m);
+			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Z) && lockoutTimer <= crntTime) {
 			std::cout << "Reading from file.\n";
