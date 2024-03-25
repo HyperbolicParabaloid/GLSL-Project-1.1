@@ -149,11 +149,11 @@ vec4 spotLight() {
 // Doing Phong shading
 void main()
 {
-	vec4 pntLgt = pointLight();
+	//vec4 pntLgt = pointLight();
 	vec4 drtLgt = directionalLight();
-	vec4 sptLgt = spotLight();
+	//vec4 sptLgt = spotLight();
 	//FragColor = mix(mix(drtLgt, pntLgt, pntLgt), sptLgt, sptLgt);
 	//FragColor = mix(drtLgt, pntLgt, pntLgt);
-	FragColor = pntLgt;
+	FragColor = drtLgt;
 	FragColor.w = 1.f;
 }

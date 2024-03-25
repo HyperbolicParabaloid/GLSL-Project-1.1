@@ -19,12 +19,18 @@ private:
 	std::string text;
 
 	int seed;
+	int realLetters;
+	float xCount;
+	float yCount;
+
+	glm::vec2 textOffset;
 public:
-	UI(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, float _characterScale, std::string _text, glm::uvec2(&_dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
+	UI(GLFWwindow* _window, glm::vec3 _objPos, glm::vec2 _textOffset, float _objScale, float _characterScale, std::string _text, glm::uvec2(&_dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
 	~UI();
 	void genOctahedron();
 	void setVBOandEBO(std::string msg);
 
+	void setNewString(std::string _code, bool _removeFormatting);
 	void setNewString(std::string _code);
 	void setNewNumber(double _num, int _precision);
 	void appendString(std::string _code);

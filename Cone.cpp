@@ -1,13 +1,12 @@
 #include "Cone.h"
 
 // Constructor for Cone.
-Cone::Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
+Cone::Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, bool _smooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
 	level = _level;
-	isSmooth = _isSmooth;
+	smooth = _smooth;
 	bottomRadius = _bottomRadius;
 	topRadius = _topRadius;
 	pointPos = _pointPos;
-	objPos = _objPos;
 	startingPos = glm::vec3(0.f);
 	randomColor = false;
 	seed = 1;
@@ -17,9 +16,9 @@ Cone::Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, 
 }
 
 // Constructor for Cone.
-Cone::Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _shaftColor, _textures, _camera) {
+Cone::Cone(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, bool _smooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _shaftColor, _textures, _camera) {
 	level = _level;
-	isSmooth = _isSmooth;
+	smooth = _smooth;
 	bottomRadius = _bottomRadius;
 	topRadius = _topRadius;
 	pointPos = _pointPos;
@@ -105,7 +104,7 @@ void Cone::genTriangles() {
 	indices.clear();
 	indCount = 0;
 
-	int layers = 4;
+	int layers = 1;
 	float scaleMax = .75f, scaleMin = .5f;
 
 	glm::vec3 b = startingPos, t = pointPos;
@@ -180,6 +179,9 @@ void Cone::genCone() {
 
 void Cone::setVerticesVector() {
 	srand(seed);
+
+	randomColor = true;
+
 	glm::vec4 color1, color2;
 	glm::vec3 n1, n2, n3, n4;
 
@@ -227,7 +229,7 @@ void Cone::setVerticesVector() {
 		n3 = glm::normalize(glm::cross((v4 - v6), (v5 - v6)));
 		n4 = glm::normalize(glm::cross((v5 - v6), (v2 - v6)));
 
-		if (isSmooth) {
+		if (smooth) {
 			// Setting the previous and future indices.
 			int prevjj, futrjj;
 			if (jj - 1 <= 0) {
@@ -356,6 +358,6 @@ void Cone::reseed() {
 }
 
 // Redraws the Sphere where the Vertex normals are used instead of Surface normals of each Triangle.
-void Cone::smoothSurface(bool _isSmooth) {
-	isSmooth = _isSmooth;
+void Cone::smoothSurface(bool _smooth) {
+	smooth = _smooth;
 }

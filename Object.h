@@ -22,7 +22,6 @@
 #include"Texture.h"
 #include"shaderClass.h"
 #include"Camera.h"
-#include"Arrow.h"
 
 /*
 This class is for creating basic objects. It's meant to be a parent class.
@@ -40,8 +39,11 @@ private:
 	std::vector<glm::vec3> velocityHistory;
 	std::vector<glm::vec3> posHistory;
 
-
 public:
+	int level;
+	bool randomColor;
+	bool smooth;
+	glm::vec3 radi;
 	std::string name;
 
 	glm::uvec2 pixels;
@@ -54,8 +56,13 @@ public:
 	void draw(glm::vec3 _lightPos, glm::vec4 _lightColor);
 	void setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg);
 	virtual void setVBOandEBO(std::string msg);
+	virtual void setLevel(int _level);
+	virtual void doRandomColors(bool _randomColor);
+	virtual void smoothSurface(bool _isSmooth);
 	void rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation);
 	void moveFirstVertex();
+
+	void pointAt(glm::vec3 _direction, bool _isTopPointing);
 
 	void hotRealoadShader();
 

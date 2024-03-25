@@ -1,9 +1,9 @@
 #include "Sphere.h"
 
 // Constructor for Sphere.
-Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, glm::vec3 _radi, float _objScale, int _level, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
+Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, glm::vec3 _radi, float _objScale, int _level, bool _smooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
 	level = _level;
-	isSmooth = _isSmooth;
+	smooth = _smooth;
 	randomColor = false;
 	seed = 1;
 	objRadius = 1.f;
@@ -241,7 +241,7 @@ void Sphere::setVerticesVector() {
 			//
 			// If we'd rather they appear angular, we can set that by getting the normal of the triangle
 			// the vertexs are a part of, and using that for each Vertex.
-			if (!isSmooth) {
+			if (!smooth) {
 				glm::vec3 n1 = glm::normalize(glm::cross(v3 - v2, v1 - v2));
 				glm::vec3 n2 = glm::normalize(glm::cross(v6 - v5, v4 - v5));
 
@@ -310,6 +310,6 @@ void Sphere::reseed() {
 }
 
 // Redraws the Sphere where the Vertex normals are used instead of Surface normals of each Triangle.
-void Sphere::smoothSurface(bool _isSmooth) {
-	isSmooth = _isSmooth;
+void Sphere::smoothSurface(bool _smooth) {
+	smooth = _smooth;
 }

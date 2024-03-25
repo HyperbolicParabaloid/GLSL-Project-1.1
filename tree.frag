@@ -172,94 +172,13 @@ float noise(vec2 n) {
 // Doing Phong shading
 void main()
 {
-	vec4 pntLgt = pointLight();
+	float opacity = color.w;
+	//vec4 pntLgt = pointLight();
 	vec4 drtLgt = directionalLight();
-	vec4 sptLgt = spotLight();
+	//vec4 sptLgt = spotLight();
 	//FragColor = mix(mix(drtLgt, pntLgt, pntLgt), sptLgt, sptLgt);
 	//FragColor = mix(drtLgt, pntLgt, pntLgt);
-	FragColor = drtLgt;//(pntLgt + drtLgt) - 0.20f;
+	FragColor = drtLgt;
+	FragColor.w = opacity;
 	return;
-
-	vec2 uv = texCoord;
-	
-	vec4 noiseColor = pntLgt;
-	float n = noise(uv + time);
-	//float n = noise(uv);
-
-	//if (int(uv.y) % 2 == 0)
-	//	uv.x += 0.5;
-
-	// Adds in the cell boarders so you can see what you're doing a little better.
-	//if (fract(uv.x) > 0.99 || fract(uv.x) < 0.01)
-	//	FragColor = vec4(1);
-	//else if (fract(uv.y) > 0.99 || fract(uv.y) < 0.01)
-	//	FragColor = vec4(1);
-	//else
-		FragColor = mix(noiseColor, vec4(1), n / 2);
-
-	vec2 cPos = vec2(int(uv.x), int(uv.y));
-	
-	// The offset the loop will search around it's current cell block.
-	// A.K.A., a search distance of 1 would mean the loop would look at
-	// 1 additional cell block in all 4 directions.
-	//
-	// Generally doesn't need to be all that large unless the circle radius
-	// is giant.
-	int searchDist = 1;
-	// Maximum and minimum time it will take a given circle to reach it's
-	// maximum radius as it expands.
-	float maxCrclTm = 0.5, minCrclTm = 0.25;//0.5;
-	float maxRadius = 0.75, minRadius = 0.5;//0.5;
-
-	float offset = 0.1;
-	for (int jj = -searchDist; jj <= searchDist; jj++) {
-		for (int ii = -searchDist; ii <= searchDist; ii++) {
-			// With the ii and jj offset, this is the actual cell we're checking
-			// to see if the given circle has expanded into it so we can draw it
-			// properly.
-			vec2 searchPos = vec2(cPos.x + ii, cPos.y + jj);
-
-			// timeScaler		= Seconds until the circle reaches max radius, minCrclTm -> maxCrclTm
-			// rand(searchPos)	= Max radius
-			float timeScaler = rand(searchPos) * (maxCrclTm - minCrclTm) + minCrclTm;
-			float circleMaxRadius = rand(searchPos) * (maxRadius - minRadius) + minRadius;
-
-			// Everytime (time * timeScaler) reaches a new whole number,
-			// we know that the maximum radius of the circle has been achieved
-			// and therefore we can make a new circle with a new offset.
-			offset = rand(searchPos + floor(time / timeScaler));
-			searchPos.x -= rand(offset * 13);
-			searchPos.y -= rand(offset * 17);
-
-			//float newOffset = rand(floor(time / timeScaler));
-
-			// Scales the maximum radius size.
-			//float offsetScaler = clamp(rand(offset * circleMaxRadius) * 1.5, 0.75, 1.25);
-
-			// The outer radius
-			float radiusOuter;
-			float radiusInner;
-
-			// New Version where the max radius can change everytime.
-			if (circleMaxRadius < 0.5)
-				radiusOuter = fract(time / timeScaler) * ((circleMaxRadius));
-			else
-				radiusOuter = fract(time / timeScaler) * ((circleMaxRadius));
-			//radiusOuter = fract(time / timeScaler) * circleMaxRadius;	// Old Version with set max radius per cell
-			radiusInner = radiusOuter * clamp(offset * 1.5, 0.9, .95);
-
-			// This is the distance between the point we're at right now in the offset,
-			// cell, and the actual texture coodiantes of the given fragment. We need
-			// to know this to see if the distance is less than the max radius so we
-			// know we're within the circle.
-			float cLength = length(texCoord - searchPos);
-	
-			// Pretty self explanitory: if distance > min but < max, draw the color.
-			if ((cLength <= radiusOuter && cLength > radiusInner)) {
-				//vec4 randomColor = vec4(rand(searchPos), rand(searchPos + 1), rand(searchPos + 2), 1);
-				FragColor = mix(vec4(.75), FragColor, fract(time / timeScaler));
-			} //else if (cLength <= radiusInner)
-			//	FragColor = FragColor;
-		}
-	}
 }

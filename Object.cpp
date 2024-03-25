@@ -22,6 +22,14 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	rotationalVelocity = 0.f;
 	rotationalAxis = glm::vec3(0.f);
 	pixels = glm::uvec2(0);//glm::ivec2(INT_MAX);
+
+	randomColor = false;
+	smooth = true;
+
+	// Not really used for all objects, so starts at -1.
+	level = -1;
+
+	//pointingAt = glm::vec3(0.f, 1.f, 0.f);
 }
 
 glm::vec3 Object::rayToObject(glm::vec3 _ray) {
@@ -40,6 +48,10 @@ void Object::setNewPos(glm::vec3 _objPos) {
 // Rotates the object about a given axis by a set angle in degrees.
 void Object::rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation) {
 	model = glm::rotate(model, glm::radians(rotationDegreeAngle), axisOfRotation);
+}
+
+void Object::setLevel(int _level) {
+	std::cout << "N/A";
 }
 
 // Draws the object to the screen and sets the appropriate information in the Shader object about position, and lighting.
@@ -196,39 +208,6 @@ void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>&
 	vertices = _vertices;
 	indices = _indices;
 
-	//std::cout << "doNormalArrows = " << doNormalArrows << " for " << msg << "\n";
-	if (doNormalArrows == true) {
-		//std::cout << "Drawing the arrows for " << msg <<  "\n";
-		int vNum = 1;
-		int maxSize = vertices.size();
-		for (int vv = 0; vv < maxSize; vv++) {
-			glm::vec3 conePos = vertices[vv].pos;
-			float coneScale = 0.02f;
-			int coneLevel = 4;
-			float coneBottomRadius = 1.f;
-			float coneTopRadius = 0.f;
-			glm::vec3 conePointPos = glm::vec3(0.f, 5.f, 0.f);
-			glm::vec3 conePointingAt = vertices[vv].norm;
-			bool coneIsSmooth = true;
-			glm::vec4 coneColor = glm::vec4(0.4f, 0.5f, 0.3f, 1.f); //vertices[vv].color;
-			glm::vec4 shaftColor = glm::vec4(0.5f, 0.3f, 0.f, 1.f);// vertices[vv].color;
-			int coneStartingIndex = indices.size();
-			float randomizationEffect = 0.f;
-
-			//std::cout << "Drawing arrows #" << vNum << " at pos (" << conePos.x << ", " << conePos.y << ", " << conePos.z << ")\n";
-			//vNum++;
-
-			//std::cout << "Drawing a " << msg << "\n";
-			Arrow newArrow(conePos, coneScale, coneLevel, coneBottomRadius, coneTopRadius, conePointPos, conePointingAt, coneIsSmooth, shaftColor, coneColor, randomizationEffect, coneStartingIndex);
-			std::vector <Vertex> coneVerts = newArrow.getVerts();
-			std::vector <GLuint> coneInds = newArrow.getInds();
-
-			//std::cout << "vertices.size() BEFORE = " << vertices.size() << "\n";
-			vertices.insert(vertices.end(), coneVerts.begin(), coneVerts.end());
-			indices.insert(indices.end(), coneInds.begin(), coneInds.end());
-		}
-	}
-
 	VAO.Bind();
 	// Setting VBO and EBO
 	// Generates Vertex Buffer Object and links it to vertices
@@ -339,6 +318,82 @@ void Object::hotRealoadShader() {
 		textures[i].texUnit(*shaderProgram, (type + num).c_str(), i);
 		textures[i].Bind();
 	}
+}
+
+// Toggles random colors.
+void Object::doRandomColors(bool _randomColor) {
+	randomColor = !randomColor;
+}
+
+void Object::smoothSurface(bool _isSmooth) {
+	smooth = _isSmooth;
+}
+
+// Aims object in the given direction.
+void Object::pointAt(glm::vec3 _direction, bool _isTopPointing) {
+	// Removing the y axis from _direction and normalizing it gives us yawPlaneDir, which we use to reset
+	// the rolling effect so that cone isn't rolling all over the place when it tracks a target.
+	// Forward is the forward direction (down the -z axis).
+	glm::vec3 forward = glm::vec3(0.f, 0.f, -1.f);
+	glm::vec3 yawPlaneDir = glm::normalize(glm::vec3(_direction.x, 0.f, _direction.z));
+	float yaw = glm::dot(forward, yawPlaneDir);
+
+	// Sets Top (+y axis) of object to pitch to _direction.
+	glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
+	glm::vec3 right = glm::cross(up, _direction);
+	float topPitch = glm::dot(up, _direction);
+	// Sets Forward (-z axis) of object to pitch to _direction.
+	glm::vec3 pitchPlaneDir = glm::cross(yawPlaneDir, _direction);
+	float forwardPitch = glm::dot(yawPlaneDir, _direction);
+
+	// We have 3 matrices here: objMat, objRot, and rotMat.
+	glm::mat4 objMat = glm::translate(glm::mat4(1.f), objPos) * glm::scale(glm::mat4(1.f), glm::vec3(objScale));// model;
+	glm::mat4 objRot = glm::mat4(1.f);
+	glm::mat4 rotMat = glm::mat4(1.f);
+
+	// My attempt at tryng to fix the teleporting/disappearing effects of trying to "aim"
+	// directly below you.
+	if (_direction == up) {
+		model = objMat;
+		return;
+	}
+	else if (_direction == -up) {
+		if (_isTopPointing) {
+			objRot = glm::rotate(glm::mat4(1.f), float(PI), glm::vec3(1.f, 0.f, 0.f));// Aim
+			rotMat = glm::rotate(glm::mat4(1.f), float(PI), -up); // Roll
+		}
+		else {
+			objRot = glm::rotate(glm::mat4(1.f), float(PI / 2.f), glm::vec3(1.f, 0.f, 0.f));// Aim
+			rotMat = glm::rotate(glm::mat4(1.f), float(PI / 2.f), -up); // Roll
+		}
+		model = objMat * objRot * rotMat;
+		return;
+	}
+
+	// Making sure it's a real number.
+	// TL:DR: should probably have just used quaternions because this rotation crap issue
+	// where the object disappears if the thing it's pointing at is directly below it is rough
+	// and mostly do to rounding errors. Could probably fix it by checking if the new direction
+	// is either equal to and opposite of up.
+	if (_isTopPointing && 
+		!isnan(right.x) && !isnan(right.y) && !isnan(right.z) && !isnan(acos(topPitch)) &&
+		!isinf(right.x) && !isinf(right.y) && !isinf(right.z) && !isinf(acos(topPitch)) &&
+		abs(topPitch) > 0.f && abs(topPitch) < 1.f)
+		objRot = glm::rotate(glm::mat4(1.f), acos(topPitch), right);// Aim
+
+	if (!_isTopPointing && 
+		!isnan(pitchPlaneDir.x) && !isnan(pitchPlaneDir.y) && !isnan(pitchPlaneDir.z) && !isnan(acos(forwardPitch)) &&
+		!isinf(pitchPlaneDir.x) && !isinf(pitchPlaneDir.y) && !isinf(pitchPlaneDir.z) && !isinf(acos(forwardPitch)) &&
+		abs(forwardPitch) > 0.f && abs(forwardPitch) < 1.f)
+		objRot = glm::rotate(glm::mat4(1.f), acos(forwardPitch), pitchPlaneDir);// Aim
+	
+	// Making sure it's a real number.
+	if (_direction.x < 0.f && !isnan(yaw))
+		rotMat = glm::rotate(glm::mat4(1.f), acos(yaw), up); // Roll
+	else if (!isnan(yaw))
+		rotMat = glm::rotate(glm::mat4(1.f), acos(yaw), -up); // Roll
+	
+	model = objMat * objRot * rotMat;
 }
 
 void Object::toggleNormalArrows() {

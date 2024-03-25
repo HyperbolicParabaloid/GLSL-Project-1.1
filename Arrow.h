@@ -7,59 +7,38 @@
 //
 // Creates a Sphere of a given "smoothness" (A.K.A. the number of triangles it has)
 // at a given position, with given textures etc.
-class Arrow
+class Arrow : public Object
 {
 private:
 	void genTriangles();
+	void genCircle(glm::vec3 _pos, glm::vec3 _norm, glm::vec3 _radi, glm::vec2 _angles, int &_indCount);
+	void genWall(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _startRadi, glm::vec3 _endRadi, glm::vec2 _angles, int& _indCount);
 	int numVertsPerSide(int _level);
-	void setVerticesVector();
-
-	std::vector <Vertex> verts;		// Vertex vector that gets sent to Object class to put information into the GPU.
-	std::vector <GLuint> indices;	// GLuint vector that gets sent to Object class to put indices into the GPU.
-
-	glm::vec3* preVerts = new glm::vec3[1];		// glm:V:ec3 array that gets resized and stuffed with vertex information.
-	glm::vec2* texCoords = new glm::vec2[1];	// glm::VecW array that gets resized and stuffed with texture coordinate information.
-
-	int preVertsSize;
-	int level;
-	int startingIndex;
-
-	bool isSmooth;
+	
 	bool randomColor;
-	float objScale;
 
-	float bottomRadius;
-	float topRadius;
+	glm::vec3 bottomRadius;
+	glm::vec3 topRadius;
 	glm::vec3 pointPos;
-	glm::vec3 objPos;
+	glm::vec3 startingPos;
+	//glm::vec3 objPos;
 	glm::vec3 pointingAt;
 
-	glm::mat4 model;
-
-	glm::vec4 shaftColor;
-	glm::vec4 coneColor;
-	glm::vec4 color;
-
-	float randomizationEffect;
+	glm::vec4 shaftColor, coneColor;
 
 	int seed;
-	int indCount;
 public:
-	Arrow(glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, glm::vec3 _pointingAt, bool _isSmooth, glm::vec4 _color, int _startingIndex);
-	Arrow(glm::vec3 _objPos, float _objScale, int _level, float _bottomRadius, float _topRadius, glm::vec3 _pointPos, glm::vec3 _pointingAt, bool _isSmooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, float _randomizationEffect, int _startingIndex);
+	Arrow(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, glm::vec3 _bottomRadius, glm::vec3 _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
+	Arrow(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, glm::vec3 _bottomRadius, glm::vec3 _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, std::vector <Texture>& _textures, Camera* _camera);
 	~Arrow();
-	void genCone();
+	void genCone(glm::vec3 _bottomCenter, glm::vec3 _topCenter,	glm::vec3 _bottomRadius, glm::vec3 _topRadius, bool _doingBottomCircle, bool _doingTopCircle, int &_indCount);
 	void setLevel(int _level);
 	void doRandomColors(bool _randomColor);
 	void reseed();
 	void smoothSurface(bool _isSmooth);
-	void setTopRadius(float _topRadius);
-	void setBottomRadius(float _bottomRadius);
+	void setTopRadius(glm::vec3 _topRadius);
+	void setBottomRadius(glm::vec3 _bottomRadius);
 	void setTipPos(glm::vec3 _pointPos);
-	std::vector <Vertex> getVerts();
-	std::vector <GLuint> getInds();
-	float newrand(glm::vec2 co);
-	float noise(glm::vec2 n);
 };
 
 #endif

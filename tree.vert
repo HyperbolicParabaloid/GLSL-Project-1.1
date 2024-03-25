@@ -74,13 +74,13 @@ void main()
 	//float newY = (noise(aPos.xz + time) * 2.f) + (noise((aPos.xz + time) * 1.2) * 1/8) + (noise((aPos.xz + time) * 2) * 1/16);
 	//crntPos.y += newY / 10.f;
 	crntPos = vec3(model * vec4(crntPos, 1.f));
-	vec3 startPosTest = startPos * 25.f;
-	if ((startPosTest.x <= 0.f && startPosTest.x >= -20.f) && (startPosTest.z >= 0.f && startPosTest.z <= 70.f)){// && crntPos.z <= 0.f && crntPos.z >= -20.f) {
-		
-	} else {
-		Normal = transpose(inverse(mat3(model))) * calculateNoiseWave();
-		crntPos.y += applyNoise(startPos) * 25.f;
-	}
+	//vec3 startPosTest = startPos * 25.f;
+	//if ((startPosTest.x <= 0.f && startPosTest.x >= -20.f) && (startPosTest.z >= 0.f && startPosTest.z <= 70.f)){// && crntPos.z <= 0.f && crntPos.z >= -20.f) {
+	//	
+	//} else {
+	//	Normal = transpose(inverse(mat3(model))) * calculateNoiseWave();
+	//	crntPos.y += applyNoise(startPos) * 25.f;
+	//}
 
 	//crntPos = vec3(model * vec4(aPos, 1.f));
 

@@ -21,16 +21,14 @@ private:
 	glm::vec2* texCoords = new glm::vec2[1];	// glm::VecW array that gets resized and stuffed with texture coordinate information.
 
 	int preVertsSize;
-	int level;
 
-	bool isSmooth;
 	bool randomColor;
 
 	float bottomRadius;
 	float topRadius;
 	glm::vec3 pointPos;
 	glm::vec3 startingPos;
-	glm::vec3 objPos;
+	//glm::vec3 objPos;
 	glm::vec3 pointingAt;
 
 	glm::vec4 shaftColor, coneColor;
