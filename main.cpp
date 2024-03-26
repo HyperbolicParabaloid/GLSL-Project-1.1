@@ -452,18 +452,16 @@ int main()
 	bool arrowIsSmooth = true;
 	glm::vec4 arrowShaftColor = glm::vec4(1.f), arrowConeColor = glm::vec4(1.f);
 	Arrow arrow1(window, arrowPos, arrowScale, arrowLevel, arrowBottomRadius, arrowTopRadius, arrowRadi, arrowPointPos, arrowIsSmooth, arrowShaftColor, arrowConeColor, empty, &camera);
-	arrow1.setNormalsVBOandEBO();
 	
 	std::vector <Object*> objectList;
 	std::vector <UI*> UIList;
 
 	//Object* trackingObj = &arrow1;
 	int  targetIndex = 0;
-	std::vector <Object*> targetObjs;
-	targetObjs.push_back(&sphere1);
-	targetObjs.push_back(&arrow1);
-	targetObjs.push_back(&cube3);
-	Object* targetObj = targetObjs[targetIndex];
+	//std::vector <Object*> targetObjs;
+	//targetObjs.push_back(&sphere1);
+	//targetObjs.push_back(&arrow1);
+	//targetObjs.push_back(&cube3);
 
 	bool trackingSphere = true;
 
@@ -473,6 +471,7 @@ int main()
 	objectList.push_back(&cone1);
 	objectList.push_back(&arrow1);
 	objectList.push_back(&sphere1UI);
+	Object* targetObj = objectList[targetIndex];
 
 
 	bool first = true;
@@ -504,8 +503,6 @@ int main()
 	double crntTime = 0.f, prevTime = 0.f;
 
 	bool rotate = true;
-
-	std::cout << "toUppercase(hi) = " << toUppercase("hi") << "\ttoUppercase(HI) = " << toUppercase("HI") << "\n";
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -631,7 +628,8 @@ int main()
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_T) && lockoutTimer <= crntTime) {
 			targetIndex++;
-			targetObj = targetObjs[targetIndex % targetObjs.size()];
+			//targetObj = targetObjs[targetIndex % targetObjs.size()];
+			targetObj = objectList[targetIndex % objectList.size()];
 			lockoutTimer = crntTime + 0.2;
 		}
 
