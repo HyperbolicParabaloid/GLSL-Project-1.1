@@ -50,16 +50,24 @@ public:
 
 	VAO VAO;
 	Shader* shaderProgram;
+	Shader* normalShaderProgram;
 	Camera* camera;
 	Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 color, std::vector <Texture>& _textures, Camera* _camera);
 	~Object();
-	void draw(glm::vec3 _lightPos, glm::vec4 _lightColor);
+	virtual void draw(glm::vec3 _lightPos, glm::vec4 _lightColor);
+	virtual void drawNormals(glm::vec3 _lightPos, glm::vec4 _lightColor);
+	virtual void setNormalsVBOandEBO();
 	void setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg);
 	virtual void setVBOandEBO(std::string msg);
 	virtual void setLevel(int _level);
 	virtual void doRandomColors(bool _randomColor);
 	virtual void smoothSurface(bool _isSmooth);
+	
+	void setNewPos(glm::vec3 _objPos);
 	void rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation);
+	void setScale(glm::vec3 _radi);
+	void setScale(float _scale);
+	
 	void moveFirstVertex();
 
 	void pointAt(glm::vec3 _direction, bool _isTopPointing);
@@ -70,7 +78,6 @@ public:
 	float noise(glm::vec2 n);
 
 	void toggleNormalArrows();
-	void setNewPos(glm::vec3 _objPos);
 
 	std::vector <Triangle> triangles;
 	std::vector <Vertex> vertices;
@@ -81,6 +88,7 @@ public:
 	glm::vec4 color;
 	float objScale;
 	float objRadius = 1.f;
+	glm::mat4 rotationMatrix;
 	glm::mat4 model;
 	glm::vec3 objPos;
 

@@ -16,7 +16,7 @@ Arrow::Arrow(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level
 }
 
 // Constructor for Arrow.
-Arrow::Arrow(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, glm::vec3 _bottomRadius, glm::vec3 _topRadius, glm::vec3 _pointPos, bool _smooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _shaftColor, _textures, _camera) {
+Arrow::Arrow(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, glm::vec3 _bottomRadius, glm::vec3 _topRadius, glm::vec3 _radi, glm::vec3 _pointPos, bool _smooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _shaftColor, _textures, _camera) {
 	level = _level;
 	smooth = _smooth;
 	bottomRadius = _bottomRadius;
@@ -29,6 +29,8 @@ Arrow::Arrow(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level
 	//indCount = 0;
 	shaftColor = _shaftColor;
 	coneColor = _coneColor;
+	radi = _radi;
+	setScale(radi);
 	genTriangles();
 }
 
@@ -156,8 +158,8 @@ void Arrow::genWall(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _startRadi
 		glm::vec3 right2 = glm::cross(forward2, up);
 		glm::vec3 norm2 = glm::cross(bottomTop2, right2);
 
-		bottomNorm1 = topNorm1 = norm1 / _startRadi;
-		bottomNorm2 = topNorm2 = norm2 / _endRadi;
+		bottomNorm1 = topNorm1 = glm::normalize(norm1 / _startRadi);
+		bottomNorm2 = topNorm2 = glm::normalize(norm2 / _endRadi);
 
 		// bw1 tw1 tw2
 		vertices.push_back(Vertex{ bottomWallPos1, bottomNorm1, topBottomTriColor, texCoordBottomWall1 });
@@ -173,12 +175,12 @@ void Arrow::genWall(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _startRadi
 		// bw1 tw1 tw2
 		glm::vec3 topBottomEdge1 = bottomWallPos1 - topWallPos1;
 		glm::vec3 topBottomEdge2 = topWallPos2 - topWallPos1;
-		topBottomNorm = glm::cross(topBottomEdge1, topBottomEdge2);
+		topBottomNorm = glm::normalize(glm::cross(topBottomEdge1, topBottomEdge2));
 
 		// tw2 bw2 bw1
 		glm::vec3 bottomTopEdge1 = topWallPos2 - bottomWallPos2;
 		glm::vec3 bottomTopEdge2 = bottomWallPos1 - bottomWallPos2;
-		bottomTopNorm = glm::cross(bottomTopEdge1, bottomTopEdge2);
+		bottomTopNorm = glm::normalize(glm::cross(bottomTopEdge1, bottomTopEdge2));
 
 		// bw1 tw1 tw2
 		vertices.push_back(Vertex{ bottomWallPos1, topBottomNorm, topBottomTriColor, texCoordBottomWall1 });
@@ -260,6 +262,58 @@ void Arrow::setTipPos(glm::vec3 _pointPos) {
 	pointPos = _pointPos;
 	setLevel(level);
 }
+
+void Arrow::setVBOandEBO(std::string msg) {
+	// Generates Shader object using shaders object.vert and object.frag
+	delete shaderProgram;
+	name = msg;
+	
+	shaderProgram = new Shader("GEOMETRY_TEST.vert", "GEOMETRY_TEST.frag", "GEOMETRY_TEST.geom");
+
+	shaderProgram->Activate();
+
+	VAO.Bind();
+
+	// Setting VBO and EBO
+	// Generates Vertex Buffer Object and links it to vertices
+	VBO VBO(vertices);
+	// Generates Element Buffer Object and links it to indices
+	EBO EBO(indices);
+
+
+	// Links VBO attributes such as coordinates and colors to VAO
+	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 2, 4, GL_FLOAT, sizeof(Vertex), (void*)(6 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)(10 * sizeof(float)));
+
+	// Unbind all to prevent accidentally modifying them
+	VAO.Unbind();
+	VBO.Unbind();
+	EBO.Unbind();
+}
+
+//void Arrow::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
+//	// Activating the shader program and binding the VAO so OpenGL knows what we're trying to do.
+//	shaderProgram->Activate();
+//	VAO.Bind();
+//
+//	if (isWireframe)
+//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//	else
+//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//
+//	// Assigning all relevant info to the shader.
+//	glUniform3f(glGetUniformLocation(shaderProgram->ID, "camPos"), camera->cameraPos.x, camera->cameraPos.y, camera->cameraPos.z);
+//	camera->camMatrixForShader(*shaderProgram, "camMatrix");
+//	glUniformMatrix4fv(glGetUniformLocation(shaderProgram->ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+//	glUniform3f(glGetUniformLocation(shaderProgram->ID, "lightPos"), _lightPos.x, _lightPos.y, _lightPos.z);
+//	glUniform4f(glGetUniformLocation(shaderProgram->ID, "lightColor"), _lightColor.x, _lightColor.y, _lightColor.z, _lightColor.w);
+//	glUniform1f(glGetUniformLocation(shaderProgram->ID, "time"), glfwGetTime());
+//
+//	// Draw the actual mesh
+//	glDrawElements(triangleType, indices.size(), GL_UNSIGNED_INT, 0);
+//}
 
 
 // Destructor of Arrow class.

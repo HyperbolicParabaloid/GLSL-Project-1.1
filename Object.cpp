@@ -8,8 +8,10 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	objPos = _objPos;
 	objScale = _objScale;
 	color = _color;
+	radi = glm::vec3(objScale);
 	model = glm::translate(glm::mat4(1.f), objPos);
 	model = glm::scale(model, glm::vec3(objScale));
+	rotationMatrix = glm::mat4(1.f);
 	camera = _camera;
 	textures = _textures;
 
@@ -22,6 +24,7 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	rotationalVelocity = 0.f;
 	rotationalAxis = glm::vec3(0.f);
 	pixels = glm::uvec2(0);//glm::ivec2(INT_MAX);
+
 
 	randomColor = false;
 	smooth = true;
@@ -37,18 +40,36 @@ glm::vec3 Object::rayToObject(glm::vec3 _ray) {
 	return glm::vec3(0.f);
 }
 
+// Translates the object to a new position in world space.
 void Object::setNewPos(glm::vec3 _objPos) {
+	//std::cout << "rotationMatrix =  | " << rotationMatrix[0][0] << ", " << rotationMatrix[0][1] << ", " << rotationMatrix[0][2] << ", " << rotationMatrix[0][3] << "|\n";
+	//std::cout << "rotationMatrix =  | " << rotationMatrix[1][0] << ", " << rotationMatrix[1][1] << ", " << rotationMatrix[1][2] << ", " << rotationMatrix[1][3] << "|\n";
+	//std::cout << "rotationMatrix =  | " << rotationMatrix[2][0] << ", " << rotationMatrix[2][1] << ", " << rotationMatrix[2][2] << ", " << rotationMatrix[2][3] << "|\n";
+	//std::cout << "rotationMatrix =  | " << rotationMatrix[3][0] << ", " << rotationMatrix[3][1] << ", " << rotationMatrix[3][2] << ", " << rotationMatrix[3][3] << "|\n\n";
 	objPos = _objPos;
-	glm::mat4 newModel = glm::translate(glm::mat4(1.f), objPos);
-	newModel = glm::scale(newModel, glm::vec3(objScale));
-	glm::mat3 rotationMatrix = (1.0f / objScale) * glm::mat3(model);
-	model = newModel * glm::mat4(rotationMatrix);
+	model = glm::translate(glm::mat4(1.f), objPos) * rotationMatrix * glm::scale(glm::mat4(1.f), radi);
 }
 
 // Rotates the object about a given axis by a set angle in degrees.
 void Object::rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation) {
-	model = glm::rotate(model, glm::radians(rotationDegreeAngle), axisOfRotation);
+	glm::mat4 rotMat = glm::rotate(glm::mat4(1.f), glm::radians(rotationDegreeAngle), axisOfRotation);
+	model = glm::translate(glm::mat4(1.f), objPos)  * rotationMatrix * glm::scale(glm::mat4(1.f), radi);
+	rotationMatrix *= rotMat;
+	model = model * rotMat;
 }
+
+// Sets the radi scaling value.
+void Object::setScale(glm::vec3 _radi) {
+	radi = _radi;
+	model = glm::translate(glm::mat4(1.f), objPos) * rotationMatrix * glm::scale(glm::mat4(1.f), radi);
+}
+
+// Sets the radi scaling value.
+void Object::setScale(float _scale) {
+	objScale = _scale;
+	model = glm::translate(glm::mat4(1.f), objPos) * rotationMatrix * glm::scale(glm::mat4(1.f), glm::vec3(objScale));
+}
+
 
 void Object::setLevel(int _level) {
 	std::cout << "N/A";
@@ -82,6 +103,10 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 	// Draw the actual mesh
 	glDrawElements(triangleType, indices.size(), GL_UNSIGNED_INT, 0);
 
+	// Drawing normals if applicable.
+	if (normalShaderProgram != nullptr)
+		drawNormals(_lightPos, _lightColor);
+
 
 }
 
@@ -91,16 +116,14 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 void Object::setVBOandEBO(std::string msg) {
 	// Generates Shader object using shaders object.vert and object.frag
 	delete shaderProgram;
+	name = msg;
 	if (msg == "Plane") {
-		name = msg;
 		shaderProgram = new Shader("grass.vert", "grass.frag");
 	}
 	else if (msg == "Tree") {
-		name = msg;
 		shaderProgram = new Shader("tree.vert", "tree.frag");
 	}
 	else if (msg == "UI") {
-		name = msg;
 		shaderProgram = new Shader("ui.vert", "ui.frag");
 	}
 	else
@@ -182,22 +205,72 @@ void Object::setVBOandEBO(std::string msg) {
 	VAO.Unbind();
 	VBO.Unbind();
 	EBO.Unbind();
+
 	
 }
+
+void Object::drawNormals(glm::vec3 _lightPos, glm::vec4 _lightColor) {
+	// Activating the shader program and binding the VAO so OpenGL knows what we're trying to do.
+	normalShaderProgram->Activate();
+	VAO.Bind();
+
+	if (isWireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	// Assigning all relevant info to the shader.
+	glUniform3f(glGetUniformLocation(normalShaderProgram->ID, "camPos"), camera->cameraPos.x, camera->cameraPos.y, camera->cameraPos.z);
+	camera->camMatrixForShader(*normalShaderProgram, "camMatrix");
+	glUniformMatrix4fv(glGetUniformLocation(normalShaderProgram->ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniform3f(glGetUniformLocation(normalShaderProgram->ID, "lightPos"), _lightPos.x, _lightPos.y, _lightPos.z);
+	glUniform4f(glGetUniformLocation(normalShaderProgram->ID, "lightColor"), _lightColor.x, _lightColor.y, _lightColor.z, _lightColor.w);
+	glUniform1f(glGetUniformLocation(normalShaderProgram->ID, "time"), glfwGetTime());
+
+	// Draw the actual mesh
+	glDrawElements(triangleType, indices.size(), GL_UNSIGNED_INT, 0);
+}
+void Object::setNormalsVBOandEBO() {
+	// Generates Shader object using shaders object.vert and object.frag
+	delete normalShaderProgram;
+	
+	normalShaderProgram = new Shader("GEOMETRY_NORMALS.vert", "GEOMETRY_NORMALS.frag", "GEOMETRY_NORMALS.geom");
+	normalShaderProgram->Activate();
+
+
+	VAO.Bind();
+
+	// Setting VBO and EBO
+	// Generates Vertex Buffer Object and links it to vertices
+	VBO VBO(vertices);
+	// Generates Element Buffer Object and links it to indices
+	EBO EBO(indices);
+
+
+	// Links VBO attributes such as coordinates and colors to VAO
+	VAO.LinkAttrib(VBO, 0, 3, GL_FLOAT, sizeof(Vertex), (void*)0);
+	VAO.LinkAttrib(VBO, 1, 3, GL_FLOAT, sizeof(Vertex), (void*)(3 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 2, 4, GL_FLOAT, sizeof(Vertex), (void*)(6 * sizeof(float)));
+	VAO.LinkAttrib(VBO, 3, 2, GL_FLOAT, sizeof(Vertex), (void*)(10 * sizeof(float)));
+
+	// Unbind all to prevent accidentally modifying them
+	VAO.Unbind();
+	VBO.Unbind();
+	EBO.Unbind();
+}
+
 
 void Object::setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg) {
 	// Generates Shader object using shaders object.vert and object.frag
 	delete shaderProgram;
+	name = msg;
 	if (msg == "Plane") {
-		name = msg;
 		shaderProgram = new Shader("grass.vert", "grass.frag");
 	}
 	else if (msg == "Tree") {
-		name = msg;
 		shaderProgram = new Shader("tree.vert", "tree.frag");
 	}
 	else if (msg == "UI") {
-		name = msg;
 		std::cout << "UI ELEMENT\n";
 		shaderProgram = new Shader("ui.vert", "ui.frag");
 	}
@@ -366,7 +439,8 @@ void Object::pointAt(glm::vec3 _direction, bool _isTopPointing) {
 			objRot = glm::rotate(glm::mat4(1.f), float(PI / 2.f), glm::vec3(1.f, 0.f, 0.f));// Aim
 			rotMat = glm::rotate(glm::mat4(1.f), float(PI / 2.f), -up); // Roll
 		}
-		model = objMat * objRot * rotMat;
+		rotationMatrix = objRot * rotMat;
+		model = objMat * rotationMatrix;
 		return;
 	}
 
@@ -393,7 +467,8 @@ void Object::pointAt(glm::vec3 _direction, bool _isTopPointing) {
 	else if (!isnan(yaw))
 		rotMat = glm::rotate(glm::mat4(1.f), acos(yaw), -up); // Roll
 	
-	model = objMat * objRot * rotMat;
+	rotationMatrix = objRot * rotMat;
+	model = objMat * rotationMatrix;
 }
 
 void Object::toggleNormalArrows() {
@@ -723,8 +798,8 @@ void Object::reflectAbout(Force f) {
 	rotationalVelocity = -glm::radians((glm::length(velocity - velocity * normal) / length(objPos - f.pos)) * sin(theta));
 	rotationalAxis = axis;
 
-	glm::mat4 rotationMatrix = glm::mat4(1.f);
-	glm::rotate(rotationMatrix, angle, normal_cross_velocity);
+	//glm::mat4 rotationMatrix = glm::mat4(1.f);
+	//glm::rotate(rotationMatrix, angle, normal_cross_velocity);
 
 	glm::vec3 reflect = glm::vec3(rotationMatrix * glm::vec4(normal, 1.f)) * glm::length(velocity * normal);// *cos(theta);
 	velocity += (reflect * bounciness) + ((velocity + reflect) * drag);
@@ -795,8 +870,8 @@ void Object::getNextPos() {
 	if (glm::length(rotationalAxis) > 0.f && abs(rotationalVelocity) > 0.f)
 		newModel = glm::rotate(newModel, rotationalVelocity, rotationalAxis);
 
-	glm::mat3 rotationMatrix = (1.0f / objScale) * glm::mat3(model);
-	newModel = newModel * glm::mat4(rotationMatrix);
+	//glm::mat3 rotationMatrix = (1.0f / objScale) * glm::mat3(model);
+	//newModel = newModel * glm::mat4(rotationMatrix);
 
 	model = glm::scale(newModel, glm::vec3(objScale));
 }

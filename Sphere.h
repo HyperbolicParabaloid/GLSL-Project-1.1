@@ -32,7 +32,6 @@ public:
 	void doRandomColors(bool _randomColor);
 	void reseed();
 	void smoothSurface(bool _isSmooth);
-	void setRadi(glm::vec3 _radi);
 };
 
 #endif

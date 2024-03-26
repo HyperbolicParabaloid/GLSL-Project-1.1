@@ -262,6 +262,16 @@ std::string floatToString(float _num, int _precision) {
 	return shortString;
 }
 
+// Converts any lowercase letters in string to uppercase.
+std::string toUppercase(std::string _str) {
+	// 65->90 = A->Z;
+	// 97->122 = A->Z;
+	for (int i = 0; i < _str.length(); i++)
+		if (_str[i] >= 97 && _str[i] <= 122)
+			_str[i] = _str[i] - ('a' - 'A');
+	return _str;
+}
+
 
 
 #if 1
@@ -437,22 +447,23 @@ int main()
 	int arrowLevel = 16;
 	glm::vec3 arrowBottomRadius = glm::vec3(1.f);
 	glm::vec3 arrowTopRadius = glm::vec3(0.5f);
+	glm::vec3 arrowRadi = glm::vec3(1.f, 1.f, 1.f);
 	glm::vec3 arrowPointPos = glm::vec3(0.f, 1.f, 0.f);
 	bool arrowIsSmooth = true;
 	glm::vec4 arrowShaftColor = glm::vec4(1.f), arrowConeColor = glm::vec4(1.f);
-	Arrow arrow1(window, arrowPos, arrowScale, arrowLevel, arrowBottomRadius, arrowTopRadius, arrowPointPos, arrowIsSmooth, arrowShaftColor, arrowConeColor, empty, &camera);
-	
+	Arrow arrow1(window, arrowPos, arrowScale, arrowLevel, arrowBottomRadius, arrowTopRadius, arrowRadi, arrowPointPos, arrowIsSmooth, arrowShaftColor, arrowConeColor, empty, &camera);
+	arrow1.setNormalsVBOandEBO();
 	
 	std::vector <Object*> objectList;
 	std::vector <UI*> UIList;
 
 	//Object* trackingObj = &arrow1;
-	int targetIndex = 0;
-	Object* targetObj;
+	int  targetIndex = 0;
 	std::vector <Object*> targetObjs;
 	targetObjs.push_back(&sphere1);
 	targetObjs.push_back(&arrow1);
 	targetObjs.push_back(&cube3);
+	Object* targetObj = targetObjs[targetIndex];
 
 	bool trackingSphere = true;
 
@@ -494,6 +505,8 @@ int main()
 
 	bool rotate = true;
 
+	std::cout << "toUppercase(hi) = " << toUppercase("hi") << "\ttoUppercase(HI) = " << toUppercase("HI") << "\n";
+
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -502,15 +515,8 @@ int main()
 		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// Setting target obj.
-		targetObj = targetObjs[targetIndex % targetObjs.size()];
-
 		// Setting info about the Sphere to the screen.
-		std::string s1UIHeader;
-		if (trackingSphere)
-			s1UIHeader ="SPHERE1 STATS:\n";
-		else
-			s1UIHeader = "ARROW1 STATS:\n";
+		std::string s1UIHeader = "STATS: " + toUppercase(targetObj->name) + "\n";
 		std::string s1UIFPS =	" FPS    = " + std::to_string(FPS) + "\n";
 		std::string s1UILevel = " LEVEL  = " + std::to_string(targetObj->level) + "\n";
 		std::string s1UIPos =	" POS    = (" + floatToString(targetObj->objPos.x, 1) + ", " + floatToString(targetObj->objPos.y, 1) + ", " + floatToString(targetObj->objPos.z, 1) + ")\n";
@@ -521,6 +527,11 @@ int main()
 			s1UISmooth = " SMOOTH = TRUE\n";
 		else
 			s1UISmooth = " SMOOTH = FALSE\n";
+		std::string s1UINormals;
+		if (targetObj->normalShaderProgram != nullptr)
+			s1UINormals = " NORMS  = ON\n";
+		else
+			s1UINormals = " NORMS  = OFF\n";
 		std::string s1UIColor;
 		if (randomColor)
 			s1UIColor = " COLOR  = SOLID\n";
@@ -538,6 +549,7 @@ int main()
 								s1UIFPS		+ //"\n" + 
 								s1UILevel	+ //"\n" + 
 								s1UIVisuals + //"\n" + 
+								s1UINormals + //"\n" +
 								s1UISmooth	+ //"\n" + 
 								s1UIColor	+ //"\n" + 
 								s1UIMotion, true);
@@ -619,6 +631,7 @@ int main()
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_T) && lockoutTimer <= crntTime) {
 			targetIndex++;
+			targetObj = targetObjs[targetIndex % targetObjs.size()];
 			lockoutTimer = crntTime + 0.2;
 		}
 
@@ -630,7 +643,14 @@ int main()
 
 		// Mouse Buttons
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) && lockoutTimer <= crntTime) {
-			lockoutTimer = crntTime + 0.02;
+			if (targetObj->normalShaderProgram != nullptr) {
+				targetObj->normalShaderProgram->Delete();
+				targetObj->normalShaderProgram = nullptr;
+			}
+			else {
+				targetObj->setNormalsVBOandEBO();
+			}
+			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
 			rotate = !rotate;

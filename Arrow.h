@@ -29,7 +29,7 @@ private:
 	int seed;
 public:
 	Arrow(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, glm::vec3 _bottomRadius, glm::vec3 _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
-	Arrow(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, glm::vec3 _bottomRadius, glm::vec3 _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, std::vector <Texture>& _textures, Camera* _camera);
+	Arrow(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, glm::vec3 _bottomRadius, glm::vec3 _topRadius, glm::vec3 _radi, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, std::vector <Texture>& _textures, Camera* _camera);
 	~Arrow();
 	void genCone(glm::vec3 _bottomCenter, glm::vec3 _topCenter,	glm::vec3 _bottomRadius, glm::vec3 _topRadius, bool _doingBottomCircle, bool _doingTopCircle, int &_indCount);
 	void setLevel(int _level);
@@ -39,6 +39,10 @@ public:
 	void setTopRadius(glm::vec3 _topRadius);
 	void setBottomRadius(glm::vec3 _bottomRadius);
 	void setTipPos(glm::vec3 _pointPos);
+
+	// To do the yee-old Geometry shader.
+	void setVBOandEBO(std::string msg);
+	//void draw(glm::vec3 _lightPos, glm::vec4 _lightColor);
 };
 
 #endif

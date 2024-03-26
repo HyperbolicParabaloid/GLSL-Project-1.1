@@ -17,6 +17,7 @@ public:
 	GLuint ID;
 	// Constructor that build the Shader Program from 2 different shaders
 	Shader(const char* vertexFile, const char* fragmentFile);
+	Shader(const char* vertexFile, const char* fragmentFile, const char* geometryFile);
 	Shader();
 
 	// Activates the Shader Program
@@ -29,6 +30,7 @@ public:
 private:
 	const char* vertexFile;
 	const char* fragmentFile;
+	const char* geometryFile;
 	// Checks if the different Shaders have compiled properly
 	void compileErrors(unsigned int shader, const char* type);
 };

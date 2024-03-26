@@ -172,6 +172,12 @@
     <None Include="computeShader.vert" />
     <None Include="default.frag" />
     <None Include="default.vert" />
+    <None Include="GEOMETRY_NORMALS.frag" />
+    <None Include="GEOMETRY_NORMALS.geom" />
+    <None Include="GEOMETRY_NORMALS.vert" />
+    <None Include="GEOMETRY_TEST.frag" />
+    <None Include="GEOMETRY_TEST.geom" />
+    <None Include="GEOMETRY_TEST.vert" />
     <None Include="grass.frag" />
     <None Include="grass.vert" />
     <None Include="light.frag" />

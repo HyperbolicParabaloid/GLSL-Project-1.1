@@ -8,6 +8,8 @@ Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, glm::vec3 _radi, float _o
 	seed = 1;
 	objRadius = 1.f;
 	radi = _radi;
+	model = glm::translate(glm::mat4(1.f), objPos);
+	model = glm::scale(model, glm::vec3(objScale));
 	genTriangles();
 }
 
@@ -275,10 +277,6 @@ void Sphere::setVerticesVector() {
 		}
 	}
 
-}
-
-void Sphere::setRadi(glm::vec3 _radi) {
-	radi = _radi;
 }
 
 // Destructor of Sphere class.

@@ -128,6 +128,24 @@
     <None Include="ui.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="GEOMETRY_TEST.geom">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="GEOMETRY_TEST.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="GEOMETRY_TEST.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="GEOMETRY_NORMALS.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="GEOMETRY_NORMALS.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="GEOMETRY_NORMALS.geom">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaderClass.h">
