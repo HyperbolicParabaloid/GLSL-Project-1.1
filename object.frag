@@ -150,10 +150,11 @@ vec4 spotLight() {
 void main()
 {
 	//vec4 pntLgt = pointLight();
+	float opacity = color.w;
 	vec4 drtLgt = directionalLight();
 	//vec4 sptLgt = spotLight();
 	//FragColor = mix(mix(drtLgt, pntLgt, pntLgt), sptLgt, sptLgt);
 	//FragColor = mix(drtLgt, pntLgt, pntLgt);
 	FragColor = drtLgt;
-	FragColor.w = 1.f;
+	FragColor.w = opacity;
 }

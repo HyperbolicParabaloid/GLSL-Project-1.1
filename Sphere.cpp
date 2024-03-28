@@ -7,9 +7,10 @@ Sphere::Sphere(GLFWwindow* _window, glm::vec3 _objPos, glm::vec3 _radi, float _o
 	randomColor = false;
 	seed = 1;
 	objRadius = 1.f;
-	radi = _radi;
-	model = glm::translate(glm::mat4(1.f), objPos);
-	model = glm::scale(model, glm::vec3(objScale));
+	//radi = _radi;
+	setScale(_radi * objScale);
+	//model = glm::translate(glm::mat4(1.f), objPos);
+	//model = glm::scale(model, radi);//glm::vec3(objScale));
 	genTriangles();
 }
 
@@ -164,7 +165,7 @@ void Sphere::genOctahedron() {
 			}
 
 			// Normalizing the vector, places the vertices of the Octehdron on the surface of the sphere.
-			preVerts[vertsPerSide * vv + uu] = glm::normalize(glm::vec3(x, y, z)) * radi;
+			preVerts[vertsPerSide * vv + uu] = glm::normalize(glm::vec3(x, y, z));// *radi;
 			//preVerts[vertsPerSide * vv + uu] = glm::vec3(x, y, z);
 			//preVerts[vertsPerSide * vv + uu] = glm::vec3(-x, z, y);
 		}
@@ -228,12 +229,12 @@ void Sphere::setVerticesVector() {
 				float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 				float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 				float r3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				color1 = glm::vec4(r1, r2, r3, 1.f);
+				color1 = glm::vec4(r1, r2, r3, color.w);
 
 				float r4 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 				float r5 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 				float r6 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				color2 = glm::vec4(r4, r5, r6, 1.f);
+				color2 = glm::vec4(r4, r5, r6, color.w);
 			}
 			else
 				color1 = color2 = color;
@@ -256,13 +257,20 @@ void Sphere::setVerticesVector() {
 				vertices.push_back(Vertex{ v6, n2, color2, tex6 });
 			}
 			else {
-				vertices.push_back(Vertex{ v1, glm::normalize(v1 / radi) / radi, color1, tex1 });
-				vertices.push_back(Vertex{ v2, glm::normalize(v2 / radi) / radi, color1, tex2 });
-				vertices.push_back(Vertex{ v3, glm::normalize(v3 / radi) / radi, color1, tex3 });
-
-				vertices.push_back(Vertex{ v4, glm::normalize(v4 / radi) / radi, color2, tex4 });
-				vertices.push_back(Vertex{ v5, glm::normalize(v5 / radi) / radi, color2, tex5 });
-				vertices.push_back(Vertex{ v6, glm::normalize(v6 / radi) / radi, color2, tex6 });
+				//vertices.push_back(Vertex{ v1, glm::normalize(v1 / radi) / radi, color1, tex1 });
+				//vertices.push_back(Vertex{ v2, glm::normalize(v2 / radi) / radi, color1, tex2 });
+				//vertices.push_back(Vertex{ v3, glm::normalize(v3 / radi) / radi, color1, tex3 });
+				//
+				//vertices.push_back(Vertex{ v4, glm::normalize(v4 / radi) / radi, color2, tex4 });
+				//vertices.push_back(Vertex{ v5, glm::normalize(v5 / radi) / radi, color2, tex5 });
+				//vertices.push_back(Vertex{ v6, glm::normalize(v6 / radi) / radi, color2, tex6 });
+				vertices.push_back(Vertex{ v1, glm::normalize(v1 / radi), color1, tex1 });
+				vertices.push_back(Vertex{ v2, glm::normalize(v2 / radi), color1, tex2 });
+				vertices.push_back(Vertex{ v3, glm::normalize(v3 / radi), color1, tex3 });
+																		
+				vertices.push_back(Vertex{ v4, glm::normalize(v4 / radi), color2, tex4 });
+				vertices.push_back(Vertex{ v5, glm::normalize(v5 / radi), color2, tex5 });
+				vertices.push_back(Vertex{ v6, glm::normalize(v6 / radi), color2, tex6 });
 			}
 			triangles.push_back(Triangle{ &vertices[indCount + 0], &vertices[indCount + 1] , &vertices[indCount + 2], &model });
 			triangles.push_back(Triangle{ &vertices[indCount + 3], &vertices[indCount + 4] , &vertices[indCount + 5], &model });

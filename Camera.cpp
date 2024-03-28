@@ -119,7 +119,7 @@ glm::vec3 Camera::getCursorRay() {
 	glm::mat4 model_to_cam = inverse(glm::translate(glm::mat4(1.f), cameraPos));
 	glm::vec3 f = model_to_cam * cam_to_world * rasterCoords;
 
-	return f;
+	return glm::normalize(f);
 }
 
 

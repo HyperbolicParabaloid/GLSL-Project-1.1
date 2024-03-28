@@ -49,7 +49,7 @@ float noise(vec2 n) {
 void main()
 {
 	gl_Position = model * vec4(aPos, 1.0f);
-	data_out.Normal = transpose(inverse(mat3(model))) * aNormal;
+	data_out.Normal = normalize(transpose(inverse(mat3(model))) * aNormal);
 	data_out.color = aColor;
 	data_out.texCoord = mat2(0.0, -1.0, 1.0, 0.0) * aTex;
 	data_out.projection = camMatrix;

@@ -45,8 +45,8 @@ void Arrow::genTriangles() {
 	glm::vec3 bottomRadius_R = bottomRadius;
 	glm::vec3 topRadius_R = topRadius;
 
-	bool doBottomRadius = false;
-	bool doTopRadius = false;
+	bool doBottomRadius = true; // false;
+	bool doTopRadius = true;// false;
 
 	if (level < 2)
 		level = 2;
@@ -66,7 +66,7 @@ void Arrow::genTriangles() {
 	setVBOandEBO("Arrow");
 }
 
-void Arrow::genCircle(glm::vec3 _pos, glm::vec3 _norm, glm::vec3 _radi, glm::vec2 _angles, int& _indCount) {
+void Arrow::genCircle(bool _isBottom, glm::vec3 _pos, glm::vec3 _norm, glm::vec3 _radi, glm::vec2 _angles, int& _indCount) {
 	float angle1 = _angles.x;
 	float angle2 = _angles.y;
 
@@ -93,10 +93,17 @@ void Arrow::genCircle(glm::vec3 _pos, glm::vec3 _norm, glm::vec3 _radi, glm::vec
 	glm::vec2 texCoordWall1 = wallNorm1;
 	glm::vec2 texCoordWall2 = wallNorm2;
 	glm::vec2 texCoordCenter = glm::vec2(0.f);
-
-	vertices.push_back(Vertex{ wallPos1, centerNorm, triColor, texCoordWall1 });
-	vertices.push_back(Vertex{ wallPos2, centerNorm, triColor, texCoordWall2 });
-	vertices.push_back(Vertex{ center, centerNorm, triColor, texCoordCenter });
+	
+	if (_isBottom) {
+		vertices.push_back(Vertex{ wallPos2, centerNorm, triColor, texCoordWall2 });
+		vertices.push_back(Vertex{ wallPos1, centerNorm, triColor, texCoordWall1 });
+		vertices.push_back(Vertex{ center, centerNorm, triColor, texCoordCenter });
+	}
+	else {
+		vertices.push_back(Vertex{ wallPos1, centerNorm, triColor, texCoordWall1 });
+		vertices.push_back(Vertex{ wallPos2, centerNorm, triColor, texCoordWall2 });
+		vertices.push_back(Vertex{ center, centerNorm, triColor, texCoordCenter });
+	}
 
 	indices.push_back(_indCount + 0);
 	indices.push_back(_indCount + 1);
@@ -162,13 +169,13 @@ void Arrow::genWall(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _startRadi
 		bottomNorm2 = topNorm2 = glm::normalize(norm2 / _endRadi);
 
 		// bw1 tw1 tw2
-		vertices.push_back(Vertex{ bottomWallPos1, bottomNorm1, topBottomTriColor, texCoordBottomWall1 });
+		vertices.push_back(Vertex{ topWallPos2, topNorm2, topBottomTriColor, texCoordTopWall2 });
 		vertices.push_back(Vertex{ topWallPos1, topNorm1, topBottomTriColor, texCoordTopWall1 });
-		vertices.push_back(Vertex{ topWallPos2, topNorm2, topBottomTriColor, texCoordTopWall2 });
-		// tw2 bw2 bw1
-		vertices.push_back(Vertex{ topWallPos2, topNorm2, topBottomTriColor, texCoordTopWall2 });
-		vertices.push_back(Vertex{ bottomWallPos2, bottomNorm2, topBottomTriColor, texCoordBottomWall2 });
 		vertices.push_back(Vertex{ bottomWallPos1, bottomNorm1, topBottomTriColor, texCoordBottomWall1 });
+		// tw2 bw2 bw1
+		vertices.push_back(Vertex{ bottomWallPos1, bottomNorm1, topBottomTriColor, texCoordBottomWall1 });
+		vertices.push_back(Vertex{ bottomWallPos2, bottomNorm2, topBottomTriColor, texCoordBottomWall2 });
+		vertices.push_back(Vertex{ topWallPos2, topNorm2, topBottomTriColor, texCoordTopWall2 });
 	}
 	else { // Not smooth lighting.
 		glm::vec3 bottomTopNorm, topBottomNorm;
@@ -183,13 +190,13 @@ void Arrow::genWall(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _startRadi
 		bottomTopNorm = glm::normalize(glm::cross(bottomTopEdge1, bottomTopEdge2));
 
 		// bw1 tw1 tw2
-		vertices.push_back(Vertex{ bottomWallPos1, topBottomNorm, topBottomTriColor, texCoordBottomWall1 });
-		vertices.push_back(Vertex{ topWallPos1, topBottomNorm, topBottomTriColor, texCoordTopWall1 });
 		vertices.push_back(Vertex{ topWallPos2, topBottomNorm, topBottomTriColor, texCoordTopWall2 });
+		vertices.push_back(Vertex{ topWallPos1, topBottomNorm, topBottomTriColor, texCoordTopWall1 });
+		vertices.push_back(Vertex{ bottomWallPos1, topBottomNorm, topBottomTriColor, texCoordBottomWall1 });
 		// tw2 bw2 bw1
-		vertices.push_back(Vertex{ topWallPos2, bottomTopNorm, topBottomTriColor, texCoordTopWall2 });
-		vertices.push_back(Vertex{ bottomWallPos2, bottomTopNorm, topBottomTriColor, texCoordBottomWall2 });
 		vertices.push_back(Vertex{ bottomWallPos1, bottomTopNorm, topBottomTriColor, texCoordBottomWall1 });
+		vertices.push_back(Vertex{ bottomWallPos2, bottomTopNorm, topBottomTriColor, texCoordBottomWall2 });
+		vertices.push_back(Vertex{ topWallPos2, bottomTopNorm, topBottomTriColor, texCoordTopWall2 });
 	}
 
 	// Triangle 1, top-to-bottom.
@@ -230,7 +237,7 @@ void Arrow::genCone(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _startRadi
 		// Generating the Lower Circle of the Cone //
 		// --------------------------------------- //
 		if (_doingBottomCircle)
-			genCircle(_startPos, _startPos - _endPos, _startRadius, angles, _indCount);
+			genCircle(true, _startPos, _startPos - _endPos, _startRadius, angles, _indCount);
 
 		// --------------------------------------- //
 		//    Generating the Walls of the Cone     //
@@ -244,7 +251,7 @@ void Arrow::genCone(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _startRadi
 		// Generating the Upper Circle of the Cone.//
 		// --------------------------------------- //
 		if (_doingTopCircle)
-			genCircle(_endPos, _endPos - _startPos, _endRadius, angles, _indCount);
+			genCircle(false, _endPos, _endPos - _startPos, _endRadius, angles, _indCount);
 	}	
 }
 

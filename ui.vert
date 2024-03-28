@@ -22,12 +22,8 @@ flat out uvec2 Letter;
 
 // Controls the scale of the vertices
 uniform mat4 model;
-//uniform mat4 projection;
-uniform mat4 camMatrix;
 // For time
 uniform float time;
-// Starting position of object
-uniform vec3 startPos;
 
 
 void main()

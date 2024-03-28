@@ -54,14 +54,21 @@ public:
 	Camera* camera;
 	Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec4 color, std::vector <Texture>& _textures, Camera* _camera);
 	~Object();
+	
 	virtual void draw(glm::vec3 _lightPos, glm::vec4 _lightColor);
 	virtual void drawNormals(glm::vec3 _lightPos, glm::vec4 _lightColor);
 	virtual void setNormalsVBOandEBO();
+	
 	void setVBOandEBO(std::vector <Vertex>& _vertices, std::vector <GLuint>& _indices, std::string msg);
+	
 	virtual void setVBOandEBO(std::string msg);
 	virtual void setLevel(int _level);
 	virtual void doRandomColors(bool _randomColor);
 	virtual void smoothSurface(bool _isSmooth);
+	
+	virtual glm::vec3 isRayTouching(glm::vec3 _rayStart, glm::vec3 _rayDir);
+	virtual bool isCursorTouching(glm::vec2 _cursorPos);
+	virtual void setColor(glm::vec4 _color);
 	
 	void setNewPos(glm::vec3 _objPos);
 	void rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation);

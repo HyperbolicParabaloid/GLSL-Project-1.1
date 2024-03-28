@@ -11,7 +11,7 @@ class Arrow : public Object
 {
 private:
 	void genTriangles();
-	void genCircle(glm::vec3 _pos, glm::vec3 _norm, glm::vec3 _radi, glm::vec2 _angles, int &_indCount);
+	void genCircle(bool _isBottom, glm::vec3 _pos, glm::vec3 _norm, glm::vec3 _radi, glm::vec2 _angles, int &_indCount);
 	void genWall(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _startRadi, glm::vec3 _endRadi, glm::vec2 _angles, int& _indCount);
 	int numVertsPerSide(int _level);
 	

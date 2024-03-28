@@ -241,7 +241,9 @@ GLuint sqrIndices_2[] = {
 	22, 23, 20
 };
 
-int viewWidth = 800, viewHeight = 800;
+
+
+int viewWidth = 1000, viewHeight = 800;
 int setCamera = 0;
 
 // Converts a float to a string to a given decimal precision.
@@ -287,6 +289,7 @@ int main()
 	// Tell GLFW we are using the CORE profile
 	// So that means we only have the modern functions
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 
 
 	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
@@ -350,6 +353,10 @@ int main()
 	// Enabling transparency with Alpha value.
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// Enabling backface culling :D
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+	glFrontFace(GL_CCW);
 
 
 	// Initializing matrices for model, view and projection
@@ -425,10 +432,15 @@ int main()
 	glm::vec3 cube3Pos = glm::vec3(0.0f, 2.f, -2.5f);
 	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), empty, &camera);
 	// Spheres.
-	int level = 2;
-	glm::vec3 sphere1Pos = glm::vec3(2.0f, 1.0f, 0.0f);
-	glm::vec3 sphere1Radi = glm::vec3(1.f, 1.f, 1.0f);
-	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.0f, level, false, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
+	int level = 5;
+	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 sphere1Radi = glm::vec3(1.f, 1.f, 1.f);// / 25.f);
+	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.0f, level, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
+	Sphere sphere1Mirror(window, sphere1Pos, sphere1Radi, 1.0f, level, true, glm::vec4(0.f, .0f, .1f, 0.25f), empty, &camera);
+	// Spheres.
+	glm::vec3 sphere2Pos = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 sphere2Radi = glm::vec3(1.f, 1.f, 1.0f);
+	Sphere sphere2(window, sphere2Pos, sphere2Radi, 0.2f, 5, true, glm::vec4(1.0f, .1f, .1f, 1.f), empty, &camera);
 	// Cones.
 	glm::vec3 conePos = glm::vec3(0.f, 1.f, -1.f);
 	float coneScale = 1.f;
@@ -439,8 +451,19 @@ int main()
 	bool coneIsSmooth = true;
 	glm::vec4 coneShaftColor = glm::vec4(1.f), coneConeColor = glm::vec4(1.f);
 	Cone cone1(window, conePos, coneScale, coneLevel, coneBottomRadius, coneTopRadius, conePointPos, coneIsSmooth, coneShaftColor, coneConeColor, empty, &camera);
+	
 	// UI elements.
-	UI sphere1UI(window, glm::vec3(0.0, 0.f, 0.f), glm::vec2(-1.f, 1.f), 1.f, 1.f / 32.f, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+	glm::vec3 UIRadi = glm::vec3(0.5f, 1.f, 1.f);
+	float UICharacterScale = 1.f / 32.f;
+	UI sphere1UI(window, glm::vec3(0.f, 0.f, 0.f), glm::vec2(-2.f, 1.f), UIRadi, UICharacterScale, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+	//UI sphere1UI(window, glm::vec3(0.0, 0.f, 0.f), glm::vec2(-1.f, 1.f), 1.f, 1.f / 32.f, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+	//UI sphere1UI(window, glm::vec3(0.0, 0.f, 0.f), glm::vec2(-1.f, 1.f), 1.f, 1.f / 32.f, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+	//UI sphere1UI(window, glm::vec3(0.0, 0.f, 0.f), glm::vec2(-1.f, 1.f), 1.f, 1.f / 32.f, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+	//UI sphere1UI(window, glm::vec3(0.0, 0.f, 0.f), glm::vec2(-1.f, 1.f), 1.f, 1.f / 32.f, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
+	
+	
+	
+	
 	// Arrow objects,
 	glm::vec3 arrowPos = glm::vec3(-2.f, 0.f, 0.f);
 	float arrowScale = 1.f;
@@ -456,22 +479,38 @@ int main()
 	std::vector <Object*> objectList;
 	std::vector <UI*> UIList;
 
-	//Object* trackingObj = &arrow1;
-	int  targetIndex = 0;
-	//std::vector <Object*> targetObjs;
-	//targetObjs.push_back(&sphere1);
-	//targetObjs.push_back(&arrow1);
-	//targetObjs.push_back(&cube3);
+	int targetIndex = 0;
 
 	bool trackingSphere = true;
 
 	objectList.push_back(&plane1);
 	objectList.push_back(&cube3);
 	objectList.push_back(&sphere1);
+	objectList.push_back(&sphere2);
 	objectList.push_back(&cone1);
 	objectList.push_back(&arrow1);
+	objectList.push_back(&sphere1Mirror);
 	objectList.push_back(&sphere1UI);
 	Object* targetObj = objectList[targetIndex];
+
+	int objectListSize = objectList.size();
+	for (int o = 0; o < objectListSize; o++) {
+		glm::vec3 UICanvasRadi = glm::vec3(1.f);
+		glm::vec4 UIColor = glm::vec4(0.f, 1.f, 1.f, 1.f);
+		std::string UIText = toUppercase(objectList[o]->name) + " (" + std::to_string(o) + ")";
+		glm::vec3 UIPos = glm::vec3(0.f, 0.f, 0.f);
+
+		float UITextScale;
+		if (objectListSize > 32)
+			UITextScale = 1.f / objectListSize; // objectListSize characters per line.
+		else
+			UITextScale = 1.f / 32.f; // 32 characters per line
+
+		float textOffset = 0.5f / UITextScale;
+		glm::vec2 UIRasterCoords = glm::vec2(1 - (UIText.length() / textOffset), 1 - (o / textOffset)); // -1 -> 1
+
+		objectList.push_back(new UI{ window, UIPos, UIRasterCoords, UICanvasRadi, UITextScale, UIText, intDict, UIColor, empty, &camera });
+	}
 
 
 	bool first = true;
@@ -496,7 +535,6 @@ int main()
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "useTex"), 1);
 	glUniform1i(glGetUniformLocation(shaderProgram.ID, "useTexSpec"), 1);
-
 
 	int FPS = 0;
 	int FPSCount = 0;
@@ -641,14 +679,40 @@ int main()
 
 		// Mouse Buttons
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) && lockoutTimer <= crntTime) {
-			if (targetObj->normalShaderProgram != nullptr) {
-				targetObj->normalShaderProgram->Delete();
-				targetObj->normalShaderProgram = nullptr;
+			glm::vec3 camPos = camera.cameraPos;
+			glm::vec3 cursorRay = camera.getCursorRay();
+			glm::vec3 transformedPos = sphere1.isRayTouching(camPos, cursorRay);
+			
+			sphere2.setNewPos(transformedPos);
+
+
+			// Doing UI checks.
+			glm::vec2 cursorPos = camera.getCursorPos();
+			
+			// Figuring out the text scale so we can search for it properly.
+			float UITextScale;
+			if (objectListSize > 32)
+				UITextScale = 1.f / objectListSize; // objectListSize characters per line.
+			else
+				UITextScale = 1.f / 32.f; // 32 characters per line
+			
+			// Getting index of the object's UI Canvas.
+			float textOffset = 0.5f / UITextScale;
+			int offset = floor((cursorPos.y - 1) * -textOffset);
+			if (offset < objectListSize && offset >= 0) {
+				// Checking if the cursor is touching the UI Canvas.
+				if (objectList[offset + objectListSize]->isCursorTouching(cursorPos)) {
+					// Setting background colors of the old/new UI Canvases.
+					objectList[targetIndex + objectListSize]->setColor(glm::vec4(0.f));
+					objectList[offset + objectListSize]->setColor(glm::vec4(1.f));
+					// If the Canvas was hit, we know we just requested to switch attention to the
+					// respective object in ObjectList, and we set both that as targetObj as well
+					// as setting the targetIndex appropriately.
+					targetIndex = offset;
+					targetObj = objectList[offset];
+				}
 			}
-			else {
-				targetObj->setNormalsVBOandEBO();
-			}
-			lockoutTimer = crntTime + 0.2;
+
 		}
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
 			rotate = !rotate;

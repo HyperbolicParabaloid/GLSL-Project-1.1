@@ -1,15 +1,17 @@
 #include "UI.h"
 
 // Constructor for Plane.
-UI::UI(GLFWwindow* _window, glm::vec3 _objPos, glm::vec2 _textOffset, float _objScale, float _characterScale, std::string _text, glm::uvec2 (&_dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _objScale, _color, _textures, _camera) {
+UI::UI(GLFWwindow* _window, glm::vec3 _objPos, glm::vec2 _textOffset, glm::vec3 _radi, float _characterScale, std::string _text, glm::uvec2 (&_dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _characterScale, _color, _textures, _camera) {
 	text = _text;
 	dictionary = _dictionary;
 	randomColor = false;
 	seed = 1;
 	realLetters = _text.length();
 
-	scale = glm::vec2(_objScale);
+	radi = _radi;
 	characterScale = _characterScale;
+
+	backgroundColor = glm::vec4(0.f);
 
 	textOffset = _textOffset;
 	genTriangles();
@@ -48,6 +50,28 @@ void UI::setVBOandEBO(std::string msg) {
 	VAO.Unbind();
 	VBO.Unbind();
 	EBO.Unbind();
+}
+
+void UI::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
+	// Activating the shader program and binding the VAO so OpenGL knows what we're trying to do.
+	shaderProgram->Activate();
+	VAO.Bind();
+
+	if (isWireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	else
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	// Assigning all relevant info to the shader.
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram->ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	glUniform4f(glGetUniformLocation(shaderProgram->ID, "backgroundColor"), backgroundColor.a, backgroundColor.g, backgroundColor.b, backgroundColor.a);
+
+	// Draw the actual mesh
+	glDrawElements(triangleType, indices.size(), GL_UNSIGNED_INT, 0);
+
+	// Drawing normals if applicable.
+	if (normalShaderProgram != nullptr)
+		drawNormals(_lightPos, _lightColor);
 }
 
 
@@ -409,6 +433,11 @@ void UI::appendNumber(double _num, int _precision) {
 	appendString(shortString);
 }
 
+// Sets background color of text.
+void UI::setColor(glm::vec4 _color) {
+	backgroundColor = _color;
+}
+
 std::string UI::getString() {
 	return text;
 }
@@ -431,11 +460,11 @@ void UI::genOctahedron() {
 	setNewString(text);
 
 	// Setting transformation matrix.
-	glm::vec3 scalingVec = glm::vec3(objScale, objScale, 0.f);
+	//glm::vec3 scalingVec = glm::vec3(objScale, objScale, 0.f);
 	glm::vec3 screenPos = glm::vec3(objPos.x, objPos.y, 0.f);
 	//model = glm::translate(glm::mat4(1.f), screenPos - scalingVec);
 	model = glm::translate(glm::mat4(1.f), screenPos);
-	model = glm::scale(model, scalingVec);
+	model = glm::scale(model, radi);
 }
 
 // Yee old destructor.
@@ -447,24 +476,24 @@ void UI::setScreenPos(glm::vec2 _screenCoords) {
 	objPos = glm::vec3(_screenCoords, objPos.z);
 	//model = glm::translate(glm::mat4(1.f), glm::vec3(_screenCoords - scale, 0.0f));
 	model = glm::translate(glm::mat4(1.f), objPos);
-	model = glm::scale(model, glm::vec3(scale, 0.f));
+	model = glm::scale(model, radi);
 }
 
 // Sets the X and Y scaling factors for the UI objects transformation.
-void UI::setScale(glm::vec2 _scale) {
-	scale = _scale;
+void UI::setScale(glm::vec3 _radi) {
+	radi = _radi;
 	//model = glm::translate(glm::mat4(1.f), objPos - glm::vec3(scale, 0.0f));
 	model = glm::translate(glm::mat4(1.f), objPos);
-	model = glm::scale(model, glm::vec3(scale, 0.f));
+	model = glm::scale(model, radi);
 }
 
 
-glm::vec2 UI::getScale() {
-	return scale;
+glm::vec3 UI::getScale() {
+	return radi;
 }
 
-// Returns whether 2D coordiantes are touching the UI Object.
-bool UI::isTouching(glm::vec2 _cursorPos)
+// Returns whether 2D coordinates are touching the UI Object.
+bool UI::isCursorTouching(glm::vec2 _cursorPos)
 {
 	// Barycentric test.
 	glm::vec3 p = glm::vec3(_cursorPos, 0.f);
@@ -493,7 +522,6 @@ bool UI::isTouching(glm::vec2 _cursorPos)
 		// Check if point is in triangle
 		bool result = ((u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.01f));
 
-		//std::cout << "Is point p = (" << p.x << ", " << p.y << ", " << p.z << "), in triangle? [" << result << "]\n" << std::endl;
 		if (result)
 			return result;
 
@@ -501,7 +529,7 @@ bool UI::isTouching(glm::vec2 _cursorPos)
 	return false;
 }
 
-void UI::setColor(glm::vec4 _color) {
+void UI::setCharacterColor(glm::vec4 _color) {
 	color = _color;
 	genTriangles();
 }

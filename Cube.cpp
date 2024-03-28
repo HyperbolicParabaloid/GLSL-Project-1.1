@@ -43,10 +43,10 @@ void Cube::genTriangles() {
 		Vertex { v2, n3, color, texCoord3 },
 		Vertex { v6, n3, color, texCoord4 },
 
-		Vertex { v4, n4, color, texCoord1 },	// Bottom face
-		Vertex { v8, n4, color, texCoord2 },
-		Vertex { v7, n4, color, texCoord3 },
+		Vertex { v8, n4, color, texCoord2 },	// Bottom face
+		Vertex { v4, n4, color, texCoord1 },
 		Vertex { v3, n4, color, texCoord4 },
+		Vertex { v7, n4, color, texCoord3 },
 
 		Vertex { v3, n5, color, texCoord1 },	// Right face
 		Vertex { v4, n5, color, texCoord2 },

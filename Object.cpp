@@ -33,6 +33,7 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	level = -1;
 
 	//pointingAt = glm::vec3(0.f, 1.f, 0.f);
+	normalShaderProgram = nullptr;
 }
 
 glm::vec3 Object::rayToObject(glm::vec3 _ray) {
@@ -53,9 +54,9 @@ void Object::setNewPos(glm::vec3 _objPos) {
 // Rotates the object about a given axis by a set angle in degrees.
 void Object::rotate(float rotationDegreeAngle, glm::vec3 axisOfRotation) {
 	glm::mat4 rotMat = glm::rotate(glm::mat4(1.f), glm::radians(rotationDegreeAngle), axisOfRotation);
-	model = glm::translate(glm::mat4(1.f), objPos)  * rotationMatrix * glm::scale(glm::mat4(1.f), radi);
 	rotationMatrix *= rotMat;
-	model = model * rotMat;
+	model = glm::translate(glm::mat4(1.f), objPos)  * rotationMatrix * glm::scale(glm::mat4(1.f), radi);
+	//model = model * rotMat;
 }
 
 // Sets the radi scaling value.
@@ -70,9 +71,67 @@ void Object::setScale(float _scale) {
 	model = glm::translate(glm::mat4(1.f), objPos) * rotationMatrix * glm::scale(glm::mat4(1.f), glm::vec3(objScale));
 }
 
+/* NOT WORKING
+// Returns closest point on Ellipsoid struck by ray.
+glm::vec3 Object::isRayTouching(glm::vec3& _rayStart, glm::vec3& _rayDir) {
+	glm::mat4 modelInv = inverse(model);
+	glm::vec3 ro = _rayStart - objPos; // glm::vec3(modelInv * glm::vec4(_rayStart, 1.f));// _rayStart - objPos;//
+	glm::vec3 rd = _rayDir; //glm::vec3(modelInv * glm::vec4(_rayDir, 1.f)); //
+
+	glm::vec3 r = glm::vec3(1.f, 1.f, 1.f / 25.f);
+	
+	glm::vec3 r2 = r * r; // Squared radius.
+	float a = dot(rd, rd / r2); // Quadratic formula values a->c.
+	float b = dot(ro, rd / r2);
+	float c = dot(ro, ro / r2);
+	float d = b * b - a * (c - 1.f); // Determinant.
+	
+	if (d < 0.f) { // If the determinant is less than 0.f, then the ray missed.
+		return glm::vec3(0.0);
+	}
+	
+	float t = (-b - sqrt(d)) / a;
+	return _rayStart + _rayDir * t;
+}
+*/
+// Returns closest point on Ellipsoid struck by ray.
+glm::vec3 Object::isRayTouching(glm::vec3 _rayStart, glm::vec3 _rayDir) {
+	glm::mat4 modelInv = inverse(model);
+	glm::vec3 ro = glm::vec3(modelInv * glm::vec4(_rayStart, 1.0f));
+	glm::vec3 rd = glm::normalize(glm::vec3(modelInv * glm::vec4(_rayDir, 0.0f)));
+
+	float a = dot(rd, rd); // Quadratic formula values a->c.
+	float b = dot(ro, rd);
+	float c = dot(ro, ro);
+	float d = b * b - a * (c - 1.f); // Determinant.
+
+	if (d < 0.f) {
+		return glm::vec3(0.0);
+	}
+
+	float t = (-b - sqrt(d)) / a;
+	glm::vec3 intersectionLocal = ro + rd * t;
+
+	// Transform intersection point back to world space
+	glm::vec3 intersectionWorld = glm::vec3(model * glm::vec4(intersectionLocal, 1.0f));
+
+	return intersectionWorld;
+}
+
+bool Object::isCursorTouching(glm::vec2 _cursorPos)
+{
+	if (isRayTouching(camera->cameraPos, camera->getCursorRay()) == glm::vec3(0.f))
+		return false;
+	return true;
+}
+
 
 void Object::setLevel(int _level) {
 	std::cout << "N/A";
+}
+
+void Object::setColor(glm::vec4 _color) {
+	color = _color;
 }
 
 // Draws the object to the screen and sets the appropriate information in the Shader object about position, and lighting.
@@ -95,10 +154,6 @@ void Object::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 	glUniform1f(glGetUniformLocation(shaderProgram->ID, "time"), glfwGetTime());
 	if (name == "Tree" || name == "Plane")
 		glUniform3f(glGetUniformLocation(shaderProgram->ID, "startPos"), objPos.x / 25.f, objPos.y / 25.f, objPos.z / 25.f);
-	if (name == "UI") {
-		glUniform2ui(glGetUniformLocation(shaderProgram->ID, "pixels"), pixels.x, pixels.y);
-		//std::cout << "pixels = (" << pixels.x << ", " << pixels.y << ")\n";
-	}
 		
 	// Draw the actual mesh
 	glDrawElements(triangleType, indices.size(), GL_UNSIGNED_INT, 0);
@@ -420,7 +475,7 @@ void Object::pointAt(glm::vec3 _direction, bool _isTopPointing) {
 	float forwardPitch = glm::dot(yawPlaneDir, _direction);
 
 	// We have 3 matrices here: objMat, objRot, and rotMat.
-	glm::mat4 objMat = glm::translate(glm::mat4(1.f), objPos) * glm::scale(glm::mat4(1.f), glm::vec3(objScale));// model;
+	glm::mat4 objMat = glm::translate(glm::mat4(1.f), objPos) * glm::scale(glm::mat4(1.f), radi);// model;
 	glm::mat4 objRot = glm::mat4(1.f);
 	glm::mat4 rotMat = glm::mat4(1.f);
 

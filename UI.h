@@ -14,7 +14,6 @@ private:
 	bool isSmooth;
 	bool randomColor;
 
-	glm::vec2 scale;
 	float characterScale;
 	std::string text;
 
@@ -24,11 +23,14 @@ private:
 	float yCount;
 
 	glm::vec2 textOffset;
+
+	glm::vec4 backgroundColor;
 public:
-	UI(GLFWwindow* _window, glm::vec3 _objPos, glm::vec2 _textOffset, float _objScale, float _characterScale, std::string _text, glm::uvec2(&_dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
+	UI(GLFWwindow* _window, glm::vec3 _objPos, glm::vec2 _textOffset, glm::vec3 _radi, float _characterScale, std::string _text, glm::uvec2(&_dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
 	~UI();
 	void genOctahedron();
 	void setVBOandEBO(std::string msg);
+	void draw(glm::vec3 _lightPos, glm::vec4 _lightColor);
 
 	void setNewString(std::string _code, bool _removeFormatting);
 	void setNewString(std::string _code);
@@ -36,14 +38,16 @@ public:
 	void appendString(std::string _code);
 	void appendNumber(double _num, int _precision);
 
+	void setColor(glm::vec4 _color);
+
 	std::string getString();
 
 	void setScreenPos(glm::vec2 _screenCoords);
-	void setScale(glm::vec2 _scale);
+	void setScale(glm::vec3 _scale);
 	glm::vec3 rayToObject(glm::vec3 _ray);
-	glm::vec2 getScale();
-	bool isTouching(glm::vec2 _cursorPos);
-	void setColor(glm::vec4 _color);
+	glm::vec3 getScale();
+	bool isCursorTouching(glm::vec2 _cursorPos);
+	void setCharacterColor(glm::vec4 _color);
 };
 
 #endif

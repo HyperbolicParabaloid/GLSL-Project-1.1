@@ -18,12 +18,9 @@ uniform sampler2D diffuse0;
 uniform sampler2D specular0;
 uniform int useTex;
 uniform int useTexSpec;
-uniform vec4 lightColor;
-uniform vec3 lightPos;
-uniform vec3 camPos;
+uniform vec4 backgroundColor;
 // For time
 uniform float time;
-uniform uvec2 pixels;
 
 void main()
 {
@@ -44,7 +41,7 @@ void main()
 	if (bit == 1)
 		FragColor = color;
 	else
-		FragColor = vec4(0.f);
+		FragColor = backgroundColor;//vec4(0.f);
 
 
 	//Adds in the cell boarders so you can see what you're doing a little better.
