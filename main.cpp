@@ -665,9 +665,16 @@ int main()
 				targetObj->setNewPos(targetObj->objPos + glm::vec3(0.f, -0.01f, 0.f));
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_T) && lockoutTimer <= crntTime) {
+			targetIndex %= objectListSize;
+			objectList[targetIndex + objectListSize]->setColor(glm::vec4(0.f));
+
 			targetIndex++;
-			//targetObj = targetObjs[targetIndex % targetObjs.size()];
-			targetObj = objectList[targetIndex % objectList.size()];
+
+			targetIndex %= objectListSize;
+			objectList[targetIndex + objectListSize]->setColor(glm::vec4(1.f));
+
+			targetObj = objectList[targetIndex];
+
 			lockoutTimer = crntTime + 0.2;
 		}
 
@@ -695,16 +702,18 @@ int main()
 				UITextScale = 1.f / objectListSize; // objectListSize characters per line.
 			else
 				UITextScale = 1.f / 32.f; // 32 characters per line
+
+			targetIndex = targetIndex % objectListSize;
 			
 			// Getting index of the object's UI Canvas.
 			float textOffset = 0.5f / UITextScale;
 			int offset = floor((cursorPos.y - 1) * -textOffset);
 			if (offset < objectListSize && offset >= 0) {
 				// Checking if the cursor is touching the UI Canvas.
-				if (objectList[offset + objectListSize]->isCursorTouching(cursorPos)) {
+				if (objectList[(offset + objectListSize) % objectList.size()]->isCursorTouching(cursorPos)) {
 					// Setting background colors of the old/new UI Canvases.
-					objectList[targetIndex + objectListSize]->setColor(glm::vec4(0.f));
-					objectList[offset + objectListSize]->setColor(glm::vec4(1.f));
+					objectList[(targetIndex + objectListSize) % objectList.size()]->setColor(glm::vec4(0.f));
+					objectList[(offset + objectListSize) % objectList.size()]->setColor(glm::vec4(1.f));
 					// If the Canvas was hit, we know we just requested to switch attention to the
 					// respective object in ObjectList, and we set both that as targetObj as well
 					// as setting the targetIndex appropriately.
