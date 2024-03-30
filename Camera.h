@@ -64,7 +64,6 @@ public:
 	glm::vec3 track_movement();	// Tracks movements of player
 	glm::mat4 get_view();	// Returns the view matrix
 
-	bool lookAtObj(glm::vec3 _objPos);
 	bool fly_to(glm::vec3 newPos, glm::vec3 newForward, bool lockCursorMovement);	// Specifying a position, forward and option to lock camera
 	bool fly_to(glm::vec3 newPos);	// Specifying a position
 	bool setMousePos(glm::vec3 _newForward, bool _lockCursorMovement, bool _snap);	// forward and option to lock camera

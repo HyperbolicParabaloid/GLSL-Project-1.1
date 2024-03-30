@@ -23,7 +23,6 @@ Object::Object(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, glm::vec
 	velocity = glm::vec3(0.f);
 	rotationalVelocity = 0.f;
 	rotationalAxis = glm::vec3(0.f);
-	pixels = glm::uvec2(0);//glm::ivec2(INT_MAX);
 
 
 	randomColor = false;
@@ -94,28 +93,78 @@ glm::vec3 Object::isRayTouching(glm::vec3& _rayStart, glm::vec3& _rayDir) {
 	return _rayStart + _rayDir * t;
 }
 */
-// Returns closest point on Ellipsoid struck by ray.
+// Determines if a ray hits any part of the objects mesh.
 glm::vec3 Object::isRayTouching(glm::vec3 _rayStart, glm::vec3 _rayDir) {
 	glm::mat4 modelInv = inverse(model);
 	glm::vec3 ro = glm::vec3(modelInv * glm::vec4(_rayStart, 1.0f));
 	glm::vec3 rd = glm::normalize(glm::vec3(modelInv * glm::vec4(_rayDir, 0.0f)));
 
-	float a = dot(rd, rd); // Quadratic formula values a->c.
-	float b = dot(ro, rd);
-	float c = dot(ro, ro);
-	float d = b * b - a * (c - 1.f); // Determinant.
+	// Looping over all the triangles in the Cube.
+	for (int i = 0; i < indices.size(); i += 3) {
+		// Getting vertices of the triangle.
+		glm::vec3 v0 = vertices[indices[i + 0]].pos;
+		glm::vec3 v1 = vertices[indices[i + 1]].pos;
+		glm::vec3 v2 = vertices[indices[i + 2]].pos;
 
-	if (d < 0.f) {
-		return glm::vec3(0.0);
+		// Setting edges to compute cross product/plane normal.
+		glm::vec3 e0 = v2 - v0;
+		glm::vec3 e1 = v1 - v0;
+		glm::vec3 planeNormal = glm::cross(e0, e1);
+		glm::vec3 point = pointOnPlane(v0, planeNormal, ro, rd);
+
+		// Ray didn't intercept plane.
+		if (point.x == FLT_MAX)
+			continue;
+
+		// Ray DID intercept plane.
+		if (barycentricInterpolation(v0, v1, v2, point)) {
+			return glm::vec3(model * glm::vec4(point, 1.f));
+		}
 	}
 
-	float t = (-b - sqrt(d)) / a;
-	glm::vec3 intersectionLocal = ro + rd * t;
+	return glm::vec3(FLT_MAX);
+}
 
-	// Transform intersection point back to world space
-	glm::vec3 intersectionWorld = glm::vec3(model * glm::vec4(intersectionLocal, 1.0f));
+// Determines where on a plane a ray intersects it.
+glm::vec3 Object::pointOnPlane(glm::vec3 planePoint, glm::vec3 planeNormal, glm::vec3 rayStart, glm::vec3 rayDirection) {
+	// Denom is the cos of the angle between teh ray direction and the normal of the plane.
+	// If the ray is at more than a 90 degree angle, (cos(90) => cos(180) = (0 -> -1)) then
+	// the denom will be less than 0. This means ray the hits a backface of an object won't count it as a hit.
+	float denom = glm::dot(glm::normalize(rayDirection), planeNormal);
 
-	return intersectionWorld;
+	// If the denom is greater than 0, we have hit the plane and will return that point.
+	if (denom > 0.f) {
+		float t = (dot(planePoint - rayStart, planeNormal) / denom);
+		if (t >= 0.f) {
+			return rayStart + (glm::normalize(rayDirection) * t);
+		}
+	}
+
+	// If we miss the plane we just return this FLT_MAX to communicate the failure.
+	return glm::vec3(FLT_MAX);
+}
+
+// Determines if point is on the triangle given by the 3 vertices.
+bool Object::barycentricInterpolation(glm::vec3 _vert0, glm::vec3 _vert1, glm::vec3 _vert2, glm::vec3 _p) {
+	// Compute vectors        
+	glm::vec3 v0 = _vert2 - _vert0;
+	glm::vec3 v1 = _vert1 - _vert0;
+	glm::vec3 v2 = _p - _vert0;
+
+	// Compute dot products
+	float dot00 = dot(v0, v0);
+	float dot01 = dot(v0, v1);
+	float dot02 = dot(v0, v2);
+	float dot11 = dot(v1, v1);
+	float dot12 = dot(v1, v2);
+
+	// Compute barycentric coordinates
+	float invDenom = 1.f / (dot00 * dot11 - dot01 * dot01);
+	float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
+	float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+
+	// Check if point is in triangle
+	return ((u >= 0.0f) && (v >= 0.0f) && (u + v <= 1.f));
 }
 
 bool Object::isCursorTouching(glm::vec2 _cursorPos)
@@ -185,39 +234,6 @@ void Object::setVBOandEBO(std::string msg) {
 		shaderProgram = new Shader("object.vert", "object.frag");
 	shaderProgram->Activate();
 
-	//std::cout << "doNormalArrows = " << doNormalArrows << " for " << msg << "\n";
-	//if (doNormalArrows == true) {
-	//	//std::cout << "Drawing the arrows for " << msg <<  "\n";
-	//	int vNum = 1;
-	//	int maxSize = vertices.size();
-	//	for (int vv = 0; vv < maxSize; vv++) {
-	//		glm::vec3 conePos = vertices[vv].pos;
-	//		float coneScale = 0.02f;
-	//		int coneLevel = 4;
-	//		float coneBottomRadius = 1.f;
-	//		float coneTopRadius = 0.f;
-	//		glm::vec3 conePointPos = glm::vec3(0.f, 5.f, 0.f);
-	//		glm::vec3 conePointingAt = vertices[vv].norm;
-	//		bool coneIsSmooth = true;
-	//		glm::vec4 coneColor = glm::vec4(0.4f, 0.5f, 0.3f, 1.f); //vertices[vv].color;
-	//		glm::vec4 shaftColor = glm::vec4(0.5f, 0.3f, 0.f, 1.f);// vertices[vv].color;
-	//		int coneStartingIndex = indices.size();
-	//		float randomizationEffect = 0.f;
-	//
-	//		//std::cout << "Drawing arrows #" << vNum << " at pos (" << conePos.x << ", " << conePos.y << ", " << conePos.z << ")\n";
-	//		//vNum++;
-	//
-	//		//std::cout << "Drawing a " << msg << "\n";
-	//		Arrow newArrow(conePos, coneScale, coneLevel, coneBottomRadius, coneTopRadius, conePointPos, conePointingAt, coneIsSmooth, shaftColor, coneColor, randomizationEffect, coneStartingIndex);
-	//		std::vector <Vertex> coneVerts = newArrow.getVerts();
-	//		std::vector <GLuint> coneInds = newArrow.getInds();
-	//
-	//		//std::cout << "vertices.size() BEFORE = " << vertices.size() << "\n";
-	//		vertices.insert(vertices.end(), coneVerts.begin(), coneVerts.end());
-	//		indices.insert(indices.end(), coneInds.begin(), coneInds.end());
-	//	}
-	//}
-
 	VAO.Bind();
 	
 	// Setting VBO and EBO
@@ -252,7 +268,7 @@ void Object::setVBOandEBO(std::string msg) {
 			num = std::to_string(numSpecular++);
 			glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTexSpec"), 1);
 		}
-		textures[i].texUnit(*shaderProgram, (type + num).c_str(), i);
+		textures[i].texUnit(*shaderProgram, (type + num).c_str(), textures[i].unit);
 		textures[i].Bind();
 	}
 

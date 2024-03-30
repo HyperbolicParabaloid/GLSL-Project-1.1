@@ -46,6 +46,8 @@ public:
 	void setScale(glm::vec3 _scale);
 	glm::vec3 rayToObject(glm::vec3 _ray);
 	glm::vec3 getScale();
+
+	glm::vec3 isRayTouching(glm::vec3 _rayStart, glm::vec3 _rayDir);
 	bool isCursorTouching(glm::vec2 _cursorPos);
 	void setCharacterColor(glm::vec4 _color);
 };

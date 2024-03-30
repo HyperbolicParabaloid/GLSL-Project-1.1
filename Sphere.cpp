@@ -319,3 +319,27 @@ void Sphere::reseed() {
 void Sphere::smoothSurface(bool _smooth) {
 	smooth = _smooth;
 }
+
+// Returns closest point on Ellipsoid struck by ray.
+glm::vec3 Sphere::isRayTouching(glm::vec3 _rayStart, glm::vec3 _rayDir) {
+	glm::mat4 modelInv = inverse(model);
+	glm::vec3 ro = glm::vec3(modelInv * glm::vec4(_rayStart, 1.0f));
+	glm::vec3 rd = glm::normalize(glm::vec3(modelInv * glm::vec4(_rayDir, 0.0f)));
+
+	float a = dot(rd, rd); // Quadratic formula values a->c.
+	float b = dot(ro, rd);
+	float c = dot(ro, ro);
+	float d = b * b - a * (c - 1.f); // Determinant.
+
+	if (d < 0.f) {
+		return glm::vec3(FLT_MAX);
+	}
+
+	float t = (-b - sqrt(d)) / a;
+	glm::vec3 intersectionLocal = ro + rd * t;
+
+	// Transform intersection point back to world space
+	glm::vec3 intersectionWorld = glm::vec3(model * glm::vec4(intersectionLocal, 1.0f));
+
+	return intersectionWorld;
+}

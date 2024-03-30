@@ -421,8 +421,13 @@ int main()
 		Texture("planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
 		Texture("planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
 	};
+	Texture ObamaTextures[] = {
+		Texture("seamless_green_grass_texture_01.png", "diffuse", 1, GL_RGBA, GL_UNSIGNED_BYTE),
+		Texture("tree_bark.png", "diffuse", 2, GL_RGBA, GL_UNSIGNED_BYTE),
+	};
 
 	std::vector <Texture> tex(textures, textures + sizeof(textures) / sizeof(Texture));
+	std::vector <Texture> ObamaTex(ObamaTextures, ObamaTextures + sizeof(ObamaTextures) / sizeof(Texture));
 	std::vector <Texture> empty;
 
 	// Planes.
@@ -445,24 +450,19 @@ int main()
 	glm::vec3 conePos = glm::vec3(0.f, 1.f, -1.f);
 	float coneScale = 1.f;
 	int coneLevel = 4;
-	float coneBottomRadius = 1.f;
-	float coneTopRadius = 0.f;
+	glm::vec3 coneBottomRadius = glm::vec3(1.f);
+	glm::vec3 coneTopRadius = glm::vec3(0.5f);
+	glm::vec3 coneRadi = glm::vec3(1.f, 2.f, 0.2f);
 	glm::vec3 conePointPos = glm::vec3(0.f, 1.f, 0.f);
 	bool coneIsSmooth = true;
 	glm::vec4 coneShaftColor = glm::vec4(1.f), coneConeColor = glm::vec4(1.f);
-	Cone cone1(window, conePos, coneScale, coneLevel, coneBottomRadius, coneTopRadius, conePointPos, coneIsSmooth, coneShaftColor, coneConeColor, empty, &camera);
-	
+	Cone cone1(window, conePos, coneScale, coneLevel, coneBottomRadius, coneTopRadius, coneRadi, conePointPos, coneIsSmooth, coneShaftColor, coneConeColor, empty, &camera);
+
+
 	// UI elements.
 	glm::vec3 UIRadi = glm::vec3(0.5f, 1.f, 1.f);
 	float UICharacterScale = 1.f / 32.f;
-	UI sphere1UI(window, glm::vec3(0.f, 0.f, 0.f), glm::vec2(-2.f, 1.f), UIRadi, UICharacterScale, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
-	//UI sphere1UI(window, glm::vec3(0.0, 0.f, 0.f), glm::vec2(-1.f, 1.f), 1.f, 1.f / 32.f, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
-	//UI sphere1UI(window, glm::vec3(0.0, 0.f, 0.f), glm::vec2(-1.f, 1.f), 1.f, 1.f / 32.f, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
-	//UI sphere1UI(window, glm::vec3(0.0, 0.f, 0.f), glm::vec2(-1.f, 1.f), 1.f, 1.f / 32.f, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
-	//UI sphere1UI(window, glm::vec3(0.0, 0.f, 0.f), glm::vec2(-1.f, 1.f), 1.f, 1.f / 32.f, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);
-	
-	
-	
+	UI sphere1UI(window, glm::vec3(0.f, 0.f, 0.f), glm::vec2(-2.f, 1.f), UIRadi, UICharacterScale, "YEE OLD SPHERE1\nSTATS:", intDict, glm::vec4(1.f, 0.f, .2f, 1.f), empty, &camera);	
 	
 	// Arrow objects,
 	glm::vec3 arrowPos = glm::vec3(-2.f, 0.f, 0.f);
@@ -509,7 +509,7 @@ int main()
 		float textOffset = 0.5f / UITextScale;
 		glm::vec2 UIRasterCoords = glm::vec2(1 - (UIText.length() / textOffset), 1 - (o / textOffset)); // -1 -> 1
 
-		objectList.push_back(new UI{ window, UIPos, UIRasterCoords, UICanvasRadi, UITextScale, UIText, intDict, UIColor, empty, &camera });
+		objectList.push_back(new UI{ window, UIPos, UIRasterCoords, UICanvasRadi, UITextScale, UIText, intDict, UIColor, ObamaTex, &camera });
 	}
 
 
@@ -607,7 +607,6 @@ int main()
 			lockoutTimer = crntTime + 0.2;
 			capturingMotion = !capturingMotion;
 			camera.motion_enabled(capturingMotion);
-			std::cout << "Crotation\n";
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
 			if (rotate)
@@ -688,9 +687,21 @@ int main()
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) && lockoutTimer <= crntTime) {
 			glm::vec3 camPos = camera.cameraPos;
 			glm::vec3 cursorRay = camera.getCursorRay();
-			glm::vec3 transformedPos = sphere1.isRayTouching(camPos, cursorRay);
-			
-			sphere2.setNewPos(transformedPos);
+
+			glm::vec3 closestPos = glm::vec3(10000.f);
+			for (int o = 0; o < objectList.size(); o++) {
+				if (o == 3)
+					continue;
+				Object* obj = objectList[o];
+				glm::vec3 transformedPos = obj->isRayTouching(camPos, cursorRay);
+				if (transformedPos.x != FLT_MAX) {
+					if (glm::length(closestPos - camera.cameraPos) > glm::length(transformedPos - camera.cameraPos)) {
+						closestPos = transformedPos;
+					}
+				}
+			}
+			//closestPos = targetObj->isRayTouching(camPos, cursorRay);
+			sphere2.setNewPos(closestPos);
 
 
 			// Doing UI checks.
@@ -721,7 +732,6 @@ int main()
 					targetObj = objectList[offset];
 				}
 			}
-
 		}
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
 			rotate = !rotate;
@@ -1082,7 +1092,6 @@ int main()
 			lockoutTimer = crntTime + 0.2;
 			capturingMotion = !capturingMotion;
 			camera.motion_enabled(capturingMotion);
-			std::cout << "Crotation\n";
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
 			//sphere1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));
@@ -1897,7 +1906,6 @@ int main()
 			lockoutTimer = crntTime + 0.2;
 			capturingMotion = !capturingMotion;
 			camera.motion_enabled(capturingMotion);
-			std::cout << "Crotation\n";
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_LEFT)) {
 			tree1.rotate(.5f, glm::vec3(0.f, -1.f, 0.f));

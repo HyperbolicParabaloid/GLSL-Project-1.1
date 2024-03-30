@@ -31,7 +31,6 @@ class Object
 private:
 	GLFWwindow* window;
 
-	std::vector <Texture> textures;
 
 	bool doNormalArrows;
 
@@ -39,14 +38,15 @@ private:
 	std::vector<glm::vec3> velocityHistory;
 	std::vector<glm::vec3> posHistory;
 
+protected:
+	std::vector <Texture> textures;
+
 public:
 	int level;
 	bool randomColor;
 	bool smooth;
 	glm::vec3 radi;
 	std::string name;
-
-	glm::uvec2 pixels;
 
 	VAO VAO;
 	Shader* shaderProgram;
@@ -66,6 +66,10 @@ public:
 	virtual void doRandomColors(bool _randomColor);
 	virtual void smoothSurface(bool _isSmooth);
 	
+	
+	glm::vec3 pointOnPlane(glm::vec3 planePoint, glm::vec3 planeNormal, glm::vec3 rayStart, glm::vec3 rayDirection);
+	bool barycentricInterpolation(glm::vec3 _vert0, glm::vec3 _vert1, glm::vec3 _vert2, glm::vec3 _p);
+
 	virtual glm::vec3 isRayTouching(glm::vec3 _rayStart, glm::vec3 _rayDir);
 	virtual bool isCursorTouching(glm::vec2 _cursorPos);
 	virtual void setColor(glm::vec4 _color);

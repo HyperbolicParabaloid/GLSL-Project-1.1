@@ -217,6 +217,7 @@ glm::vec3 Camera::track_movement() {
 	return newObjPos;
 }
 
+
 // Flies the camera to a specified location and faces the camera to new newly specified direction
 bool Camera::fly_to(glm::vec3 _newPos, glm::vec3 _newForward, bool lockCursorMovement) {
 

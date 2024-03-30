@@ -15,7 +15,7 @@ flat in uvec2 Letter;
 
 // Gets the Texture Unit from the main function
 uniform sampler2D diffuse0;
-uniform sampler2D specular0;
+uniform sampler2D diffuse1;
 uniform int useTex;
 uniform int useTexSpec;
 uniform vec4 backgroundColor;
@@ -39,9 +39,15 @@ void main()
 
 	// Adding Letters
 	if (bit == 1)
-		FragColor = color;
+		if (useTex > 0)
+			FragColor = texture(diffuse0, (texCoord.xy + 1.f) / 2.f);
+		else
+			FragColor = color;
 	else
-		FragColor = backgroundColor;//vec4(0.f);
+		if (useTex > 1)
+			FragColor = backgroundColor * texture(diffuse1, (texCoord.xy + 1.f) / 2.f);
+		else
+			FragColor = backgroundColor;//vec4(0.f);
 
 
 	//Adds in the cell boarders so you can see what you're doing a little better.

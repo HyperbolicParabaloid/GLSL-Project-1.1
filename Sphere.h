@@ -32,6 +32,9 @@ public:
 	void doRandomColors(bool _randomColor);
 	void reseed();
 	void smoothSurface(bool _isSmooth);
+
+	// Ellipsoid intersection test.
+	glm::vec3 isRayTouching(glm::vec3 _rayStart, glm::vec3 _rayDir);
 };
 
 #endif

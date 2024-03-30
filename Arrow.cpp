@@ -53,7 +53,7 @@ void Arrow::genTriangles() {
 	if (level > 36)
 		level = 36;
 
-	int numCones = 3;
+	int numCones = 1;
 	int indCount = 0;
 	for (int n = 0; n < numCones; n++) {
 		genCone(bottomCenter_R, topCenter_R, bottomRadius_R, topRadius_R, doBottomRadius, doTopRadius, indCount);

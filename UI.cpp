@@ -46,6 +46,25 @@ void UI::setVBOandEBO(std::string msg) {
 	VAO.LinkAttrib(VBO, 2, 4, GL_FLOAT, sizeof(VertexUI), (void*)(6 * sizeof(float)));
 	VAO.LinkAttribI(VBO, 3, 2, GL_UNSIGNED_INT, sizeof(VertexUI), (void*)(10 * sizeof(float)));
 
+
+	// Keep track of how many of each type of textures we have
+	unsigned int numDiffuse = 0;
+
+	// Assign all the relevant information to the shader.
+	for (unsigned int i = 0; i < textures.size(); i++)
+	{
+		std::string num;
+		std::string type = textures[i].type;
+		if (type == "diffuse")
+		{
+			num = std::to_string(numDiffuse++);
+		}
+
+		textures[i].texUnit(*shaderProgram, (type + num).c_str(), textures[i].unit);
+		textures[i].Bind();
+	}
+	glUniform1i(glGetUniformLocation(shaderProgram->ID, "useTex"), numDiffuse);
+
 	// Unbind all to prevent accidentally modifying them
 	VAO.Unbind();
 	VBO.Unbind();
@@ -490,6 +509,12 @@ void UI::setScale(glm::vec3 _radi) {
 
 glm::vec3 UI::getScale() {
 	return radi;
+}
+
+glm::vec3 UI::isRayTouching(glm::vec3 _rayStart, glm::vec3 _rayDir) {
+	if (isCursorTouching(camera->getCursorPos()))
+		return camera->cameraPos;
+	return glm::vec3(FLT_MAX);
 }
 
 // Returns whether 2D coordinates are touching the UI Object.
