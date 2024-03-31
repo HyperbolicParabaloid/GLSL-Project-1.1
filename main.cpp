@@ -439,7 +439,7 @@ int main()
 	// Spheres.
 	int level = 5;
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 sphere1Radi = glm::vec3(1.f, 1.f, 1.f);// / 25.f);
+	glm::vec3 sphere1Radi = glm::vec3(0.2f);// / 25.f);
 	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.0f, level, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 	Sphere sphere1Mirror(window, sphere1Pos, sphere1Radi, 1.0f, level, true, glm::vec4(0.f, .0f, .1f, 0.25f), empty, &camera);
 	// Spheres.
@@ -483,13 +483,43 @@ int main()
 
 	bool trackingSphere = true;
 
+	std::vector <Sphere*> sphereList;
+	
+
+	for (int i = 0; i < 100; i++) {
+		// Spheres.
+		// Setting the colors of the object:
+		float r1 = static_cast <float> (rand(glm::vec2(i, int(pow(2, i % 3)) % 65335)));
+		float r2 = static_cast <float> (rand(glm::vec2(i, int(pow(3, i % 5)) % 65335)));
+		float r3 = static_cast <float> (rand(glm::vec2(i, int(pow(4, i % 7)) % 65335)));
+		glm::vec4 newSphereColor = glm::vec4(r1, r2, r3, 1.f);
+
+		float x = static_cast <float> (rand(glm::vec2(i, int(pow(5, i % 11)) % 65335))) * 2.f - 1.f;
+		float y = static_cast <float> (rand(glm::vec2(i, int(pow(6, i % 13)) % 65335)));
+		float z = static_cast <float> (rand(glm::vec2(i, int(pow(7, i % 17)) % 65335))) * 2.f - 1.f;
+		glm::vec3 newSpherePos = glm::vec3(x, y + 5.f, z) * 9.f;
+
+
+		std::cout << "Sphere[" << i << "]\n";
+		std::cout << "newSphereColor = (" << newSphereColor.x << ", " << newSphereColor.y << ", " << newSphereColor.z << ")\n";
+		std::cout << "newSpherePos = (" << newSpherePos.x << ", " << newSpherePos.y << ", " << newSpherePos.z << ")\n\n";
+
+
+		glm::vec3 newSphereRadi = glm::vec3(0.2f);
+		sphereList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, 1.f, 5, true, newSphereColor, empty, &camera });
+	}
+	sphereList.push_back(&sphere1);
+	sphereList.push_back(&sphere1Mirror);
+
+
+
 	objectList.push_back(&plane1);
-	objectList.push_back(&cube3);
-	objectList.push_back(&sphere1);
+	//objectList.push_back(&cube3);
+	//objectList.push_back(&sphere1);
 	objectList.push_back(&sphere2);
-	objectList.push_back(&cone1);
-	objectList.push_back(&arrow1);
-	objectList.push_back(&sphere1Mirror);
+	//objectList.push_back(&cone1);
+	//objectList.push_back(&arrow1);
+	//objectList.push_back(&sphere1Mirror);
 	objectList.push_back(&sphere1UI);
 	Object* targetObj = objectList[targetIndex];
 
@@ -568,7 +598,7 @@ int main()
 		else
 			s1UINormals = " NORMS  = OFF\n";
 		std::string s1UIColor;
-		if (randomColor)
+		if (targetObj->getRandomColor())
 			s1UIColor = " COLOR  = SOLID\n";
 		else
 			s1UIColor = " COLOR  = RANDOM\n";
@@ -590,6 +620,7 @@ int main()
 								s1UIMotion, true);
 
 		// Simple timer
+		float timeDelta = glfwGetTime() - crntTime;
 		crntTime = glfwGetTime();
 		if (crntTime - prevTime >= 1) {
 			prevTime = crntTime;
@@ -598,6 +629,40 @@ int main()
 		}
 		else
 			FPSCount++;
+
+
+		glm::vec3 gravity = glm::vec3(0.f, -9.81f * 10.f, 0.f);
+		for (int s1i = 0; s1i < sphereList.size(); s1i++) {
+			Sphere* s1 = sphereList[s1i];
+			glm::vec3 newForceDir = (sphere2.objPos - s1->objPos);
+			glm::vec3 newForce = newForceDir / glm::clamp(glm::dot(newForceDir, newForceDir) / 100.f, 0.001f, 100.f);
+			s1->calculateNewPos(newForce, timeDelta);
+			s1->calculateNewPos(gravity, timeDelta);
+			for (int s2i = 0; s2i < sphereList.size(); s2i++) {
+				if (s1i != s2i) {
+					Sphere* s2 = sphereList[s2i];
+					s1->resolveCollision(s2, timeDelta);
+				}
+			}
+		}
+
+
+
+		//glm::vec3 newForceDir = (sphere2.objPos - sphere1.objPos);
+		//glm::vec3 newForce = newForceDir / glm::clamp(glm::dot(newForceDir, newForceDir) / 100.f, 0.001f, 100.f);
+		//sphere1.calculateNewPos(newForce, timeDelta);
+		//
+		//newForceDir = (sphere2.objPos - sphere1Mirror.objPos);
+		//newForce = newForceDir / glm::clamp(glm::dot(newForceDir, newForceDir) / 100.f, 0.001f, 100.f);
+		//sphere1Mirror.calculateNewPos(newForce, timeDelta);
+		//
+		//sphere1.calculateNewPos(gravity, timeDelta);
+		//sphere1Mirror.calculateNewPos(gravity, timeDelta);
+		//
+		//sphere1.resolveCollision(&sphere1Mirror, timeDelta);
+
+
+
 
 		// Aiming cone1 at sphere1.
 		//arrow1.pointAt(glm::normalize(sphere1.objPos - arrow1.objPos), true);
@@ -634,15 +699,22 @@ int main()
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_MINUS) && lockoutTimer <= crntTime) {
 			targetObj->setLevel(targetObj->level - 1);
+			for (Object* obj : objectList)
+				obj->setVBOandEBO(obj->name);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_EQUAL) && lockoutTimer <= crntTime) {
 			targetObj->setLevel(targetObj->level + 1);
+			// Have to do this or the shader programs textures will overwrite other ones.
+			for (Object* obj : objectList)
+				obj->setVBOandEBO(obj->name);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_R) && lockoutTimer <= crntTime) {
-			targetObj->doRandomColors(randomColor);
+			targetObj->doRandomColors(!targetObj->getRandomColor());
 			targetObj->setLevel(targetObj->level);
+			for (Object* obj : objectList)
+				obj->setVBOandEBO(obj->name);
 			randomColor = !randomColor;
 			lockoutTimer = crntTime + 0.2;
 		}
@@ -653,6 +725,8 @@ int main()
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_Y) && lockoutTimer <= crntTime) {
 			targetObj->smoothSurface(!targetObj->smooth);
 			targetObj->setLevel(targetObj->level);
+			for (Object* obj : objectList)
+				obj->setVBOandEBO(obj->name);
 			lockoutTimer = crntTime + 0.2;
 		}
 		if (GLFW_PRESS == glfwGetKey(window, GLFW_KEY_L) && lockoutTimer <= crntTime) {
@@ -689,6 +763,7 @@ int main()
 			glm::vec3 cursorRay = camera.getCursorRay();
 
 			glm::vec3 closestPos = glm::vec3(10000.f);
+			int closestIndex = -1;
 			for (int o = 0; o < objectList.size(); o++) {
 				if (o == 3)
 					continue;
@@ -697,11 +772,21 @@ int main()
 				if (transformedPos.x != FLT_MAX) {
 					if (glm::length(closestPos - camera.cameraPos) > glm::length(transformedPos - camera.cameraPos)) {
 						closestPos = transformedPos;
+						closestIndex = o;
 					}
 				}
 			}
-			//closestPos = targetObj->isRayTouching(camPos, cursorRay);
-			sphere2.setNewPos(closestPos);
+			if (closestIndex >= 0 && closestIndex < objectListSize) {
+				sphere2.setNewPos(closestPos);
+				// Setting background colors of the old/new UI Canvases.
+				objectList[(targetIndex + objectListSize) % objectList.size()]->setColor(glm::vec4(0.f));
+				objectList[(closestIndex + objectListSize) % objectList.size()]->setColor(glm::vec4(1.f));
+				// If the Canvas was hit, we know we just requested to switch attention to the
+				// respective object in ObjectList, and we set both that as targetObj as well
+				// as setting the targetIndex appropriately.
+				targetIndex = closestIndex;
+				targetObj = objectList[closestIndex];
+			}
 
 
 			// Doing UI checks.
@@ -757,6 +842,13 @@ int main()
 		// Drawing all the Objects in the list.
 		for (auto obj : objectList)
 			obj->draw(lightPos, lightColor);
+
+
+		// Drawing all the Spheres in the list.
+		for (auto obj : sphereList)
+			obj->draw(lightPos, lightColor);
+
+
 
 		// Drawing the Light.
 		lightShader.Activate();

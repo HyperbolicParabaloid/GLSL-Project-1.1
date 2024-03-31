@@ -326,10 +326,11 @@ glm::vec3 Sphere::isRayTouching(glm::vec3 _rayStart, glm::vec3 _rayDir) {
 	glm::vec3 ro = glm::vec3(modelInv * glm::vec4(_rayStart, 1.0f));
 	glm::vec3 rd = glm::normalize(glm::vec3(modelInv * glm::vec4(_rayDir, 0.0f)));
 
+	float sr = 1.f; // Unit sphere radius.
 	float a = dot(rd, rd); // Quadratic formula values a->c.
 	float b = dot(ro, rd);
-	float c = dot(ro, ro);
-	float d = b * b - a * (c - 1.f); // Determinant.
+	float c = dot(ro, ro) - sr;
+	float d = b * b - a * c; // Determinant.
 
 	if (d < 0.f) {
 		return glm::vec3(FLT_MAX);
@@ -342,4 +343,187 @@ glm::vec3 Sphere::isRayTouching(glm::vec3 _rayStart, glm::vec3 _rayDir) {
 	glm::vec3 intersectionWorld = glm::vec3(model * glm::vec4(intersectionLocal, 1.0f));
 
 	return intersectionWorld;
+}
+
+// Calculates new position of the sphere over time, given a force.
+void Sphere::calculateNewPos(glm::vec3 _nForce, float _t) {
+	// Basic kinematic equations are:
+	// position(t1) = position(t0) + velocity * t + acceleration * t^2.
+	// Since acceleration = Force / Mass,
+	// position(t1) = position(t0) + velocity * t + (Force / Mass) * t^2.
+	// Shrimple.
+
+	// Calculate new force.
+	sForce = _nForce; // sForce += _nForce;
+	// Set new position.
+	sVelocity += 2.f * (sForce / sMass) * _t;
+	objPos += sVelocity * _t + (sForce / sMass) * _t * _t;
+	// Update model matrix.
+	model = glm::translate(glm::mat4(1.f), objPos) * rotationMatrix * glm::scale(glm::mat4(1.f), radi);
+}
+
+// Resolves the collision between two Spheres.
+void Sphere::resolveCollision(Sphere* _sphere, float _t) {
+	// Ray from our sphere to _sphere.
+	glm::vec3 meToThem = _sphere->objPos - objPos;
+	glm::vec3 collisionNormal = glm::normalize(meToThem);
+
+	float radius = 0.2f;
+
+	// If the two spheres are touching
+	if (glm::length(meToThem) < 2.f * radius) {
+		// Setting the variables.
+		glm::vec3 v1i = sVelocity;
+		glm::vec3 v2i = _sphere->sVelocity;
+		float m1 = sMass;
+		float m2 = _sphere->sMass;
+
+		// Project velocities onto collision normal
+		float v1i_normal = glm::dot(v1i, collisionNormal);
+		float v2i_normal = glm::dot(v2i, collisionNormal);
+
+		// Calculate final velocities along collision normal using restitution
+		float restitution = 0.8f;
+		float v1f_normal = (v1i_normal * (m1 - m2) + 2 * m2 * v2i_normal) / (m1 + m2);
+		float v2f_normal = (v2i_normal * (m2 - m1) + 2 * m1 * v1i_normal) / (m1 + m2);
+
+		// Apply restitution only to the component of velocity along collision normal
+		glm::vec3 v1f = v1i + (v1f_normal - v1i_normal) * collisionNormal * restitution;
+		glm::vec3 v2f = v2i + (v2f_normal - v2i_normal) * collisionNormal * restitution;
+
+		// Shifting the spheres outside of each other.
+		glm::vec3 meCrntPos = objPos;
+		glm::vec3 themCrntPos = _sphere->objPos;
+		float overlap = 2.f * radius - glm::length(meToThem);
+		setNewPos(meCrntPos - collisionNormal * overlap * 0.5f);
+		_sphere->setNewPos(themCrntPos + collisionNormal * overlap * 0.5f);
+
+		// Set final velocities
+		sVelocity = v1f;
+		_sphere->sVelocity = v2f;
+	}
+	applyBounds();
+}
+/*
+// Ray from our sphere to _sphere.
+	glm::vec3 meToThem = _sphere->objPos - objPos;
+
+	float radius = 1.f;
+
+	// If the two spheres are touching
+	if (glm::length(meToThem) < 2.f * radius) {
+		// Setting the variables.
+		glm::vec3 v1i = sVelocity;
+		glm::vec3 v2i = _sphere->sVelocity;
+		float m1 = sMass;
+		float m2 = _sphere->sMass;
+
+
+		// v1i * m1 + v2i + m2 = v1f * m1 + v2f + m2
+		// AND
+		// v1i + v1f = v2i + v2f
+		// THEREFOR
+		// v1i - v2i + v1f = v2f
+		// (v1i * m1 + v2i * m2) = (v1f*m1) + (v1f * m2) + (v1i * m2) - (v2i * m2)
+		// THEREFOR
+		// (v1i * m1 + v2i * m2 - (v1i * m2) + (v2i * m2)) / (m1 + m2) = v1f
+		// THEREFOR
+		// v1i + v1f - v2i = v2f
+		// Solving for final velocities using momentum conservation equation.
+		glm::vec3 v1f = ((v1i * (m1 - m2)) + 2 * m2 * v2i) / (m1 + m2);
+		glm::vec3 v2f = ((v2i * (m2 - m1)) + 2 * m1 * v1i) / (m1 + m2);
+
+		// Shifting the spheres outside of each other.
+		glm::vec3 meCrntPos = objPos;
+		glm::vec3 themCrntPos = _sphere->objPos;
+		float overlap = 2.f * radius - glm::length(meToThem);
+		setNewPos(meCrntPos - glm::normalize(meToThem) * overlap * 0.5f);
+		_sphere->setNewPos(themCrntPos + glm::normalize(meToThem) * overlap * 0.5f);
+
+		// Setting final velocities with restitution.
+		float restitution = 1.0f;
+		sVelocity = v1f * restitution;
+		//_sphere->sVelocity = v2f * restitution;
+	}
+*/
+
+/*
+// Equation for momentum:
+	// v1i * m1 + v2i + m2 = v1f * m1 + v2f + m2
+	// AND
+	// v1i + v1f = v2i + v2f
+	// THEREFOR
+	// Substitute v1i - v2i + v1f = v2f for v2f
+	// v1i * m1 + v2i + m2 = v1f * m1 + (v1f * m2) + (v1i * m2) - (v2i * m2)
+	// THEREFOR
+	// (v1i * m1 + v2i + m2 - (v1i * m2) + (v2i * m2)) / (m1 + m2) = v1f
+	// THEREFOR
+	// v1i + v1f - v2i = v2f
+	//
+	//
+	// Force equation:
+	// F = force; v = velocity; m = mass; d = distance (meters)
+	// F = v * v * m / (2 d)
+	// OR
+	// F = v * m / t
+
+
+	// Ray from our sphere to _sphere.
+	glm::vec3 meToThem = _sphere->objPos - objPos;
+
+	// If the two spheres be touching
+	if (glm::length(meToThem) < 2.f) {
+		// Setting the variables.
+		glm::vec3 v1i = sVelocity;
+		glm::vec3 v2i = _sphere->sVelocity;
+		float m1 = sMass;
+		float m2 = _sphere->sMass;
+
+		// Solving for final velocities.
+		glm::vec3 v1f = ((v1i * m1) + v2i * m2 - (v1i * m2) + (v2i * m2)) / (m1 + m2);
+		glm::vec3 v2f = v1i + v1f - v2i;
+
+		// Shifting the sphere's outside of each other.
+		glm::vec3 meCrntPos = objPos;
+		glm::vec3 themCrntPos = _sphere->objPos;
+		setNewPos(meCrntPos - meToThem * (2.f - glm::length(meToThem)));
+		_sphere->setNewPos(themCrntPos + meToThem * (2.f - glm::length(meToThem)));
+
+		// Setting final velocities.
+		sVelocity = v1f;// *0.9f;
+		_sphere->sVelocity = v2f;// *0.9f;
+	}
+	applyBounds();
+*/
+
+// Resolving bounds for Sphere to roam in.
+void Sphere::applyBounds() {
+	float restitution = 0.8f;
+	// Currently not working.
+	// +x
+	if (objPos.x > 10.f - radi.x) {
+		objPos.x = 10.f - radi.x;
+		sVelocity.x = -sVelocity.x * restitution;
+	}
+	// -x
+	if (objPos.x < -10.f + radi.x) {
+		objPos.x = -10.f + radi.x;
+		sVelocity.x = -sVelocity.x * restitution;
+	}
+	// +z
+	if (objPos.z > 10.f - radi.z) {
+		objPos.z = 10.f - radi.z;
+		sVelocity.z = -sVelocity.z * restitution;
+	}
+	// -z
+	if (objPos.z < -10.f + radi.z) {
+		objPos.z = -10.f + radi.z;
+		sVelocity.z = -sVelocity.z * restitution;
+	}
+	// -y
+	if (objPos.y < 0.f + radi.y) {
+		objPos.y = radi.y;
+		sVelocity.y = -sVelocity.y * restitution;
+	}
+	return;
 }

@@ -466,7 +466,12 @@ void Object::hotRealoadShader() {
 
 // Toggles random colors.
 void Object::doRandomColors(bool _randomColor) {
-	randomColor = !randomColor;
+	randomColor = _randomColor;
+}
+
+bool Object::getRandomColor()
+{
+	return randomColor;
 }
 
 void Object::smoothSurface(bool _isSmooth) {

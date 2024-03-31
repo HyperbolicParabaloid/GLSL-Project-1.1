@@ -26,37 +26,60 @@ void Cube::genTriangles() {
 	glm::vec2 texCoord3 = glm::vec2(1.f, 1.f);
 	glm::vec2 texCoord4 = glm::vec2(0.f, 1.f);
 
+	glm::vec4 color1 = color;
+	glm::vec4 color2 = color;
+	glm::vec4 color3 = color;
+	glm::vec4 color4 = color;
+	glm::vec4 color5 = color;
+	glm::vec4 color6 = color;
+	glm::vec4 colors[6];
+
+	// Seeding random;
+	srand(seed);
+	for (int c = 0; c < 6; c++) {
+		if(randomColor) {
+			float r1 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			float r3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			colors[c] = glm::vec4(r1, r2, r3, 1.f);
+		}
+		else {
+			colors[c] = color;
+		}
+	}
+
+
 	vertices = {
 		//		VERTEX		/		NORMAL		/				COLOR				/	/		TEXTURE COORD	/
-		Vertex { v7, n1, color, texCoord1 },	// Front face
-		Vertex { v3, n1, color, texCoord2 },
-		Vertex { v1, n1, color, texCoord3 },
-		Vertex { v5, n1, color, texCoord4 },
+		Vertex { v7, n1, colors[0], texCoord1 },	// Front face
+		Vertex { v3, n1, colors[0], texCoord2 },
+		Vertex { v1, n1, colors[0], texCoord3 },
+		Vertex { v5, n1, colors[0], texCoord4 },
 
-		Vertex { v4, n2, color, texCoord1 },	// Back face
-		Vertex { v8, n2, color, texCoord2 },
-		Vertex { v6, n2, color, texCoord3 },
-		Vertex { v2, n2, color, texCoord4 },
+		Vertex { v4, n2, colors[1], texCoord1 },	// Back face
+		Vertex { v8, n2, colors[1], texCoord2 },
+		Vertex { v6, n2, colors[1], texCoord3 },
+		Vertex { v2, n2, colors[1], texCoord4 },
 
-		Vertex { v5, n3, color, texCoord1 },	// Top face
-		Vertex { v1, n3, color, texCoord2 },
-		Vertex { v2, n3, color, texCoord3 },
-		Vertex { v6, n3, color, texCoord4 },
+		Vertex { v5, n3, colors[2], texCoord1 },	// Top face
+		Vertex { v1, n3, colors[2], texCoord2 },
+		Vertex { v2, n3, colors[2], texCoord3 },
+		Vertex { v6, n3, colors[2], texCoord4 },
 
-		Vertex { v8, n4, color, texCoord2 },	// Bottom face
-		Vertex { v4, n4, color, texCoord1 },
-		Vertex { v3, n4, color, texCoord4 },
-		Vertex { v7, n4, color, texCoord3 },
+		Vertex { v8, n4, colors[3], texCoord2 },	// Bottom face
+		Vertex { v4, n4, colors[3], texCoord1 },
+		Vertex { v3, n4, colors[3], texCoord4 },
+		Vertex { v7, n4, colors[3], texCoord3 },
 
-		Vertex { v3, n5, color, texCoord1 },	// Right face
-		Vertex { v4, n5, color, texCoord2 },
-		Vertex { v2, n5, color, texCoord3 },
-		Vertex { v1, n5, color, texCoord4 },
+		Vertex { v3, n5, colors[4], texCoord1 },	// Right face
+		Vertex { v4, n5, colors[4], texCoord2 },
+		Vertex { v2, n5, colors[4], texCoord3 },
+		Vertex { v1, n5, colors[4], texCoord4 },
 
-		Vertex { v8, n6, color, texCoord1 },	// Left face
-		Vertex { v7, n6, color, texCoord2 },
-		Vertex { v5, n6, color, texCoord3 },
-		Vertex { v6, n6, color, texCoord4 }
+		Vertex { v8, n6, colors[5], texCoord1 },	// Left face
+		Vertex { v7, n6, colors[5], texCoord2 },
+		Vertex { v5, n6, colors[5], texCoord3 },
+		Vertex { v6, n6, colors[5], texCoord4 }
 	};
 
 	indices = {
@@ -85,6 +108,12 @@ void Cube::genTriangles() {
 		22, 23, 20
 	};
 	setVBOandEBO("Cube");
+}
+
+// Redraws the Sphere where ever triangle has a random color.
+void Cube::doRandomColors(bool _randomColor) {
+	randomColor = _randomColor;
+	genTriangles();
 }
 
 void Cube::reGenTriangles() {

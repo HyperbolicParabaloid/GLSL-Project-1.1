@@ -59,7 +59,6 @@ void UI::setVBOandEBO(std::string msg) {
 		{
 			num = std::to_string(numDiffuse++);
 		}
-
 		textures[i].texUnit(*shaderProgram, (type + num).c_str(), textures[i].unit);
 		textures[i].Bind();
 	}

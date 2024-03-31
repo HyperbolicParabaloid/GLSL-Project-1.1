@@ -22,7 +22,10 @@ private:
 
 	int preVertsSize;
 
-	int seed;
+
+	float sMass = PI * dot(radi, radi);
+	glm::vec3 sForce = glm::vec3(0.f, -9.81 / 10.f, 0.f);
+	glm::vec3 sVelocity = glm::vec3(0.f);
 public:
 	
 	Sphere(GLFWwindow* _window, glm::vec3 _objPos, glm::vec3 _radi, float _objScale, int _level, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
@@ -35,6 +38,11 @@ public:
 
 	// Ellipsoid intersection test.
 	glm::vec3 isRayTouching(glm::vec3 _rayStart, glm::vec3 _rayDir);
+
+	void calculateNewPos(glm::vec3 _newForce, float _timeElapsed);
+	void resolveCollision(Sphere* _sphere, float _t);
+	void applyBounds();
+
 };
 
 #endif

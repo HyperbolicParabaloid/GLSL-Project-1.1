@@ -40,10 +40,11 @@ private:
 
 protected:
 	std::vector <Texture> textures;
+	bool randomColor;
+	int seed;
 
 public:
 	int level;
-	bool randomColor;
 	bool smooth;
 	glm::vec3 radi;
 	std::string name;
@@ -64,6 +65,7 @@ public:
 	virtual void setVBOandEBO(std::string msg);
 	virtual void setLevel(int _level);
 	virtual void doRandomColors(bool _randomColor);
+	bool getRandomColor();
 	virtual void smoothSurface(bool _isSmooth);
 	
 	

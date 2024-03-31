@@ -15,8 +15,6 @@ private:
 	void genWall(glm::vec3 _startPos, glm::vec3 _endPos, glm::vec3 _startRadi, glm::vec3 _endRadi, glm::vec2 _angles, int& _indCount);
 	int numVertsPerSide(int _level);
 	
-	bool randomColor;
-
 	glm::vec3 bottomRadius;
 	glm::vec3 topRadius;
 	glm::vec3 pointPos;
@@ -26,7 +24,6 @@ private:
 
 	glm::vec4 shaftColor, coneColor;
 
-	int seed;
 public:
 	Arrow(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, glm::vec3 _bottomRadius, glm::vec3 _topRadius, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
 	Arrow(GLFWwindow* _window, glm::vec3 _objPos, float _objScale, int _level, glm::vec3 _bottomRadius, glm::vec3 _topRadius, glm::vec3 _radi, glm::vec3 _pointPos, bool _isSmooth, glm::vec4 _shaftColor, glm::vec4 _coneColor, std::vector <Texture>& _textures, Camera* _camera);
