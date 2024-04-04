@@ -492,7 +492,7 @@ int main()
 	int level = 5;
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 sphere1Radi = glm::vec3(0.2f);// / 25.f);
-	unsigned int iSphereInstances = 200;
+	unsigned int iSphereInstances = 150;
 	InstanceSphere iSphere(window, iSphereInstances, sphere1Pos, sphere1Radi, 1.0f, level, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 	
 

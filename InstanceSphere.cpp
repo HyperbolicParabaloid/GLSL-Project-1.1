@@ -90,11 +90,11 @@ void InstanceSphere::genOctahedron() {
 	// Whenever we generate a new set a vertices and indices, we want to wipe the old ones.
 	// In the future it'd be better to just add in the new vertices and update indices instead
 	// of clearing both indices and verts and starting over but it's fine for now.
-	//verticesGeneral.clear();
-	//verticesIBall.clear();
-	//balls.clear();
-	//indices.clear();
-	//vertices.clear();
+	verticesGeneral.clear();
+	verticesIBall.clear();
+	balls.clear();
+	indices.clear();
+	vertices.clear();
 
 	if (level < 1)
 		level = 1;
@@ -276,9 +276,9 @@ void InstanceSphere::genBalls() {
 		float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		float r3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		glm::vec4 ballColor = glm::vec4(r1, r2, r3, color.w);
-		float r = 0.2f;// glm::clamp(r1, 0.2f, 1.f);
+		float r = glm::clamp(r1, 0.2f, 1.f);
 		verticesIBall.push_back(VertexIBall{ newPos, glm::vec3(r), ballColor});
-		balls.push_back(new Ball{ 1.f, glm::vec3(0.f), glm::vec3(0.f), newPos, glm::vec4(1.f), glm::vec3(r) });
+		balls.push_back(new Ball{ 10.f * r, glm::vec3(0.f), glm::vec3(0.f), newPos, glm::vec4(1.f), glm::vec3(r) });
 		std::cout << "Added [" << i << "]\n";
 	}
 }
@@ -373,14 +373,11 @@ void InstanceSphere::resolveCollision(int bIndex1, int bIndex2, float _t) {
 
 	// Ray from our sphere to b2.
 	glm::vec3 meToThem = b2->ballPos - b1->ballPos;
-	
-	float radius = radi.x;
-	float distance = radius * radius * 4.f;
-	//float distance = b2->ballRadi.x * b1->ballRadi.x * 4.f;
-	float separation = glm::dot(meToThem, meToThem);
 
 	// If the two spheres are touching
-	if (separation < distance) {
+	float separation = glm::dot(meToThem, meToThem);
+	float distance = b1->ballRadi.x + b2->ballRadi.x;
+	if (separation < distance * distance) {
 
 		glm::vec3 collisionNormal = glm::normalize(meToThem);
 
@@ -398,15 +395,15 @@ void InstanceSphere::resolveCollision(int bIndex1, int bIndex2, float _t) {
 		float v1f_normal = (v1i_normal * (m1 - m2) + 2 * m2 * v2i_normal) / (m1 + m2);
 		float v2f_normal = (v2i_normal * (m2 - m1) + 2 * m1 * v1i_normal) / (m1 + m2);
 
-		// Shifting the spheres outside of each other.
-		float overlap = distance - separation;
-		b1->ballPos -= collisionNormal * overlap * 1.5f;
-		b2->ballPos += collisionNormal * overlap * 1.5f;
-
 		// Set final velocities
 		// Apply restitution only to the component of velocity along collision normal
 		b1->sVelocity = v1i + abs(v1f_normal - v1i_normal) * -collisionNormal * restitution;
 		b2->sVelocity = v2i + abs(v2f_normal - v2i_normal) * collisionNormal * restitution;
+
+		// Shifting the spheres outside of each other.
+		float overlap = distance - glm::length(meToThem);
+		b1->ballPos -= collisionNormal * overlap * .5f;
+		b2->ballPos += collisionNormal * overlap * .5f;
 	}
 }
 /*
