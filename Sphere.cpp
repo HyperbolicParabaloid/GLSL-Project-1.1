@@ -85,6 +85,27 @@ void Sphere::genTriangles() {
 	genOctahedron();
 	//setVBOandEBO(verts, indices, "Sphere");
 	setVBOandEBO("Sphere");
+	//std::cout << "NEW SPHERE\n";
+	for (int i = 0; i < indices.size(); i+=3) {
+		glm::vec3 v0 = vertices[i + 0].pos;
+		glm::vec3 v1 = vertices[i + 1].pos;
+		glm::vec3 v2 = vertices[i + 2].pos;
+		
+		//std::cout << "gl_Position = data_in[0].projection * vec3(" << v0.x << ", " << v0.z << ", " << v0.z << ");\n";
+		//std::cout << "Normal = vec3(" << v0.x << ", " << v0.z << ", " << v0.z << ");\n";
+		//std::cout << "EmitVertex();\n\n";
+		//
+		//std::cout << "gl_Position = data_in[0].projection * vec3(" << v1.x << ", " << v1.z << ", " << v1.z << ");\n";
+		//std::cout << "Normal = vec3(" << v1.x << ", " << v1.z << ", " << v1.z << ");\n";
+		//std::cout << "EmitVertex();\n\n";
+		//
+		//std::cout << "gl_Position = data_in[0].projection * vec3(" << v2.x << ", " << v2.z << ", " << v2.z << ");\n";
+		//std::cout << "Normal = vec3(" << v2.x << ", " << v2.z << ", " << v2.z << ");\n";
+		//std::cout << "EmitVertex();\n";
+		//std::cout << "EndPrimitive();\n\n";
+
+	}
+	//std::cout << "END SPHERE\n\n";
 }
 
 void Sphere::genOctahedron() {

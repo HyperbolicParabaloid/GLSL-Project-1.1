@@ -152,6 +152,7 @@
     <ClCompile Include="Cone.cpp" />
     <ClCompile Include="EditingSphere.cpp" />
     <ClCompile Include="HashTable.cpp" />
+    <ClCompile Include="InstanceSphere.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Sphere.cpp" />
@@ -180,6 +181,9 @@
     <None Include="GEOMETRY_TEST.vert" />
     <None Include="grass.frag" />
     <None Include="grass.vert" />
+    <None Include="Instance_Sphere.frag" />
+    <None Include="Instance_Sphere.geom" />
+    <None Include="Instance_Sphere.vert" />
     <None Include="light.frag" />
     <None Include="light.vert" />
     <None Include="object.frag" />
@@ -197,6 +201,7 @@
     <ClInclude Include="Cone.h" />
     <ClInclude Include="EditingSphere.h" />
     <ClInclude Include="HashTable.h" />
+    <ClInclude Include="InstanceSphere.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Sphere.h" />

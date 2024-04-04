@@ -8,6 +8,8 @@
 #include"Tree.h"
 #include"HashTable.h"
 #include"EditingSphere.h"
+#include"InstanceSphere.h"
+
 
 float rand(glm::vec2 co) {
 	return glm::fract(sin(glm::dot(co, glm::vec2(12.9898, 78.233))) * 43758.5453);
@@ -437,15 +439,15 @@ int main()
 	glm::vec3 cube3Pos = glm::vec3(0.0f, 2.f, -2.5f);
 	Cube cube3(window, cube3Pos, 1.f, glm::vec4(.1f, .8f, .3f, 1.f), empty, &camera);
 	// Spheres.
-	int level = 5;
-	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 sphere1Radi = glm::vec3(0.2f);// / 25.f);
-	Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.0f, level, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
-	Sphere sphere1Mirror(window, sphere1Pos, sphere1Radi, 1.0f, level, true, glm::vec4(0.f, .0f, .1f, 0.25f), empty, &camera);
-	// Spheres.
-	glm::vec3 sphere2Pos = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 sphere2Radi = glm::vec3(1.f, 1.f, 1.0f);
-	Sphere sphere2(window, sphere2Pos, sphere2Radi, 0.2f, 5, true, glm::vec4(1.0f, .1f, .1f, 1.f), empty, &camera);
+	//int level = 5;
+	//glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
+	//glm::vec3 sphere1Radi = glm::vec3(0.2f);// / 25.f);
+	//Sphere sphere1(window, sphere1Pos, sphere1Radi, 1.0f, level, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
+	//Sphere sphere1Mirror(window, sphere1Pos, sphere1Radi, 1.0f, level, true, glm::vec4(0.f, .0f, .1f, 0.25f), empty, &camera);
+	//// Spheres.
+	//glm::vec3 sphere2Pos = glm::vec3(0.0f, 0.0f, 0.0f);
+	//glm::vec3 sphere2Radi = glm::vec3(1.f, 1.f, 1.0f);
+	//Sphere sphere2(window, sphere2Pos, sphere2Radi, 0.2f, 5, true, glm::vec4(1.0f, .1f, .1f, 1.f), empty, &camera);
 	// Cones.
 	glm::vec3 conePos = glm::vec3(0.f, 1.f, -1.f);
 	float coneScale = 1.f;
@@ -484,9 +486,17 @@ int main()
 	bool trackingSphere = true;
 
 	std::vector <Sphere*> sphereList;
+
+
+
+	int level = 5;
+	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 sphere1Radi = glm::vec3(0.2f);// / 25.f);
+	unsigned int iSphereInstances = 200;
+	InstanceSphere iSphere(window, iSphereInstances, sphere1Pos, sphere1Radi, 1.0f, level, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 	
 
-	for (int i = 0; i < 100; i++) {
+	for (int i = 0; i < 0; i++) {
 		// Spheres.
 		// Setting the colors of the object:
 		float r1 = static_cast <float> (rand(glm::vec2(i, int(pow(2, i % 3)) % 65335)));
@@ -498,28 +508,24 @@ int main()
 		float y = static_cast <float> (rand(glm::vec2(i, int(pow(6, i % 13)) % 65335)));
 		float z = static_cast <float> (rand(glm::vec2(i, int(pow(7, i % 17)) % 65335))) * 2.f - 1.f;
 		glm::vec3 newSpherePos = glm::vec3(x, y + 5.f, z) * 9.f;
-
-
-		std::cout << "Sphere[" << i << "]\n";
-		std::cout << "newSphereColor = (" << newSphereColor.x << ", " << newSphereColor.y << ", " << newSphereColor.z << ")\n";
-		std::cout << "newSpherePos = (" << newSpherePos.x << ", " << newSpherePos.y << ", " << newSpherePos.z << ")\n\n";
-
-
 		glm::vec3 newSphereRadi = glm::vec3(0.2f);
+		
+		// Adding new Sphere.
 		sphereList.push_back(new Sphere{ window, newSpherePos, newSphereRadi, 1.f, 5, true, newSphereColor, empty, &camera });
 	}
-	sphereList.push_back(&sphere1);
-	sphereList.push_back(&sphere1Mirror);
+	//sphereList.push_back(&sphere1);
+	//sphereList.push_back(&sphere1Mirror);
 
 
 
-	objectList.push_back(&plane1);
-	//objectList.push_back(&cube3);
 	//objectList.push_back(&sphere1);
-	objectList.push_back(&sphere2);
+	//objectList.push_back(&sphere2);
+	//objectList.push_back(&sphere1Mirror);
+	//objectList.push_back(&cube3);
 	//objectList.push_back(&cone1);
 	//objectList.push_back(&arrow1);
-	//objectList.push_back(&sphere1Mirror);
+	objectList.push_back(&plane1);
+	objectList.push_back(&iSphere);
 	objectList.push_back(&sphere1UI);
 	Object* targetObj = objectList[targetIndex];
 
@@ -529,18 +535,35 @@ int main()
 		glm::vec4 UIColor = glm::vec4(0.f, 1.f, 1.f, 1.f);
 		std::string UIText = toUppercase(objectList[o]->name) + " (" + std::to_string(o) + ")";
 		glm::vec3 UIPos = glm::vec3(0.f, 0.f, 0.f);
-
 		float UITextScale;
 		if (objectListSize > 32)
 			UITextScale = 1.f / objectListSize; // objectListSize characters per line.
 		else
 			UITextScale = 1.f / 32.f; // 32 characters per line
-
 		float textOffset = 0.5f / UITextScale;
 		glm::vec2 UIRasterCoords = glm::vec2(1 - (UIText.length() / textOffset), 1 - (o / textOffset)); // -1 -> 1
 
 		objectList.push_back(new UI{ window, UIPos, UIRasterCoords, UICanvasRadi, UITextScale, UIText, intDict, UIColor, ObamaTex, &camera });
 	}
+
+
+
+	glm::vec3 UICanvasRadi = glm::vec3(1.f);
+	glm::vec4 UIColor = glm::vec4(0.f, 1.f, 1.f, 1.f);
+	std::string UIText ="REPELLING FORCE (" + std::to_string(objectListSize) + ")";
+	glm::vec3 UIPos = glm::vec3(0.f, 0.f, 0.f);
+
+	float UITextScale;
+	if (objectListSize > 32)
+		UITextScale = 1.f / objectListSize; // objectListSize characters per line.
+	else
+		UITextScale = 1.f / 32.f; // 32 characters per line
+
+	float textOffset = 0.5f / UITextScale;
+	glm::vec2 UIRasterCoords = glm::vec2(1 - (UIText.length() / textOffset), 1 - (objectListSize / textOffset)); // -1 -> 1
+
+	objectList.push_back(new UI{ window, UIPos, UIRasterCoords, UICanvasRadi, UITextScale, UIText, intDict, UIColor, ObamaTex, &camera });
+
 
 
 	bool first = true;
@@ -571,6 +594,8 @@ int main()
 	double crntTime = 0.f, prevTime = 0.f;
 
 	bool rotate = true;
+
+	bool isRepelling = false;
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window))
@@ -631,20 +656,23 @@ int main()
 			FPSCount++;
 
 
-		glm::vec3 gravity = glm::vec3(0.f, -9.81f * 10.f, 0.f);
-		for (int s1i = 0; s1i < sphereList.size(); s1i++) {
-			Sphere* s1 = sphereList[s1i];
-			glm::vec3 newForceDir = (sphere2.objPos - s1->objPos);
-			glm::vec3 newForce = newForceDir / glm::clamp(glm::dot(newForceDir, newForceDir) / 100.f, 0.001f, 100.f);
-			s1->calculateNewPos(newForce, timeDelta);
-			s1->calculateNewPos(gravity, timeDelta);
-			for (int s2i = 0; s2i < sphereList.size(); s2i++) {
-				if (s1i != s2i) {
-					Sphere* s2 = sphereList[s2i];
-					s1->resolveCollision(s2, timeDelta);
-				}
-			}
-		}
+		//glm::vec3 gravity = glm::vec3(0.f, -9.81f * 10.f, 0.f);
+		//for (int s1i = 0; s1i < sphereList.size(); s1i++) {
+		//	Sphere* s1 = sphereList[s1i];
+		//	glm::vec3 newForceDir = (sphere2.objPos - s1->objPos);
+		//	glm::vec3 newForce = newForceDir / glm::clamp(glm::dot(newForceDir, newForceDir) / 100.f, 0.001f, 100.f);
+		//	if (isRepelling)
+		//		s1->calculateNewPos(-newForce, timeDelta);
+		//	else
+		//		s1->calculateNewPos(newForce, timeDelta);
+		//	s1->calculateNewPos(gravity, timeDelta);
+		//	for (int s2i = 0; s2i < sphereList.size(); s2i++) {
+		//		if (s1i != s2i) {
+		//			Sphere* s2 = sphereList[s2i];
+		//			s1->resolveCollision(s2, timeDelta);
+		//		}
+		//	}
+		//}
 
 
 
@@ -765,7 +793,7 @@ int main()
 			glm::vec3 closestPos = glm::vec3(10000.f);
 			int closestIndex = -1;
 			for (int o = 0; o < objectList.size(); o++) {
-				if (o == 3)
+				if (o == 1)
 					continue;
 				Object* obj = objectList[o];
 				glm::vec3 transformedPos = obj->isRayTouching(camPos, cursorRay);
@@ -777,7 +805,7 @@ int main()
 				}
 			}
 			if (closestIndex >= 0 && closestIndex < objectListSize) {
-				sphere2.setNewPos(closestPos);
+				//sphere2.setNewPos(closestPos);
 				// Setting background colors of the old/new UI Canvases.
 				objectList[(targetIndex + objectListSize) % objectList.size()]->setColor(glm::vec4(0.f));
 				objectList[(closestIndex + objectListSize) % objectList.size()]->setColor(glm::vec4(1.f));
@@ -807,6 +835,10 @@ int main()
 			if (offset < objectListSize && offset >= 0) {
 				// Checking if the cursor is touching the UI Canvas.
 				if (objectList[(offset + objectListSize) % objectList.size()]->isCursorTouching(cursorPos)) {
+					// Resetting isReppelling.
+					objectList[objectList.size() - 1]->setColor(glm::vec4(0.f));
+
+
 					// Setting background colors of the old/new UI Canvases.
 					objectList[(targetIndex + objectListSize) % objectList.size()]->setColor(glm::vec4(0.f));
 					objectList[(offset + objectListSize) % objectList.size()]->setColor(glm::vec4(1.f));
@@ -816,6 +848,12 @@ int main()
 					targetIndex = offset;
 					targetObj = objectList[offset];
 				}
+			}
+			else if (offset == objectListSize) {
+				objectList[(targetIndex + objectListSize) % objectList.size()]->setColor(glm::vec4(0.f));
+				objectList[(offset + objectListSize) % objectList.size()]->setColor(glm::vec4(1.f));
+				isRepelling = !isRepelling;
+				lockoutTimer = crntTime + 0.2;
 			}
 		}
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
@@ -839,14 +877,18 @@ int main()
 		// Setting view matrix with camera class
 		view = camera.get_view();
 
-		// Drawing all the Objects in the list.
-		for (auto obj : objectList)
-			obj->draw(lightPos, lightColor);
 
 
 		// Drawing all the Spheres in the list.
 		for (auto obj : sphereList)
 			obj->draw(lightPos, lightColor);
+
+		// Drawing all the Objects in the list.
+		for (auto obj : objectList)
+			obj->draw(lightPos, lightColor);
+
+
+		
 
 
 

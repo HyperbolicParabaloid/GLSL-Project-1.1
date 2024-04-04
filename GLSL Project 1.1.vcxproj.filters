@@ -81,6 +81,9 @@
     <ClCompile Include="UI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="InstanceSphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="default.vert">
@@ -146,6 +149,15 @@
     <None Include="GEOMETRY_NORMALS.geom">
       <Filter>Resource Files\shaders</Filter>
     </None>
+    <None Include="Instance_Sphere.geom">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="Instance_Sphere.vert">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
+    <None Include="Instance_Sphere.frag">
+      <Filter>Resource Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="shaderClass.h">
@@ -197,6 +209,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="UI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InstanceSphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

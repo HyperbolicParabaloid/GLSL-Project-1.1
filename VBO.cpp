@@ -19,6 +19,21 @@ VBO::VBO(std::vector<VertexUI>& verticesUI) {
 	glBindBuffer(GL_ARRAY_BUFFER, ID);
 	glBufferData(GL_ARRAY_BUFFER, verticesUI.size() * sizeof(VertexUI), verticesUI.data(), GL_DYNAMIC_DRAW);
 }
+VBO::VBO(std::vector<glm::mat4>& models) {
+	glGenBuffers(1, &ID);
+	glBindBuffer(GL_ARRAY_BUFFER, ID);
+	glBufferData(GL_ARRAY_BUFFER, models.size() * sizeof(glm::mat4), models.data(), GL_DYNAMIC_DRAW);
+}
+VBO::VBO(std::vector<VertexI>& vertexI) {
+	glGenBuffers(1, &ID);
+	glBindBuffer(GL_ARRAY_BUFFER, ID);
+	glBufferData(GL_ARRAY_BUFFER, vertexI.size() * sizeof(VertexI), vertexI.data(), GL_STATIC_DRAW);
+}
+VBO::VBO(std::vector<VertexIBall>& vertexIBall) {
+	glGenBuffers(1, &ID);
+	glBindBuffer(GL_ARRAY_BUFFER, ID);
+	glBufferData(GL_ARRAY_BUFFER, vertexIBall.size() * sizeof(VertexIBall), vertexIBall.data(), GL_DYNAMIC_DRAW);
+}
 
 // Binds the VBO
 void VBO::Bind()

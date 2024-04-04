@@ -15,6 +15,16 @@ struct Vertex {
 struct VertexUI {
 	glm::vec3 pos = glm::vec3(0.f);	glm::vec3 texCoord;	glm::vec4 color = glm::vec4(0.f);	glm::uvec2 letter = glm::uvec2(0);
 };
+// For instance Sphere class.
+struct VertexI {
+	glm::vec3 pos = glm::vec3(0.f);	glm::vec3 norm = glm::vec3(1.f); glm::vec2 texCoord = glm::vec2(0.f);
+};
+
+struct VertexIBall {
+	glm::vec3 ballPos = glm::vec3(0.f);	
+	glm::vec3 ballRadi = glm::vec3(0.f); 
+	glm::vec4 color = glm::vec4(1.f);
+};
 struct Triangle {
 	Triangle(Vertex* _v1, Vertex* _v2, Vertex* _v3, glm::mat4* _model) {
 		model = _model;
@@ -67,6 +77,9 @@ public:
 	VBO(GLfloat* vertices, GLsizeiptr size);
 	VBO(std::vector<Vertex>& vertices);
 	VBO(std::vector<VertexUI>& verticesUI);
+	VBO(std::vector<glm::mat4>& models);
+	VBO(std::vector<VertexI>& vertexI);
+	VBO(std::vector<VertexIBall>& vertexIBall);
 
 	// Binds the VBO
 	void Bind();
