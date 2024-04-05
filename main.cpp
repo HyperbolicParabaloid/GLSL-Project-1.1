@@ -9,6 +9,7 @@
 #include"HashTable.h"
 #include"EditingSphere.h"
 #include"InstanceSphere.h"
+#include"Slider.h"
 
 
 float rand(glm::vec2 co) {
@@ -527,6 +528,20 @@ int main()
 	objectList.push_back(&plane1);
 	objectList.push_back(&iSphere);
 	objectList.push_back(&sphere1UI);
+
+	std::vector<Slider*> sldierList;
+	glm::vec3 sliderPos			= glm::vec3(.5f, .5f, 0.f);
+	glm::vec2 sliderTextOffset	= glm::vec2(0.0f);
+	glm::vec3 sliderRadi		= glm::vec3(0.25f);
+	float sliderTextScale		= 1.f / 6;
+	std::string sliderLabel		= "SLIDER";
+	glm::vec4 sliderColor		= glm::vec4(0.4f, 0.2, 0.2, 1.f);
+	sldierList.push_back(new Slider{ window, glm::vec2(0.f, -0.2f), glm::vec2(0.f, 0.2f), sliderPos, sliderTextOffset, sliderRadi, sliderTextScale, sliderLabel, intDict, sliderColor, empty, &camera});
+	
+	
+	
+	
+	
 	Object* targetObj = objectList[targetIndex];
 
 	int objectListSize = objectList.size();
@@ -548,21 +563,7 @@ int main()
 
 
 
-	glm::vec3 UICanvasRadi = glm::vec3(1.f);
-	glm::vec4 UIColor = glm::vec4(0.f, 1.f, 1.f, 1.f);
-	std::string UIText ="REPELLING FORCE (" + std::to_string(objectListSize) + ")";
-	glm::vec3 UIPos = glm::vec3(0.f, 0.f, 0.f);
-
-	float UITextScale;
-	if (objectListSize > 32)
-		UITextScale = 1.f / objectListSize; // objectListSize characters per line.
-	else
-		UITextScale = 1.f / 32.f; // 32 characters per line
-
-	float textOffset = 0.5f / UITextScale;
-	glm::vec2 UIRasterCoords = glm::vec2(1 - (UIText.length() / textOffset), 1 - (objectListSize / textOffset)); // -1 -> 1
-
-	objectList.push_back(new UI{ window, UIPos, UIRasterCoords, UICanvasRadi, UITextScale, UIText, intDict, UIColor, ObamaTex, &camera });
+	
 
 
 
@@ -855,6 +856,11 @@ int main()
 				isRepelling = !isRepelling;
 				lockoutTimer = crntTime + 0.2;
 			}
+
+
+			for (auto slider : sldierList)
+				if (slider->isCursorTouching(cursorPos))
+					slider->drag(cursorPos);
 		}
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
 			rotate = !rotate;
@@ -878,16 +884,13 @@ int main()
 		view = camera.get_view();
 
 
-
-		// Drawing all the Spheres in the list.
-		for (auto obj : sphereList)
-			obj->draw(lightPos, lightColor);
-
 		// Drawing all the Objects in the list.
 		for (auto obj : objectList)
 			obj->draw(lightPos, lightColor);
 
-
+		// Drawing all the Spheres in the list.
+		for (auto obj : sldierList)
+			obj->draw(lightPos, lightColor);
 		
 
 

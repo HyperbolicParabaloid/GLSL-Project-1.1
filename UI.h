@@ -14,17 +14,18 @@ private:
 	bool isSmooth;
 	bool randomColor;
 
-	float characterScale;
-	std::string text;
-
 	int seed;
 	int realLetters;
 	float xCount;
 	float yCount;
 
+protected:
 	glm::vec2 textOffset;
-
 	glm::vec4 backgroundColor;
+	float characterScale;
+	std::string text;
+	std::string toUppercase(std::string _str);
+
 public:
 	UI(GLFWwindow* _window, glm::vec3 _objPos, glm::vec2 _textOffset, glm::vec3 _radi, float _characterScale, std::string _text, glm::uvec2(&_dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera);
 	~UI();

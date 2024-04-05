@@ -22,7 +22,7 @@ struct VertexI {
 
 struct VertexIBall {
 	glm::vec3 ballPos = glm::vec3(0.f);	
-	glm::vec3 ballRadi = glm::vec3(0.f); 
+	glm::vec3 ballRadi = glm::vec3(1.f); 
 	glm::vec4 color = glm::vec4(1.f);
 };
 struct Triangle {

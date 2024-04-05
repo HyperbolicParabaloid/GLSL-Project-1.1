@@ -155,6 +155,7 @@
     <ClCompile Include="InstanceSphere.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Plane.cpp" />
+    <ClCompile Include="Slider.cpp" />
     <ClCompile Include="Sphere.cpp" />
     <ClCompile Include="Cube.cpp" />
     <ClCompile Include="EBO.cpp" />
@@ -204,6 +205,7 @@
     <ClInclude Include="InstanceSphere.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Plane.h" />
+    <ClInclude Include="Slider.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Cube.h" />
     <ClInclude Include="EBO.h" />

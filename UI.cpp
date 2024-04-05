@@ -1,4 +1,13 @@
 #include "UI.h"
+// Converts any lowercase letters in string to uppercase.
+std::string UI::toUppercase(std::string _str) {
+	// 65->90 = A->Z;
+	// 97->122 = A->Z;
+	for (int i = 0; i < _str.length(); i++)
+		if (_str[i] >= 97 && _str[i] <= 122)
+			_str[i] = _str[i] - ('a' - 'A');
+	return _str;
+}
 
 // Constructor for Plane.
 UI::UI(GLFWwindow* _window, glm::vec3 _objPos, glm::vec2 _textOffset, glm::vec3 _radi, float _characterScale, std::string _text, glm::uvec2 (&_dictionary)[100], glm::vec4 _color, std::vector <Texture>& _textures, Camera* _camera) : Object(_window, _objPos, _characterScale, _color, _textures, _camera) {
@@ -14,6 +23,7 @@ UI::UI(GLFWwindow* _window, glm::vec3 _objPos, glm::vec2 _textOffset, glm::vec3 
 	backgroundColor = glm::vec4(0.f);
 
 	textOffset = _textOffset;
+	name = "UI";
 	genTriangles();
 }
 
@@ -26,7 +36,6 @@ void UI::setVBOandEBO(std::string msg) {
 	// Generates Shader object using shaders ui.vert and ui.frag
 	delete shaderProgram;
 	
-	name = msg;
 	shaderProgram = new Shader("ui.vert", "ui.frag");
 	
 	shaderProgram->Activate();
