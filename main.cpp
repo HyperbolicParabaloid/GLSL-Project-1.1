@@ -493,7 +493,7 @@ int main()
 	int level = 5;
 	glm::vec3 sphere1Pos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 sphere1Radi = glm::vec3(0.2f);// / 25.f);
-	unsigned int iSphereInstances = 150;
+	unsigned int iSphereInstances = 550;
 	InstanceSphere iSphere(window, iSphereInstances, sphere1Pos, sphere1Radi, 1.0f, level, true, glm::vec4(.8f, .2f, .5f, 1.f), empty, &camera);
 	
 
@@ -529,15 +529,23 @@ int main()
 	objectList.push_back(&iSphere);
 	objectList.push_back(&sphere1UI);
 
-	std::vector<Slider*> sldierList;
-	glm::vec3 sliderPos			= glm::vec3(.5f, .5f, 0.f);
+	std::vector<Slider*> sliderList;
+	glm::vec3 sliderPos			= glm::vec3(-.10f, .5f, 0.f);
 	glm::vec2 sliderTextOffset	= glm::vec2(0.0f);
-	glm::vec3 sliderRadi		= glm::vec3(0.25f);
-	float sliderTextScale		= 1.f / 6;
-	std::string sliderLabel		= "SLIDER";
+	glm::vec3 sliderRadi		= glm::vec3(.25f, .75f, 1.f);
+	float sliderTextScale		= 1.f / 12;
+	std::string sliderLabel		= "DAMPENING";
 	glm::vec4 sliderColor		= glm::vec4(0.4f, 0.2, 0.2, 1.f);
-	sldierList.push_back(new Slider{ window, glm::vec2(0.f, -0.2f), glm::vec2(0.f, 0.2f), sliderPos, sliderTextOffset, sliderRadi, sliderTextScale, sliderLabel, intDict, sliderColor, empty, &camera});
+	sliderList.push_back(new Slider{ window, 1.f, glm::vec2(0.f, -0.2f), glm::vec2(0.f, 0.2f), sliderPos, sliderTextOffset, sliderRadi, sliderTextScale, sliderLabel, intDict, sliderColor, empty, &camera});
 	
+	glm::vec3 sensSliderPos = glm::vec3(.40f, .5f, 0.f);
+	glm::vec2 sensSliderTextOffset = glm::vec2(0.0f);
+	glm::vec3 sensSliderRadi = glm::vec3(.25f, .75f, 1.f);
+	float sensSliderTextScale = 1.f / 12;
+	std::string sensSliderLabel = "SENSITIVITY";
+	glm::vec4 sensSliderColor = glm::vec4(0.9f, 0.2, 0.2, 1.f);
+	sliderList.push_back(new Slider{ window, 10.0f, glm::vec2(0.f, -0.2f), glm::vec2(0.f, 0.2f), sensSliderPos, sensSliderTextOffset, sensSliderRadi, sensSliderTextScale, sensSliderLabel, intDict, sensSliderColor, empty, &camera });
+
 	
 	
 	
@@ -858,9 +866,19 @@ int main()
 			}
 
 
-			for (auto slider : sldierList)
-				if (slider->isCursorTouching(cursorPos))
-					slider->drag(cursorPos);
+			for (int s = 0; s < sliderList.size(); s++) {
+				Slider* slider = sliderList[s];
+				if (slider->isCursorTouching(cursorPos)) {
+					if (s == 0) {
+						slider->drag(cursorPos);
+						iSphere.setVelocityDampeningRestitution(slider->getValue());
+					}
+					else {
+						slider->drag(cursorPos);
+						iSphere.setDampeningSensitivity(slider->getValue());
+					}
+				}
+			}
 		}
 		if (GLFW_PRESS == glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) && lockoutTimer <= crntTime) {
 			rotate = !rotate;
@@ -889,7 +907,7 @@ int main()
 			obj->draw(lightPos, lightColor);
 
 		// Drawing all the Spheres in the list.
-		for (auto obj : sldierList)
+		for (auto obj : sliderList)
 			obj->draw(lightPos, lightColor);
 		
 

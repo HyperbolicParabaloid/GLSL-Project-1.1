@@ -40,7 +40,9 @@ private:
 
 	unsigned int instances;
 	unsigned int instancesVBO_ID;
-	float restitution = 0.3f;
+	float restitution = 0.4f;
+	float velocityDampeningRestitution = 1.f;
+	float dampeningSensitivity = 0.f;
 
 public:
 
@@ -61,6 +63,8 @@ public:
 
 	void setVBOandEBO(std::string msg);
 	void draw(glm::vec3 _lightPos, glm::vec4 _lightColor);
+	void setVelocityDampeningRestitution(float _dampeningValue);
+	void setDampeningSensitivity(float _sensitivityValue);
 
 };
 

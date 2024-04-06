@@ -46,6 +46,7 @@ void UI::setVBOandEBO(std::string msg) {
 	// Setting VBO and EBO
 	// Generates Vertex Buffer Object and links it to vertices
 	VBO VBO(verticesUI);
+	VBO_ID = VBO.ID;
 	// Generates Element Buffer Object and links it to indices
 	EBO EBO(indices);
 	
@@ -111,6 +112,11 @@ void UI::setNewString(std::string _code, bool _removeFormatting) {
 	glm::vec3 texCoord3 = glm::vec3(-1.f, -1.f, 0.f);
 	glm::vec3 texCoord4 = glm::vec3(1.f, -1.f, 0.f);
 
+	// Killing old info.
+	verticesUI.clear();
+	indices.clear();
+
+
 	// Setting color;
 	glm::vec4 clr = color;
 
@@ -120,7 +126,7 @@ void UI::setNewString(std::string _code, bool _removeFormatting) {
 	int indicesCount = 0;
 
 	// Getting lengths.
-	int crntTextLength = verticesUI.size() / 4;
+	int crntTextLength = 0;
 	int newTextLength = _code.length();
 	
 	for (int i = 0; i < newTextLength; i++) {
@@ -150,57 +156,36 @@ void UI::setNewString(std::string _code, bool _removeFormatting) {
 			yCount += 1.f;
 		}
 
-
 		// Setting the character to be displayed.
 		glm::uvec2 character = dictionary[int(c) % 100];
-		if (i < crntTextLength) {
-			verticesUI[indicesCount + 0].letter = character;
-			verticesUI[indicesCount + 1].letter = character;
-			verticesUI[indicesCount + 2].letter = character;
-			verticesUI[indicesCount + 3].letter = character;
-			if (_removeFormatting) {
-				// Setting the character to be displayed.
-				verticesUI[indicesCount + 0].pos = pos1;
-				verticesUI[indicesCount + 1].pos = pos2;
-				verticesUI[indicesCount + 2].pos = pos3;
-				verticesUI[indicesCount + 3].pos = pos4;
-			}
-		}
-		else {
-
-			// Adding Vertex info to vector.
-			verticesUI.push_back(VertexUI{ pos1, texCoord1, clr, character });
-			verticesUI.push_back(VertexUI{ pos2, texCoord2, clr, character });
-			verticesUI.push_back(VertexUI{ pos3, texCoord3, clr, character });
-			verticesUI.push_back(VertexUI{ pos4, texCoord4, clr, character });
-
-			// Lower left triangle.
-			indices.push_back(indicesCount + 0);
-			indices.push_back(indicesCount + 2);
-			indices.push_back(indicesCount + 3);
-			// Upper right triangle.
-			indices.push_back(indicesCount + 0);
-			indices.push_back(indicesCount + 3);
-			indices.push_back(indicesCount + 1);
-		}
+		
+		// Adding Vertex info to vector.
+		verticesUI.push_back(VertexUI{ pos1, texCoord1, clr, character });
+		verticesUI.push_back(VertexUI{ pos2, texCoord2, clr, character });
+		verticesUI.push_back(VertexUI{ pos3, texCoord3, clr, character });
+		verticesUI.push_back(VertexUI{ pos4, texCoord4, clr, character });
+		
+		// Lower left triangle.
+		indices.push_back(indicesCount + 0);
+		indices.push_back(indicesCount + 2);
+		indices.push_back(indicesCount + 3);
+		// Upper right triangle.
+		indices.push_back(indicesCount + 0);
+		indices.push_back(indicesCount + 3);
+		indices.push_back(indicesCount + 1);
 		// Increment indices counter by 4 to move to next letter square.
 		indicesCount += 4;
 	}
-
-	// Polishing off removing previous text.
-	if (text.length() > _code.length())
-		for (int i = 0; i < text.length() - _code.length(); i++) {
-			glm::uvec2 space = dictionary[0];
-			verticesUI[indicesCount + 0].letter = space;
-			verticesUI[indicesCount + 1].letter = space;
-			verticesUI[indicesCount + 2].letter = space;
-			verticesUI[indicesCount + 3].letter = space;
-		}
-
-
-	// Finally, setting text equal to the new string (_code) and binding the vertexUI to the VAO. 
+	
+	// Finally, setting text equal to the new string (_code) and binding the vertexUI to the VAO.
+	if (text.length() == _code.length()) {
+		glBindBuffer(GL_ARRAY_BUFFER, VBO_ID);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, verticesUI.size() * sizeof(VertexIBall), &verticesUI[0]);
+	}
+	else {
+		setVBOandEBO("UI");
+	}
 	text = _code;
-	setVBOandEBO("UI");
 }
 
 // Sets the string to something else.
@@ -350,8 +335,6 @@ void UI::setNewNumber(double _num, int _precision) {
 
 // Appends current string with anther string.
 void UI::appendString(std::string _code) {
-	//text += _code;
-	//setNewString(text);
 	// Setting the texture coords.
 	glm::vec3 texCoord1 = glm::vec3(-1.f, 1.f, 0.f);
 	glm::vec3 texCoord2 = glm::vec3(1.f, 1.f, 0.f);
@@ -366,6 +349,10 @@ void UI::appendString(std::string _code) {
 	int crntTextLength = text.length();
 	int vertexIndex = crntTextLength * 4;
 	int newTextLength = _code.length();
+
+	// This is required for it to function. Not really sure why tbh.
+	//xCount -= 1.f; 
+
 
 	// Basically loops through and adds all the new characters in, but if the square for the character
 	// was already made, and blanked out previously, it just writes the character into that new slot
@@ -456,7 +443,6 @@ void UI::appendNumber(double _num, int _precision) {
 		if (decimals <= i)
 			break;
 	}
-
 	appendString(shortString);
 }
 
@@ -473,7 +459,6 @@ std::string UI::getString() {
 // class for drawing.
 void UI::genTriangles() {
 	genOctahedron();
-	setVBOandEBO("UI");
 }
 
 // Generates the basic retangle with added characters.

@@ -19,6 +19,8 @@ private:
 	float xCount;
 	float yCount;
 
+	unsigned int VBO_ID = 0;
+
 protected:
 	glm::vec2 textOffset;
 	glm::vec4 backgroundColor;

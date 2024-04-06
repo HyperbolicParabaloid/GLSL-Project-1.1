@@ -281,7 +281,9 @@ void InstanceSphere::genBalls() {
 		float r2 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		float r3 = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 		glm::vec4 ballColor = glm::vec4(r1, r2, r3, color.w);
-		float r = 0.8f;// glm::clamp(r1, 0.2f, 1.f);
+		if (i == 0)
+			ballColor = glm::vec4(0.f, 0.f, 0.f, 1.f);
+		float r = glm::clamp(r1, 0.2f, 1.f); // 0.8f;// 
 		verticesIBall.push_back(VertexIBall{ newPos, glm::vec3(r), ballColor });
 		balls.push_back(new Ball{ 1.f, glm::vec3(0.f), glm::vec3(0.f), newPos, glm::vec4(1.f), glm::vec3(r) });
 
@@ -406,9 +408,21 @@ void InstanceSphere::resolveCollision(int bIndex1, int bIndex2, float _t) {
 
 		// Set final velocities
 		// Apply restitution only to the component of velocity along collision normal
-		float restingRestitution = 0.95;
-		b1->sVelocity = (v1i * restingRestitution) + abs(v1f_normal - v1i_normal) * -collisionNormal * restitution;
-		b2->sVelocity = (v2i * restingRestitution) + abs(v2f_normal - v2i_normal) * collisionNormal * restitution;
+
+		//b1->sVelocity = (v1i * velocityDampeningRestitution) + abs(v1f_normal - v1i_normal) * -collisionNormal * restitution;
+		//b2->sVelocity = (v2i * velocityDampeningRestitution) + abs(v2f_normal - v2i_normal) * collisionNormal * restitution;
+		//if (bIndex1 == 0) {
+		//	std::cout << "v1i = (" << v1i.x << ", " << v1i.y << ", " << v1i.z << ")\n";
+		//	std::cout << "dot(v1i) = " << dot(v1i, v1i) << "\n";
+		//}
+		
+		float b1Dampening = float((dot(v1i, v1i) < dampeningSensitivity)) * velocityDampeningRestitution + float(dot(v1i, v1i) >= dampeningSensitivity);
+		float b2Dampening = float((dot(v2i, v2i) < dampeningSensitivity)) * velocityDampeningRestitution + float(dot(v2i, v2i) >= dampeningSensitivity);
+
+		b1->sVelocity = v1i * b1Dampening + abs(v1f_normal - v1i_normal) * -collisionNormal * restitution;
+		b2->sVelocity = v2i * b2Dampening + abs(v2f_normal - v2i_normal) * collisionNormal * restitution;
+
+		
 
 		// Shifting the spheres outside of each other.
 		float overlap = distance - length;
@@ -576,6 +590,14 @@ void InstanceSphere::draw(glm::vec3 _lightPos, glm::vec4 _lightColor) {
 	}
 	else
 		glDrawElements(triangleType, indices.size(), GL_UNSIGNED_INT, 0);
+}
+
+void InstanceSphere::setVelocityDampeningRestitution(float _dampeningValue) {
+	velocityDampeningRestitution = _dampeningValue;
+}
+
+void InstanceSphere::setDampeningSensitivity(float _sensitivityValue) {
+	dampeningSensitivity = _sensitivityValue;
 }
 
 void InstanceSphere::setVBOandEBO(std::string msg) {
